@@ -10,6 +10,9 @@
 
 @interface ViewController : UIViewController
 
+@property (nonatomic, strong) IBOutlet UITapGestureRecognizer *tapGestureRecognizer;
+
+@property (nonatomic, strong) IBOutlet UILabel *startLabel;
 
 @end
 
