@@ -8,18 +8,28 @@
 
 #import "SetupViewController.h"
 
+
 @interface SetupViewController () <UIPickerViewDataSource, UIPickerViewDelegate, UITableViewDataSource, UITableViewDelegate>
 
 @end
 
+NSString * const customName = @"Create custom...";
+
 @implementation SetupViewController
+
+-(NSString *)applicationDocumentsDirectory
+{
+    return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
     // Set up the default array of units and customWorkouts
-    self.defaultUnits = [[NSMutableArray alloc] initWithObjects:@"Pick a unit",@"Reps",@"Km",@"Miles",@"Add custom...", nil];
+    self.defaultUnits = [[NSMutableArray alloc] initWithObjects:@"Choose one...",@"Reps",@"Km",@"Miles",@"Mins", nil];
+    
+    
     self.customWorkouts = [[NSMutableArray alloc] init];
     
     // Custom dictionary
@@ -34,6 +44,7 @@
     // Set up table view
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
+    self.tableView.allowsSelection = YES;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -41,15 +52,57 @@
     // Dispose of any resources that can be recreated.
 }
 
-
 #pragma mark - ACTIONS
+-(IBAction)help:(id)sender {
+    UIAlertController *helpController = [UIAlertController alertControllerWithTitle:@"Instructions of use" message:@"Please enter a workout name and a unit of measurement to match, and continue doing so until you have all your workouts listed below.\n\ne.g. Workout name: Pushups\nUnit of measurement: Reps\n\n Workout name: Cycling\nUnit of measurement: Km" preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault
+                                                    handler:^(UIAlertAction * _Nonnull action) {
+                                                       //nil
+                                                    }];
+    [helpController addAction:dismiss];
+    [self presentViewController:helpController animated:YES completion:nil];
+    
+}
+
+  /*
+-(IBAction)trashEntry:(id)sender {
+    
+    NSLog(@"entry: %@", [self.tableView indexPathForSelectedRow]);
+}*/
+
+-(IBAction)done:(id)sender {
+    if(self.customData.count <= 0) {
+        [self displayAlertwithTitle:@"Error: No entries added" withMessage:@"No workouts have been added.\nTap 'Help' on the top-left for more help."];
+        return;
+    }
+    
+    [self.customData enumerateObjectsUsingBlock:^(NSMutableDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSLog(@"%@ (%@)", [obj valueForKey:@"WorkoutName"], [obj valueForKey:@"UnitOfMeasurement"]);
+    }];
+    [self dismissViewControllerAnimated:YES completion:nil];
+    
+
+    NSString *path = [[self applicationDocumentsDirectory] stringByAppendingPathComponent:@"Setup.plist"];
+    
+    //NSURL *urlPath = [[NSURL alloc] initWithString:path];
+    
+    if(![self.customData writeToFile:path atomically:YES]) {
+        NSLog(@"ERROR: Unable to write to file.");
+    } else {
+    [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"SetupComplete"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+        NSLog(@"Success!");
+    }
+    
+}
+
 -(void)displayWarningAlertWithTitle:(NSString*)title andMessage:(NSString*)message {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [self.textField resignFirstResponder];
         [self.unitPicker becomeFirstResponder];
-        //[alertController dismissViewControllerAnimated:YES completion:nil];
     }];
     [alertController addAction:dismiss];
     [self presentViewController:alertController animated:YES completion:nil];
@@ -66,27 +119,51 @@
 
 -(IBAction)addWorkout:(id)sender {
     // Type check etc,
+    /*
+    if(!self.textField.text) {
+        NSLog(@"ERROR: No name entered!");
+        return;
+    }*/
+    if(!self.textField.text || [self.textField.text isEqualToString:@""]) {
+        [self displayErrorAlertWithTitle:@"ERROR: Empty name" andMessage:@"Please enter a workout name"];
+        return;
+    }
     
-    if(self.textField.text) {
-        if([self.textField.text isEqualToString:@""]) {
-            [self displayErrorAlertWithTitle:@"ERROR" andMessage:@"Please enter a workout name"];
-            return;
-        } else {
+    
     int selectedRow = (int) [self.unitPicker selectedRowInComponent:0];
     
-    //NSLog(@"selected: %i", selectedRow);
     
+    if(![self illegalRowSelected:selectedRow]) {
+            [self addDataWithName:self.textField.text];
+            NSLog(@"Selected: %@", (NSString*)[self.defaultUnits objectAtIndex:selectedRow]);
+            [self.unitPicker selectRow:0 inComponent:0 animated:YES];
+        }
+            /*
     if(selectedRow == -1) {
         NSLog(@"Nothing selected!");
     } else if(selectedRow == 0) {
-        NSLog(@"NOT THAT EITHER");
-        [self displayWarningAlertWithTitle:@"Choose a unit" andMessage:@"Please select a unit of measurement"];
+
     } else {
-        [self addDataWithName:self.textField.text];
-        NSLog(@"Selected: %@", (NSString*)[self.defaultUnits objectAtIndex:selectedRow]);
-    }
+        if([[self.defaultUnits objectAtIndex:selectedRow] isEqualToString:customName]) {
+            NSLog(@"CREATE A CUSTOM ONE!");
+        } else {
+
         }
     }
+        }*/
+}
+-(BOOL)illegalRowSelected:(int)selectedRowIn {
+    if(selectedRowIn == -1) {
+        NSLog(@"Nothing selected!");
+        return YES;
+    } else if(selectedRowIn == 0) {
+        NSLog(@"NOT THAT EITHER");
+        [self displayWarningAlertWithTitle:@"Choose a unit" andMessage:@"Please select a unit of measurement"];
+        return YES;
+    } else {
+        return NO;
+    }
+    
 }
 -(void)addDataWithName:(NSString*)name {
     [self.textField resignFirstResponder];
@@ -138,12 +215,18 @@
     //return self.customWorkouts.count;
     return self.customData.count;
 }
+#pragma mark - TABLEVIEW DELEGATE
+-(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if(editingStyle == UITableViewCellEditingStyleDelete) {
+        [self.customData removeObjectAtIndex:indexPath.row];
+        [self.tableView reloadData];
+    }
+}
+
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *cellIdentifier = @"Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     
-    
-    //cell.textLabel.text = [self.customWorkouts objectAtIndex:indexPath.row];
     NSDictionary *dict = [self.customData objectAtIndex:indexPath.row];
     
     cell.textLabel.text = [NSString stringWithFormat:@"%@ (%@)", [dict valueForKey:@"WorkoutName"], [dict valueForKey:@"UnitOfMeasurement"]];
@@ -181,6 +264,25 @@
 -(BOOL)prefersStatusBarHidden {
     return YES;
 }
+
+#warning Set up a type check that makes sure all data is symbol-free and not too long.
+
+
+-(void)displayAlertwithTitle:(NSString*)title withMessage:(NSString*)message
+{
+    //UIViewController *root = (UIViewController*)[UIApplication sharedApplication].keyWindow.rootViewController;
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
+    
+    
+    UIAlertAction *close = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+       //[root dismissViewControllerAnimated:YES completion:nil];
+    }];
+    
+    [alert addAction:close];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+
 /*
 #pragma mark - Navigation
 
@@ -190,5 +292,7 @@
     // Pass the selected object to the new view controller.
 }
 */
+
+
 
 @end

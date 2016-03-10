@@ -13,10 +13,103 @@
 @end
 
 @implementation AppDelegate
-
+{
+    NSString *applicationDocDir;
+}
++(NSString*)getPath {
+    NSString *applicationDocDir = (NSString*)[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *setupPath = [applicationDocDir stringByAppendingPathComponent:@"Setup.plist"];
+    
+    return setupPath;
+    
+}
+-(NSString *)applicationDocumentsDirectory
+{
+    return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+}
+-(CoreDataHelper *)cdh {
+    if(!_coreDataHelper) {
+        static dispatch_once_t predicate;
+        
+        dispatch_once(&predicate, ^{
+            _coreDataHelper = [CoreDataHelper new];
+        });
+        [_coreDataHelper setupCoreData];
+    }
+    return _coreDataHelper;
+}
++(NSManagedObjectModel*)getModel {
+    if(![self isSetupComplete]) {
+        NSLog(@"ERROR! No data found!");
+        return nil;
+    }
+    NSString *applicationDocDir = (NSString*)[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *setupPath = [applicationDocDir stringByAppendingPathComponent:@"Setup.plist"];
+    
+    NSManagedObjectModel *model = [[NSManagedObjectModel alloc] init];
+        
+    NSEntityDescription *entity = [[NSEntityDescription alloc] init];
+        
+    [entity setName:@"Workout"];
+    [entity setManagedObjectClassName:@"Workout"];
+        
+    NSMutableArray *properties = [NSMutableArray new];
+    
+    NSAttributeDescription *dateAtt = [[NSAttributeDescription alloc] init];
+    [dateAtt setName:@"Date"];
+    [dateAtt setAttributeType:NSDateAttributeType];
+    [dateAtt setOptional:NO];
+    [properties addObject:dateAtt];
+    
+    NSArray *retrievedData = [[NSArray alloc] initWithContentsOfFile:setupPath];
+    if(retrievedData) {
+        [retrievedData enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSString *name = [obj valueForKey:@"WorkoutName"];
+            NSString *unit = [obj valueForKey:@"UnitOfMeasurement"];
+            
+            NSAttributeDescription *attribute = [[NSAttributeDescription alloc] init];
+            [attribute setName:name];
+            [attribute setAttributeType:[self getAttributeType:unit]];
+            [attribute setOptional:YES];
+            [attribute setDefaultValue:0];
+            [properties addObject:attribute];
+        }];
+        
+    }
+    
+    [entity setProperties:properties];
+   
+    [model setEntities:[NSArray arrayWithObject:entity]];
+    return model;
+    
+}
++(NSAttributeType)getAttributeType:(NSString*)infoD {
+    if([infoD isEqualToString:@"Reps"]) {
+        return NSInteger16AttributeType;
+    } else if([infoD isEqualToString:@"Mins"] || [infoD isEqualToString:@"Km"] || [infoD isEqualToString:@"Miles"]) {
+        return NSFloatAttributeType;
+    }
+    NSLog(@"ERROR!! Unable to match attribute!");
+    return NAN;
+}
++(BOOL)isSetupComplete {
+    // Check if MODEL data exists, if yes: return yes
+    // else return NO
+    NSString *applicationDocDir = (NSString*)[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    
+    NSString *setupPath = [applicationDocDir stringByAppendingPathComponent:@"Setup.plist"];
+    
+    if([[[NSUserDefaults standardUserDefaults] valueForKey:@"SetupComplete"] boolValue]) {
+        if([[NSFileManager defaultManager] fileExistsAtPath:setupPath]) {
+            return YES;
+        }
+    }
+    return NO;
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
     return YES;
 }
 

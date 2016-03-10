@@ -7,11 +7,19 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CoreDataHelper.h"
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
+// Access to CoreDataHelper property
+@property (nonatomic, strong, readonly) CoreDataHelper *coreDataHelper;
+
+-(CoreDataHelper*)cdh;
++(BOOL)isSetupComplete;
++(NSManagedObjectModel*)getModel;
++(NSString*)getPath;
 
 @end
 
