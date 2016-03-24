@@ -17,6 +17,12 @@ NSString * const customName = @"Create custom...";
 
 @implementation SetupViewController
 
+#warning Remove spaces from the workout name and replace with underscore (_)
+
+
+#warning Maybe consider replacing the '+' button with 'Add workout'
+ 
+
 -(NSString *)applicationDocumentsDirectory
 {
     return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
@@ -65,11 +71,6 @@ NSString * const customName = @"Create custom...";
     
 }
 
-  /*
--(IBAction)trashEntry:(id)sender {
-    
-    NSLog(@"entry: %@", [self.tableView indexPathForSelectedRow]);
-}*/
 
 -(IBAction)done:(id)sender {
     if(self.customData.count <= 0) {
@@ -84,8 +85,6 @@ NSString * const customName = @"Create custom...";
     
 
     NSString *path = [[self applicationDocumentsDirectory] stringByAppendingPathComponent:@"Setup.plist"];
-    
-    //NSURL *urlPath = [[NSURL alloc] initWithString:path];
     
     if(![self.customData writeToFile:path atomically:YES]) {
         NSLog(@"ERROR: Unable to write to file.");
@@ -118,18 +117,15 @@ NSString * const customName = @"Create custom...";
 }
 
 -(IBAction)addWorkout:(id)sender {
-    // Type check etc,
-    /*
-    if(!self.textField.text) {
-        NSLog(@"ERROR: No name entered!");
-        return;
-    }*/
     if(!self.textField.text || [self.textField.text isEqualToString:@""]) {
         [self displayErrorAlertWithTitle:@"ERROR: Empty name" andMessage:@"Please enter a workout name"];
         return;
     }
     
-    
+    if(![self isValidStringLength:self.textField.text]) {
+        [self displayErrorAlertWithTitle:@"Invalid String Length" andMessage:@"Please keep the workout name below 30 characters."];
+        return;
+    }
     int selectedRow = (int) [self.unitPicker selectedRowInComponent:0];
     
     
@@ -138,19 +134,7 @@ NSString * const customName = @"Create custom...";
             NSLog(@"Selected: %@", (NSString*)[self.defaultUnits objectAtIndex:selectedRow]);
             [self.unitPicker selectRow:0 inComponent:0 animated:YES];
         }
-            /*
-    if(selectedRow == -1) {
-        NSLog(@"Nothing selected!");
-    } else if(selectedRow == 0) {
 
-    } else {
-        if([[self.defaultUnits objectAtIndex:selectedRow] isEqualToString:customName]) {
-            NSLog(@"CREATE A CUSTOM ONE!");
-        } else {
-
-        }
-    }
-        }*/
 }
 -(BOOL)illegalRowSelected:(int)selectedRowIn {
     if(selectedRowIn == -1) {
@@ -165,18 +149,24 @@ NSString * const customName = @"Create custom...";
     }
     
 }
+
 -(void)addDataWithName:(NSString*)name {
     [self.textField resignFirstResponder];
     
     NSString *newName;
     NSString *first = [name substringToIndex:1];
-    newName = [NSString stringWithFormat:@"%@%@", [first uppercaseString], [name substringFromIndex:1]];
+    
+    // Replacing all occurences of spaces ' ' with underscores '_'
+    newName = [[NSString stringWithFormat:@"%@%@", [first uppercaseString], [name substringFromIndex:1]] stringByReplacingOccurrencesOfString:@" " withString:@"_"];
     
     
     if(![self entryAlreadyExists:newName]) {
-        //[self.customWorkouts addObject:newName];
         NSString *unit = [self.defaultUnits objectAtIndex:[self.unitPicker selectedRowInComponent:0]];
+        if([self isValidString:newName]) {
         [self addDictWithName:newName andUnit:unit];
+        } else {
+            [self displayAlertwithTitle:@"Invalid Characters" withMessage:[NSString stringWithFormat:@"The entry '%@' \ncontains illegal characters. No symbols please", newName]];
+        }
         
     } else {
         [self displayWarningAlertWithTitle:@"ERROR" andMessage:@"Workout already exists."];
@@ -265,9 +255,21 @@ NSString * const customName = @"Create custom...";
     return YES;
 }
 
-#warning Set up a type check that makes sure all data is symbol-free and not too long.
 
-
+-(BOOL)isValidStringLength:(NSString*)string {
+    if(string.length > 30) {
+        return NO;
+    }
+    return YES;
+}
+-(BOOL)isValidString:(NSString*)string {
+    NSCharacterSet *set = [[NSCharacterSet characterSetWithCharactersInString:@"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLKMNOPQRSTUVWXYZ0123456789_"] invertedSet];
+    
+    if ([string rangeOfCharacterFromSet:set].location != NSNotFound) {
+        return NO;
+    }
+    return YES;
+}
 -(void)displayAlertwithTitle:(NSString*)title withMessage:(NSString*)message
 {
     //UIViewController *root = (UIViewController*)[UIApplication sharedApplication].keyWindow.rootViewController;

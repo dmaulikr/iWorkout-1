@@ -16,6 +16,7 @@
 {
     NSString *applicationDocDir;
 }
+
 +(NSString*)getPath {
     NSString *applicationDocDir = (NSString*)[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
     NSString *setupPath = [applicationDocDir stringByAppendingPathComponent:@"Setup.plist"];
@@ -38,6 +39,61 @@
     }
     return _coreDataHelper;
 }
++(NSArray*)getWorkouts {
+    NSMutableArray *workouts = [NSMutableArray new];
+    
+    NSString *appDocDir = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *setupPath = [appDocDir stringByAppendingPathComponent:@"Setup.plist"];
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:setupPath]) {
+        /// run these statements
+        
+        NSArray *setupData = [NSArray arrayWithContentsOfFile:setupPath];
+        [setupData enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            [workouts addObject:[NSString stringWithFormat:@"%@", [obj valueForKey:@"WorkoutName"]]];
+        }];
+        
+    } else {
+        NSLog(@"ERROR: Setup file not found.");
+        exit(0);
+    }
+    return [workouts copy];
+}
++(NSArray*)getUnits {
+    NSMutableArray *units = [NSMutableArray new];
+    
+    NSString *appDocDir = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *setupPath = [appDocDir stringByAppendingPathComponent:@"Setup.plist"];
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:setupPath]) {
+        /// run these statements
+        
+        NSArray *setupData = [NSArray arrayWithContentsOfFile:setupPath];
+        [setupData enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            [units addObject:[NSString stringWithFormat:@"%@", [obj valueForKey:@"UnitOfMeasurement"]]];
+        }];
+        
+    } else {
+        NSLog(@"ERROR: Setup file not found.");
+        exit(0);
+    }
+    return [units copy];
+}
+
+/*
++(NSArray*)testMethod {
+    
+     NSString *setupPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"Setup.plist"];
+    NSMutableArray *newArray = [NSMutableArray array];
+    
+        NSArray *array = [NSArray arrayWithContentsOfFile:setupPath];
+        [array enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSString *name = [obj valueForKey:@"WorkoutName"];
+            NSLog(@"(Testmethod) Workout name: %@", name);
+            [newArray addObject:name];
+        }];
+    return (NSArray*)[newArray copy];
+}*/
 +(NSManagedObjectModel*)getModel {
     if(![self isSetupComplete]) {
         NSLog(@"ERROR! No data found!");
@@ -71,8 +127,18 @@
             [attribute setName:name];
             [attribute setAttributeType:[self getAttributeType:unit]];
             [attribute setOptional:YES];
-            [attribute setDefaultValue:0];
+            [attribute setDefaultValue:@0];
             [properties addObject:attribute];
+            
+            
+            /* New
+            NSAttributeDescription *unitAtt = [[NSAttributeDescription alloc] init];
+            [unitAtt setName:@"Unit"];
+            [unitAtt setAttributeType:[self getAttributeType:unit]];
+            [unitAtt setOptional:YES];
+            [properties addObject:unitAtt];
+             */
+            
         }];
         
     }

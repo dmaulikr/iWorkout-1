@@ -20,6 +20,8 @@
 +(BOOL)isSetupComplete;
 +(NSManagedObjectModel*)getModel;
 +(NSString*)getPath;
++(NSArray*)getWorkouts;
++(NSArray*)getUnits;
 
 @end
 

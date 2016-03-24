@@ -17,7 +17,9 @@
 @end
 
 @implementation MainTableViewController
-
+{
+    CoreDataHelper *cdh;
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.dateformatter = [[NSDateFormatter alloc] init];
@@ -32,6 +34,17 @@
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
     [self configureFetch];
     [self performFetch];
+    if(self.frc.fetchedObjects.count <= 0) {
+        NSLog(@"No data found!");
+        [self addTodayEntry];
+        [self performFetch];
+        [self.tableView reloadData];
+    }
+}
+-(void)addTodayEntry {
+    NSManagedObject *newObject = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:cdh.context];
+    [newObject setValue:[NSDate date] forKey:@"Date"];
+    [cdh backgroundSaveContext];
 }
 
 -(void)performFetch {
@@ -52,7 +65,7 @@
     }
 }
 -(void)configureFetch {
-    CoreDataHelper *cdh = [(AppDelegate*)[[UIApplication sharedApplication] delegate] cdh];
+    cdh = [(AppDelegate*)[[UIApplication sharedApplication] delegate] cdh];
     
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
     request.sortDescriptors = [NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"Date" ascending:YES]];
@@ -94,7 +107,7 @@
         
         NSManagedObject *object = [self.frc objectAtIndexPath:indexPath];
         cell.textLabel.text = [self.dateformatter stringFromDate:[object valueForKey:@"Date"]];
-
+        
     // Configure the cell...
     }
     
@@ -103,10 +116,29 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     WorkoutViewController *workoutVC = [self.storyboard instantiateViewControllerWithIdentifier:@"WorkoutViewController"];
-    NSDictionary *dict = (NSDictionary*)[self.frc objectAtIndexPath:indexPath];
-    NSString *dateL = [NSString stringWithFormat:@"%@", [self.dateformatter stringFromDate:[dict valueForKey:@"Date"]]];
+    //NSDictionary *dict = (NSDictionary*)[self.frc objectAtIndexPath:indexPath];
+    
+    NSManagedObject *object = [self.frc objectAtIndexPath:indexPath];
+    
+    NSArray *retrievedArray = [AppDelegate getWorkouts];
+    NSArray *retrievedUnits = [AppDelegate getUnits];
+    
+    [retrievedArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSLog(@"%@ (%@): %@", (NSString*)[retrievedArray objectAtIndex:idx], (NSString*)[retrievedUnits objectAtIndex:idx], [object valueForKey:obj]);
+    }];
+
+    
+    NSString *dateL = [NSString stringWithFormat:@"%@", [self.dateformatter stringFromDate:[object valueForKey:@"Date"]]];
+    
     [workoutVC setDateLabelText:dateL];
-    [workoutVC sendDict:dict];
+    
+    if([cdh.context obtainPermanentIDsForObjects:[NSArray arrayWithObject:object] error:nil]) {
+        [workoutVC sendObject:object.objectID];
+    } else {
+        NSLog(@"ERROR: NO ID");
+    }
+    
+    
     [self.navigationController pushViewController:workoutVC animated:YES];
 }
 /*

@@ -7,12 +7,19 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "AppDelegate.h"
 
 @interface WorkoutViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
 @property (nonatomic, strong) IBOutlet UILabel *dateLabel;
 @property (nonatomic, strong) IBOutlet UITableView *tableView;
 @property (nonatomic, strong) NSDictionary *dataDict;
+
+// Global accessor of chosen Workout
+@property (nonatomic, strong) NSMutableString *selectedWorkout;
+@property (nonatomic, strong) NSIndexPath *selectedIndexPath;
+
 -(void)setDateLabelText:(NSString*)textIn;
--(void)sendDict:(NSDictionary*)dictIn;
+-(void)sendObject:(NSManagedObjectID*)objIn;
+
 @end
