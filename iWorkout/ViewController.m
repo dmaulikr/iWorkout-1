@@ -104,17 +104,78 @@
 }*/
 
 
+/*
+ * Method for resetting all contents
+ */
+
+-(void)confirmFactoryReset {
+    UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"Erase All Content" message:@"Are you sure you want to continue erasing all data?" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        [self eraseAllContent];
+    }];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        // determine what cancel will actually do lol
+    }];
+    
+}
+
+-(void)eraseAllContent {
+    if([self removeSetupFile]) {
+        if([self removeStoresDirectory]) {
+            NSLog(@"Successfully erased all content!");
+            UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"Reset Complete" message:@"Application will now exit, please re-open iWorkout to start setup." preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+                exit(0);
+            }];
+            [alertC addAction:dismiss];
+            [self presentViewController:alertC animated:YES completion:nil];
+        }
+    }
+}
+-(BOOL)removeSetupFile {
+    NSString *applicationDocumentsDirectoryPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *setupPath = [applicationDocumentsDirectoryPath stringByAppendingPathComponent:@"Setup.plist"];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSError *error;
+    
+    if([fileManager fileExistsAtPath:setupPath]) {
+        if(![fileManager removeItemAtPath:setupPath error:&error]) {
+            NSLog(@"ERROR: %@", error.localizedDescription);
+            return NO;
+        } else {
+            NSLog(@"Successfully deleted setup file. ");
+            return YES;
+        }
+    } else {
+        NSLog(@"ERROR: File doesn't exist..");
+        return NO;
+    }
+}
 
 
-
-
-
-
-
-
-
-
-
+-(BOOL)removeStoresDirectory {
+    NSString *applicationDocumentsDirectoryPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *storesDirectory = [applicationDocumentsDirectoryPath stringByAppendingPathComponent:@"Stores"];
+    //NSString *fullStorePath = @"iWorkout.sqlite"; - Just remove the directory instead...
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSError *error;
+    
+    if([fileManager fileExistsAtPath:storesDirectory]) {
+        if(![fileManager removeItemAtPath:storesDirectory error:&error]) {
+            NSLog(@"ERROR: %@", error.localizedDescription);
+            return NO;
+        } else {
+            NSLog(@"Successfully deleted Stores directory. ");
+            return YES;
+        }
+    } else {
+        NSLog(@"ERROR: Stores directory doesn't exist..");
+        return NO;
+    }
+}
+/*
+ * END OF THE METHODS ---- (DELETION METHODS)
+ */
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
