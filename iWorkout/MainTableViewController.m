@@ -11,19 +11,43 @@
 #import "CoreDataHelper.h"
 #import "Workout.h"
 #import "WorkoutViewController.h"
+#import "CustomTableViewCell.h"
+#import "ThumbnailCreator.h"
 
-@interface MainTableViewController ()
-
+@interface MainTableViewController () 
 @end
 
 @implementation MainTableViewController
 {
     CoreDataHelper *cdh;
 }
+-(BOOL)hasLatestDateBeenCreated {
+    
+    NSString *todaysDate = [self.dateformatter stringFromDate:[NSDate date]];
+    NSString *topCellName = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]].textLabel.text;
+    
+    NSLog(@"%@ vs %@: %@", todaysDate, topCellName, [todaysDate isEqualToString:topCellName] ? @"YES" : @"NO");
+    if(![todaysDate isEqualToString:topCellName]) {
+        return NO;
+    } else {
+        return YES;
+    }
+}
+-(void)refreshDate {
+    [self performFetch];
+    [self.tableView reloadData];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    
     self.dateformatter = [[NSDateFormatter alloc] init];
     [self.dateformatter setDateFormat:@"dd-MM-yy"];
+    
+    UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshDate)];
+    
+    self.navigationItem.rightBarButtonItem = refreshButton;
     
     NSLog(@"Today is: %@", [self.dateformatter stringFromDate:[NSDate date]]);
     
@@ -40,11 +64,32 @@
         [self performFetch];
         [self.tableView reloadData];
     }
+
+    if([self hasLatestDateBeenCreated]) {
+        NSLog(@"Latest entry is todays date, everythings a go.");
+    } else {
+        NSLog(@"Latest entry is not todays date, attempting to add todays date");
+        [self addTodayEntry];
+        NSLog(@"Added todays entry.. ");
+        [self performSelector:@selector(delayConfirm) withObject:nil afterDelay:0.3];
+    }
+    
+
+}
+-(void)delayConfirm {
+    [self.tableView reloadData];
+    if([self hasLatestDateBeenCreated]) {
+        NSLog(@"Success!");
+    } else {
+        NSLog(@"ERROR: Database taking longer than usual..");
+        [self performSelector:@selector(delayConfirm) withObject:nil afterDelay:0.3];
+    }
 }
 -(void)addTodayEntry {
     NSManagedObject *newObject = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:cdh.context];
     [newObject setValue:[NSDate date] forKey:@"Date"];
     [cdh backgroundSaveContext];
+    [cdh.context refreshObject:newObject mergeChanges:NO];
 }
 
 -(void)performFetch {
@@ -68,7 +113,7 @@
     cdh = [(AppDelegate*)[[UIApplication sharedApplication] delegate] cdh];
     
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
-    request.sortDescriptors = [NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"Date" ascending:YES]];
+    request.sortDescriptors = [NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"Date" ascending:NO]];
     
     // Unsure about this...
     [request setFetchBatchSize:15];
@@ -99,7 +144,15 @@
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
+    
+    //UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
+    CustomTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
+    
+    if(cell == nil) {
+        NSLog(@"Cell is nil");
+        cell = [[CustomTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Cell"];
+    }
+    
     
     if(self.frc.fetchedObjects) {
         // Workout *workout = [self.frc objectAtIndexPath:indexPath];
@@ -108,6 +161,16 @@
         NSManagedObject *object = [self.frc objectAtIndexPath:indexPath];
         cell.textLabel.text = [self.dateformatter stringFromDate:[object valueForKey:@"Date"]];
         
+        NSString *today = [self.dateformatter stringFromDate:[NSDate date]];
+        if([cell.textLabel.text isEqualToString:today]) {
+            //UIImage *image = [UIImage imageNamed:@"greenbutton.png"];
+            cell.imageView.image = [ThumbnailCreator createThumbnailWithImage:[UIImage imageNamed:@"greenbutton"]];
+            NSLog(@"GREEN");
+        } else {
+          //  UIImage *image = [UIImage imageNamed:@"redbutton.png"];
+            cell.imageView.image = [ThumbnailCreator createThumbnailWithImage:[UIImage imageNamed:@"redbutton"]];
+            NSLog(@"RED");
+        }
     // Configure the cell...
     }
     
@@ -141,6 +204,8 @@
     
     [self.navigationController pushViewController:workoutVC animated:YES];
 }
+
+
 /*
 // Override to support conditional editing of the table view.
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -149,17 +214,51 @@
 }
 */
 
-/*
+
 // Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
+        
+        [self confirmThenDeleteForIndex:indexPath onTableview:tableView];
+        
+    }
 }
-*/
+-(void)confirmThenDeleteForIndex:(NSIndexPath *)indexPath onTableview:(UITableView*)tableView {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Confirm Delete" message:@"Are you sure you want to delete entry?" preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"Confirm" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        [tableView beginUpdates];
+        [cdh.context performBlockAndWait:^{
+            [cdh.context deleteObject:[self.frc objectAtIndexPath:indexPath]];
+            [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+        }];
+        [cdh backgroundSaveContext];
+        [self performFetch];
+        [tableView endUpdates];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.tableView reloadData];
+        });
+        
+        NSLog(@"Deleted object");
+        //[self dismissViewControllerAnimated:YES completion:nil];
+        
+    }];
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        // do nothing.
+        NSLog(@"Cancelled by user.");
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [tableView reloadData];
+        });
+    }];
+    
+
+    [alert addAction:confirm];
+    [alert addAction:cancel];
+    [self presentViewController:alert animated:YES completion:nil];
+}
 
 /*
 // Override to support rearranging the table view.

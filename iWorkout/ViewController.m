@@ -106,7 +106,7 @@
 
 /*
  * Method for resetting all contents
- */
+ *
 
 -(void)confirmFactoryReset {
     UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"Erase All Content" message:@"Are you sure you want to continue erasing all data?" preferredStyle:UIAlertControllerStyleAlert];
@@ -117,6 +117,9 @@
         // determine what cancel will actually do lol
     }];
     
+    [alertC addAction:yesAction];
+    [alertC addAction:cancelAction];
+    [self presentViewController:alertC animated:YES completion:nil];
 }
 
 -(void)eraseAllContent {
@@ -173,7 +176,7 @@
         return NO;
     }
 }
-/*
+
  * END OF THE METHODS ---- (DELETION METHODS)
  */
 

@@ -10,4 +10,7 @@
 
 @interface SettingsTableViewController : UITableViewController
 
+@property (nonatomic, strong) IBOutlet UITableView *tableView;
+@property (nonatomic, strong) IBOutlet UIPickerView *dateformatPicker;
+
 @end

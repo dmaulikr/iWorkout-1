@@ -92,13 +92,20 @@
     __block NSNumber *countToAdd;
     UIAlertAction *add = [UIAlertAction actionWithTitle:@"Add" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         if(isFloat) {
-            countToAdd = [NSNumber numberWithFloat:[alertController.textFields.firstObject.text floatValue]];
+            float oldValue = [[workout valueForKey:[arrayOfWorkouts objectAtIndex:indexPass]] floatValue];
+            NSNumber *newValue = [NSNumber numberWithFloat:(oldValue+[alertController.textFields.firstObject.text floatValue])];
+            countToAdd = newValue;
         } else {
-            countToAdd = [NSNumber numberWithInt:[alertController.textFields.firstObject.text intValue]];
+            int oldValue = [[workout valueForKey:[arrayOfWorkouts objectAtIndex:indexPass]] intValue];
+            NSNumber *newValue = [NSNumber numberWithInt:(oldValue+[alertController.textFields.firstObject.text intValue])];
+            countToAdd = newValue;
         }
-        NSLog(@"Added %@", countToAdd);
         [self addEntry:countToAdd toWorkoutAtIndex:indexPass];
     }];
+   // UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {}];
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDestructive handler:nil];
+    
+    [alertController addAction:cancel];
     [alertController addAction:add];
     
     [self presentViewController:alertController animated:YES completion:nil];
@@ -155,42 +162,7 @@
     [_selectedWorkout setString:[arrayOfWorkouts objectAtIndex:indexPath.row]];
     _selectedIndexPath = indexPath;
     
-    /*
-    BOOL isFloat = NO;
-    NSString *name = [arrayOfWorkouts objectAtIndex:indexPath.row];
-    NSString *unit = [arrayOfUnits objectAtIndex:indexPath.row];
-    
-    if([unit isEqualToString:@"Miles"] || [unit isEqualToString:@"Km"] || [unit isEqualToString:@"Mins"]) {
-        isFloat = YES;
-    } else {
-        isFloat = NO;
-    }
-    
-    if([workout valueForKey:name] == nil) {
-        NSLog(@"Data is nil. setting to 1");
-        if(isFloat) {
-            [workout setValue:@1.0 forKey:name];
-        } else {
-            [workout setValue:@1 forKey:name];
-        }
-    } else {
-        if(isFloat) {
-            float oldRep = [(NSNumber*)[workout valueForKey:name] floatValue];
-            oldRep = oldRep + 1.0f;
-            [workout setValue:[NSNumber numberWithFloat:oldRep] forKey:name];
-            NSLog(@"Incremented float data");
-        } else {
-            int oldRep = [(NSNumber*)[workout valueForKey:name] intValue];
-            oldRep = oldRep + 1;
-            [workout setValue:[NSNumber numberWithInt:oldRep] forKey:name];
-            NSLog(@"Incremented int data");
-        }
-    }
-    
-    [cdh backgroundSaveContext];
-    [self.tableView reloadData];
-    */
-    
+    [self addReps];
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -202,14 +174,6 @@
 -(BOOL)prefersStatusBarHidden {
     return NO;
 }
-/*
-#pragma mark - Navigation
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

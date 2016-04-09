@@ -162,7 +162,6 @@
     // Check if MODEL data exists, if yes: return yes
     // else return NO
     NSString *applicationDocDir = (NSString*)[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    
     NSString *setupPath = [applicationDocDir stringByAppendingPathComponent:@"Setup.plist"];
     
     if([[[NSUserDefaults standardUserDefaults] valueForKey:@"SetupComplete"] boolValue]) {
