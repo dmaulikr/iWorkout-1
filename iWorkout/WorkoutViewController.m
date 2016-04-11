@@ -33,9 +33,7 @@
     
     [self setupData];
     
-    // test
     [self createButtonOnNav];
-
 }
 
 -(void)createButtonOnNav {
@@ -130,12 +128,16 @@
     _selectedIndexPath = nil;
     
 }
+-(NSString*)checkAndReplaceUnderscores:(NSString*)string {
+    return [string stringByReplacingOccurrencesOfString:@"_" withString:@" "];
+}
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
     
     int rowNum = (int)indexPath.row;
     
     NSString *name = (NSString*)[arrayOfWorkouts objectAtIndex:rowNum];
+    
     NSString *unit = (NSString*)[arrayOfUnits objectAtIndex:rowNum];
     
     NSNumber *reps;
@@ -144,11 +146,9 @@
     } else {
         reps = [NSNumber numberWithInt:[[workout valueForKey:name] intValue]];
     }
-    // TEMP. Must be changed to NSNumber (use IF/ELSE to determine whether INT or FLOAT)
-    //NSString *reps = (NSString*);
     
     
-    cell.textLabel.text = [NSString stringWithFormat:@"%@ = %@ (%@)", name, reps, unit];
+    cell.textLabel.text = [NSString stringWithFormat:@"%@ = %@ (%@)", [self checkAndReplaceUnderscores:name], reps, unit];
     
     return cell;
 }

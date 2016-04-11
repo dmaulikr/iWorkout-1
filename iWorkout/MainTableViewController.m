@@ -61,8 +61,12 @@
     if(self.frc.fetchedObjects.count <= 0) {
         NSLog(@"No data found!");
         [self addTodayEntry];
+        
+        // New
+        [self refreshDate];
+        /* Old
         [self performFetch];
-        [self.tableView reloadData];
+        [self.tableView reloadData];*/
     }
 
     if([self hasLatestDateBeenCreated]) {
@@ -77,7 +81,10 @@
 
 }
 -(void)delayConfirm {
-    [self.tableView reloadData];
+    
+    //[self.tableView reloadData]; - OLD
+    [self refreshDate];
+    
     if([self hasLatestDateBeenCreated]) {
         NSLog(@"Success!");
     } else {
