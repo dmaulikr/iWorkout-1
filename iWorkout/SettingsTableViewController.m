@@ -17,10 +17,125 @@
 {
     NSArray *pickerArray;
 }
+
+-(IBAction)switchedOn:(id)sender
+{
+    UISwitch *theSwitch = (UISwitch*)sender;
+    int switchTag = (int)theSwitch.tag;
+    
+    if(switchTag == 1) {
+        // Auto save
+        if(theSwitch.on) {
+            [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"AutoSaveData"];
+            if([[NSUserDefaults standardUserDefaults] synchronize]) {
+                NSLog(@"Auto save is now ON");
+            } else {
+                NSLog(@"Error while saving settings");
+            }
+        } else {
+            [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:NO] forKey:@"AutoSaveData"];
+            if([[NSUserDefaults standardUserDefaults] synchronize]) {
+                NSLog(@"Auto save is now OFF");
+            } else {
+                NSLog(@"Error while saving settings");
+            }
+        }
+    } else {
+        // Auto Lock
+        if(theSwitch.on) {
+            [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"DisableAutoLock"];
+            if([[NSUserDefaults standardUserDefaults] synchronize]) {
+                NSLog(@"Disable auto lock is now ON");
+            } else {
+                NSLog(@"Error while saving settings");
+            }
+        } else {
+            [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:NO] forKey:@"DisableAutoLock"];
+            if([[NSUserDefaults standardUserDefaults] synchronize]) {
+                NSLog(@"Disable auto lock is now OFF");
+            } else {
+                NSLog(@"Error while saving settings");
+            }
+        }
+    }
+   
+}
+-(void)setAppropriateLoadedSettings {
+    // Load the date format
+    if([self dateIndexExists]) {
+        int dateIndex = [self getDateIndex];
+        if(dateIndex == 1) {
+            [self.dateformatPicker selectRow:1 inComponent:0 animated:YES];
+        } else if(dateIndex == 2) {
+            [self.dateformatPicker selectRow:2 inComponent:0 animated:YES];
+        }
+        NSLog(@"Loaded date settings");
+    }
+    
+    // Load Auto-Save settings
+    if([self autoSaveExists]) {
+        // Set the appropriate existing switch on view
+        BOOL autoSaveOn;
+        autoSaveOn = [[[NSUserDefaults standardUserDefaults] valueForKey:@"AutoSaveData"] boolValue];
+        [self.autoSaveSwitch setOn:autoSaveOn];
+        
+    } else {
+        [self.autoSaveSwitch setOn:NO];
+    }
+    
+    // Load Auto-Lock settings
+    if([self autoLockExists]){
+        // Set the appropriate existing switch on view
+        BOOL disableAutoLock;
+        disableAutoLock = [[[NSUserDefaults standardUserDefaults] valueForKey:@"DisableAutoLock"] boolValue];
+        [self.autoLockSwitch setOn:disableAutoLock];
+        
+    } else {
+        [self.autoLockSwitch setOn:NO];
+    }
+    
+}
+-(BOOL)autoLockExists {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+           
+    if([userDefaults valueForKey:@"DisableAutoLock"]) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
+-(BOOL)autoSaveExists {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    if([userDefaults valueForKey:@"AutoSaveData"]) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
+-(BOOL)dateIndexExists {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    if([userDefaults valueForKey:@"DateFormatIndex"]) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
+-(int)getDateIndex {
+    if([self dateIndexExists]) {
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        //NSLog(@"Dateformatindex is: %i", [[userDefaults valueForKey:@"DateFormatIndex"] intValue]);
+        return [[userDefaults valueForKey:@"DateFormatIndex"] intValue];
+    } else {
+        return 0;
+    }
+}
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     pickerArray = [NSArray arrayWithObjects:@"25-03-16",@"25th March 16",@"Friday 25th", nil];
+    
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -30,6 +145,9 @@
     
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+}
+-(void)viewWillLayoutSubviews {
+    [self setAppropriateLoadedSettings];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -50,6 +168,14 @@
 }
 -(NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
     return 1;
+}
+-(CGFloat)pickerView:(UIPickerView *)pickerView rowHeightForComponent:(NSInteger)component {
+    return 40.0;
+}
+
+-(void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
+    NSLog(@"Selected Dateformat Index: %i", (int)row);
+    [self setSelectedDateFormat:(int)row];
 }
 
 
@@ -126,6 +252,20 @@
 /*
  * END OF THE METHODS ---- (DELETION METHODS)
  */
+-(void)setSelectedDateFormat:(int)indexOfDateFormat {
+    if(indexOfDateFormat == 0) {
+        [[NSUserDefaults standardUserDefaults] setValue:@0 forKey:@"DateFormatIndex"];
+        if([[NSUserDefaults standardUserDefaults] synchronize]) {
+            NSLog(@"Success!");
+        }
+    } else {
+        [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:indexOfDateFormat] forKey:@"DateFormatIndex"];
+        if([[NSUserDefaults standardUserDefaults] synchronize]) {
+            NSLog(@"Success!");
+        }
+    }
+
+}
 
 #pragma mark - Table View Delegate
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -133,6 +273,7 @@
         switch (indexPath.row) {
             case 0:
                 NSLog(@"Delete all workout days..");
+                [self deleteAllWorkoutsIndexPath:indexPath];
                 break;
             case 1:
                 NSLog(@"Erasing all content...");
@@ -142,12 +283,20 @@
                 break;
         }
     }
-    
-   // NSLog(@"Row: %li", (long)indexPath.row);
-   // NSLog(@"Section: %li", (long)indexPath.section);
 }
 
-#pragma mark - Table view data source
+-(void)deleteAllWorkoutsIndexPath:(NSIndexPath*)indexPath {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"This function is not available yet." preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+    }];
+    [alert addAction:dismiss];
+    
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+//#pragma mark - Table view data source
 /*
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
    return 0;

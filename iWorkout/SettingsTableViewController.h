@@ -10,7 +10,14 @@
 
 @interface SettingsTableViewController : UITableViewController
 
-@property (nonatomic, strong) IBOutlet UITableView *tableView;
+
+//@property (nonatomic, strong) IBOutlet UITableView *tableView;
 @property (nonatomic, strong) IBOutlet UIPickerView *dateformatPicker;
+
+
+// Switches
+@property (nonatomic, strong) IBOutlet UISwitch *autoSaveSwitch;
+@property (nonatomic, strong) IBOutlet UISwitch *autoLockSwitch;
+
 
 @end

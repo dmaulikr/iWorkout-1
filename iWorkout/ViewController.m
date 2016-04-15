@@ -187,11 +187,12 @@
     if([self setupDataExists]) {
         NSString *setupPath = [[self applicationDocumentsDirectory] stringByAppendingPathComponent:@"Setup.plist"];
         NSLog(@"Found setup data!");
+        /*
         NSArray *retrievedData = [[NSArray alloc] initWithContentsOfFile:setupPath];
         
         [retrievedData enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
             NSLog(@"Name: %@  & Unit: %@", [obj valueForKey:@"WorkoutName"], [obj valueForKey:@"UnitOfMeasurement"]);
-        }];
+        }];*/
         [self readyToStart:YES];
     } else {
         NSLog(@"No data found!");
@@ -255,26 +256,21 @@
     
     setupVC.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
     [self.navigationController presentViewController:setupVC animated:YES completion:nil];
-    
 }
 -(void)loadData {
     // Load DB
     
     NSLog(@"Setup is: %@", [AppDelegate isSetupComplete] ? @"READY" : @"NOT READY");
     if([AppDelegate isSetupComplete]) {
-        CoreDataHelper *cdh = [(AppDelegate*)[[UIApplication sharedApplication] delegate] cdh];
-        
-        /*
-        Workout *workout = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:cdh.context];
-        workout.date = [NSDate date];
-        
-        [cdh backgroundSaveContext];*/
-        
+        // Load DB
+        //CoreDataHelper *cdh = [(AppDelegate*)[[UIApplication sharedApplication] delegate] cdh];
+        [(AppDelegate*)[[UIApplication sharedApplication] delegate] cdh];
         
         // Initialize the presenting view
         MainTableViewController *mainTVC = [self.storyboard instantiateViewControllerWithIdentifier:@"MainTableViewController"];
         [self.navigationController pushViewController:mainTVC animated:YES];
-        
+    } else {
+        NSLog(@"ERROR: Setup isnt complete.");
     }
     
 }

@@ -28,20 +28,167 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    self.dateformatter = [[NSDateFormatter alloc] init];
+    [self.dateformatter setDateFormat:@"dd-MM-yy"];
+    self.modFormatter = [[NSDateFormatter alloc] init];
+    
+    //[self.modFormatter setDateFormat:@"dd-MM-yy HH:mm:ss"];
+    [self.modFormatter setDateFormat:@"HH:mm:ss"];
+    
     cdh = [(AppDelegate*)[[UIApplication sharedApplication] delegate] cdh];
     dateLabel.text = textOfLabel;
     
     [self setupData];
     
     [self createButtonOnNav];
+    
+    // new feature
+    //self.lastModifiedLabel.text = [self getModified];
+    
+    [self lastModded];
 }
+-(void)lastModded {
+    NSString *lastMod = [self compareDates];
+    
+    if(lastMod) {
+        self.lastModifiedLabel.text = [NSString stringWithFormat:@"%@ (%@ ago)", [self getModified], lastMod];
+    }
+    else {
+        self.lastModifiedLabel.text = [self getModified];
+    }
+}
+-(NSString*)getModified {
 
+    NSString *lastModded = [self.modFormatter stringFromDate:(NSDate*)[workout valueForKey:@"LastModified"]];
+    
+    if([lastModded isEqualToString:@""] || !lastModded) {
+        return @"Last modified: null";
+    }
+    return [NSString stringWithFormat:@"Last modified: %@", lastModded];
+}
+-(NSString*)compareDates {
+    // USE THIS INSTEAD
+    // ****************
+    // http://stackoverflow.com/questions/10373911/how-to-calculate-time-difference-in-minutes-between-two-dates-in-ios
+    
+    NSMutableString *string = [NSMutableString string];
+    NSDate *nowDate = [NSDate date];
+    NSDate *dateModified = (NSDate*)[workout valueForKey:@"LastModified"];
+    
+    if(!dateModified) {
+        NSLog(@"ERROR: No last modified date found");
+        return nil;
+    }
+    /*
+    NSDateFormatter *hourFormatter = [NSDateFormatter new];
+    [hourFormatter setDateFormat:@"HH"];
+    
+    NSDateFormatter *minFormatter = [NSDateFormatter new];
+    [minFormatter setDateFormat:@"mm"];
+    
+    NSDateFormatter *secFormatter = [NSDateFormatter new];
+    [secFormatter setDateFormat:@"ss"];
+    
+    if(![[hourFormatter stringFromDate:nowDate] isEqualToString:[hourFormatter stringFromDate:laterDate]]) {
+        int currentHour = [[hourFormatter stringFromDate:nowDate] intValue];
+        int modifiedHour = [[hourFormatter stringFromDate:laterDate] intValue];
+        
+        int differenceInHours = currentHour - modifiedHour;
+        
+        NSLog(@"(HOUR) %i - %i = %i", currentHour, modifiedHour, differenceInHours);
+        
+        if(differenceInHours > 0) {
+            NSString *hourName = [NSString stringWithFormat:@"%@", (differenceInHours > 1) ? @"hours" : @"hour"];
+            [string appendString:[NSString stringWithFormat:@"%i %@ ", differenceInHours, hourName]];
+        }
+    }
+    
+    if(![[minFormatter stringFromDate:nowDate] isEqualToString:[minFormatter stringFromDate:laterDate]]) {
+        int currentMin = [[minFormatter stringFromDate:nowDate] intValue];
+        int modifiedMin = [[minFormatter stringFromDate:laterDate] intValue];
+        
+        int differenceInMins = currentMin - modifiedMin;
+        
+        NSLog(@"(MIN) %i - %i = %i", currentMin, modifiedMin, differenceInMins);
+        
+        if(differenceInMins > 0) {
+            [string appendString:[NSString stringWithFormat:@"%i mins ", differenceInMins]];
+         }
+    }
+    if(![[secFormatter stringFromDate:nowDate] isEqualToString:[secFormatter stringFromDate:laterDate]]) {
+        int currentSec = [[secFormatter stringFromDate:nowDate] intValue];
+        int modifiedSec = [[secFormatter stringFromDate:laterDate] intValue];
+        
+        int differenceInSecs = currentSec - modifiedSec;
+        
+        NSLog(@"(SEC) %i - %i = %i", currentSec, modifiedSec, differenceInSecs);
+        
+        if(differenceInSecs > 0) {
+           [string appendString:[NSString stringWithFormat:@"%i secs ", differenceInSecs]];
+        }
+    }
+    */
+    NSTimeInterval timePassed = [[NSDate date] timeIntervalSinceDate:dateModified];
+    
+    if((timePassed/60) > 60) {
+        if(((timePassed/60)/60) > 24) {
+            [string appendString:[NSString stringWithFormat:@"%.0f days", (((timePassed/60)/60)/24)]];
+        } else {
+            [string appendString:[NSString stringWithFormat:@"%.2f hours", (timePassed/60)/60]];
+        }
+    } else if((timePassed/60) < 1) {
+        [string appendString:[NSString stringWithFormat:@"%.0f seconds", timePassed]];
+    } else {
+        [string appendString:[NSString stringWithFormat:@"%.0f minutes", timePassed/60]];
+    }
+    
+    if(string) {
+        NSLog(@"Date was modified: %@ ago", string);
+        return string;
+    }
+    return nil;
+}
 -(void)createButtonOnNav {
-    self.navigationItem.title = dateLabel.text;
+    //self.navigationItem.title = dateLabel.text;
+    NSDateFormatter *newFormat = [NSDateFormatter new];
+    [newFormat setDateFormat:@"EEEE dd"];
+    
+    NSDate *workoutDate = (NSDate*)[workout valueForKey:@"Date"];
+    NSString *navTitle = [NSString stringWithFormat:@"%@%@",[newFormat stringFromDate:workoutDate],[self getSuffixForDate:workoutDate]];
+    self.navigationItem.title = navTitle;
+    
+   // NSDateFormatter *testformatter = [NSDateFormatter new];
+    //[testformatter setDateFormat:@"LLLL"];
+    
+    //NSLog(@"This is: %@", [NSString stringWithFormat:@"%@ %@",navTitle, [testformatter stringFromDate:workoutDate]]);
+    
     UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addReps)];
     self.navigationItem.rightBarButtonItem = addButton;
+}
+-(NSString *)getSuffixForDate:(NSDate*)theDate
+{
+    NSDateFormatter *dayOf = [NSDateFormatter new];
+    [dayOf setDateFormat:@"dd"];
     
+    int number = [[dayOf stringFromDate:theDate] intValue];
     
+    NSString *suffix;
+    
+    int ones = number % 10;
+    int tens = (number/10) % 10;
+    
+    if (tens ==1) {
+        suffix = [NSString stringWithFormat:@"th"];
+    } else if (ones ==1){
+        suffix = [NSString stringWithFormat:@"st"];
+    } else if (ones ==2){
+        suffix = [NSString stringWithFormat:@"nd"];
+    } else if (ones ==3){
+        suffix = [NSString stringWithFormat:@"rd"];
+    } else {
+        suffix = [NSString stringWithFormat:@"th"];
+    }
+    return suffix;
 }
 
 -(void)setupData {
@@ -49,8 +196,6 @@
     
     arrayOfUnits = [AppDelegate getUnits];
     arrayOfWorkouts = [AppDelegate getWorkouts];
-    
-    
 }
 -(void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -100,7 +245,6 @@
         }
         [self addEntry:countToAdd toWorkoutAtIndex:indexPass];
     }];
-   // UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {}];
     UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDestructive handler:nil];
     
     [alertController addAction:cancel];
@@ -108,9 +252,20 @@
     
     [self presentViewController:alertController animated:YES completion:nil];
 }
+-(void)modifiedData {
+    [workout setValue:[NSDate date] forKey:@"LastModified"];
+    
+    // Change the date of when it was modified on the label
+    // this is temp.
+    self.lastModifiedLabel.text = [NSString stringWithFormat:@"Last modified: %@", [self.modFormatter stringFromDate:[NSDate date]]];
+}
 -(void)addEntry:(NSNumber*)number toWorkoutAtIndex:(NSInteger)index {
     
     [workout setValue:number forKey:[arrayOfWorkouts objectAtIndex:index]];
+    
+    // New feature:
+    [self modifiedData];
+    
     [cdh backgroundSaveContext];
     [self.tableView reloadData];
 }
@@ -149,6 +304,7 @@
     
     
     cell.textLabel.text = [NSString stringWithFormat:@"%@ = %@ (%@)", [self checkAndReplaceUnderscores:name], reps, unit];
+    
     
     return cell;
 }

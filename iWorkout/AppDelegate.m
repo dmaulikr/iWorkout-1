@@ -117,6 +117,13 @@
     [dateAtt setOptional:NO];
     [properties addObject:dateAtt];
     
+    /* New feature - 'lastModified' attribute */
+    NSAttributeDescription *lastMod = [[NSAttributeDescription alloc] init];
+    [lastMod setName:@"LastModified"];
+    [lastMod setAttributeType:NSDateAttributeType];
+    [lastMod setOptional:YES];
+    [properties addObject:lastMod];
+    
     NSArray *retrievedData = [[NSArray alloc] initWithContentsOfFile:setupPath];
     if(retrievedData) {
         [retrievedData enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -190,6 +197,17 @@
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+    
+    NSLog(@"Read AppDelegate");
+    /*
+     * Add function that checks latest database entry to ensure that latest date is created.
+     */
+    NSError *error;
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
+    
+    NSManagedObject *object = [self.coreDataHelper.context executeFetchRequest:fetch error:&error];
+    
+    
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
