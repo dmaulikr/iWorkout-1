@@ -202,11 +202,47 @@
     /*
      * Add function that checks latest database entry to ensure that latest date is created.
      */
+    NSDateFormatter *dateFormatter = [NSDateFormatter new];
+    [dateFormatter setDateFormat:@"dd-MM-yy"];
+    
     NSError *error;
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
+    [fetch setFetchLimit:1];
+    [fetch setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"Date" ascending:NO]]];
     
-    NSManagedObject *object = [self.coreDataHelper.context executeFetchRequest:fetch error:&error];
     
+    NSArray *fetchedObjects = [self.coreDataHelper.context executeFetchRequest:fetch error:&error];
+    if(fetchedObjects) {
+        NSManagedObject *obj = (NSManagedObject*)[fetchedObjects lastObject];
+        
+        NSString *lastDate = [dateFormatter stringFromDate:[obj valueForKey:@"Date"]];
+        NSString *todayDate = [dateFormatter stringFromDate:[NSDate date]];
+        
+        NSLog(@"Last date is: %@", lastDate);
+        //NSLog(@"Today is: %@", [dateFormatter stringFromDate:[NSDate date]]);
+        
+        if([todayDate isEqualToString:lastDate]) {
+            NSLog(@"Everything's smooth. Continuing with the date displayed.");
+        } else {
+            
+            if([lastDate compare:todayDate] == NSOrderedAscending) {
+                [self addTodayEntry];
+                NSLog(@"Added todays entry!");
+            }
+        }
+        
+        
+    }
+    
+}
+-(void)addTodayEntry {
+    NSManagedObject *newObject = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:_coreDataHelper.context];
+    [newObject setValue:[NSDate date] forKey:@"Date"];
+    [_coreDataHelper backgroundSaveContext];
+    [_coreDataHelper.context refreshObject:newObject mergeChanges:NO];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SomethingChanged" object:nil];
+}
+-(void)refreshDate:(NSDate*)latestDate {
     
 }
 

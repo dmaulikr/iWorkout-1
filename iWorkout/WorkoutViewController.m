@@ -62,7 +62,7 @@
     NSString *lastModded = [self.modFormatter stringFromDate:(NSDate*)[workout valueForKey:@"LastModified"]];
     
     if([lastModded isEqualToString:@""] || !lastModded) {
-        return @"Last modified: null";
+        return @"Last modified: never modified";
     }
     return [NSString stringWithFormat:@"Last modified: %@", lastModded];
 }
@@ -72,62 +72,13 @@
     // http://stackoverflow.com/questions/10373911/how-to-calculate-time-difference-in-minutes-between-two-dates-in-ios
     
     NSMutableString *string = [NSMutableString string];
-    NSDate *nowDate = [NSDate date];
     NSDate *dateModified = (NSDate*)[workout valueForKey:@"LastModified"];
     
     if(!dateModified) {
         NSLog(@"ERROR: No last modified date found");
         return nil;
     }
-    /*
-    NSDateFormatter *hourFormatter = [NSDateFormatter new];
-    [hourFormatter setDateFormat:@"HH"];
-    
-    NSDateFormatter *minFormatter = [NSDateFormatter new];
-    [minFormatter setDateFormat:@"mm"];
-    
-    NSDateFormatter *secFormatter = [NSDateFormatter new];
-    [secFormatter setDateFormat:@"ss"];
-    
-    if(![[hourFormatter stringFromDate:nowDate] isEqualToString:[hourFormatter stringFromDate:laterDate]]) {
-        int currentHour = [[hourFormatter stringFromDate:nowDate] intValue];
-        int modifiedHour = [[hourFormatter stringFromDate:laterDate] intValue];
-        
-        int differenceInHours = currentHour - modifiedHour;
-        
-        NSLog(@"(HOUR) %i - %i = %i", currentHour, modifiedHour, differenceInHours);
-        
-        if(differenceInHours > 0) {
-            NSString *hourName = [NSString stringWithFormat:@"%@", (differenceInHours > 1) ? @"hours" : @"hour"];
-            [string appendString:[NSString stringWithFormat:@"%i %@ ", differenceInHours, hourName]];
-        }
-    }
-    
-    if(![[minFormatter stringFromDate:nowDate] isEqualToString:[minFormatter stringFromDate:laterDate]]) {
-        int currentMin = [[minFormatter stringFromDate:nowDate] intValue];
-        int modifiedMin = [[minFormatter stringFromDate:laterDate] intValue];
-        
-        int differenceInMins = currentMin - modifiedMin;
-        
-        NSLog(@"(MIN) %i - %i = %i", currentMin, modifiedMin, differenceInMins);
-        
-        if(differenceInMins > 0) {
-            [string appendString:[NSString stringWithFormat:@"%i mins ", differenceInMins]];
-         }
-    }
-    if(![[secFormatter stringFromDate:nowDate] isEqualToString:[secFormatter stringFromDate:laterDate]]) {
-        int currentSec = [[secFormatter stringFromDate:nowDate] intValue];
-        int modifiedSec = [[secFormatter stringFromDate:laterDate] intValue];
-        
-        int differenceInSecs = currentSec - modifiedSec;
-        
-        NSLog(@"(SEC) %i - %i = %i", currentSec, modifiedSec, differenceInSecs);
-        
-        if(differenceInSecs > 0) {
-           [string appendString:[NSString stringWithFormat:@"%i secs ", differenceInSecs]];
-        }
-    }
-    */
+
     NSTimeInterval timePassed = [[NSDate date] timeIntervalSinceDate:dateModified];
     
     if((timePassed/60) > 60) {
@@ -151,10 +102,12 @@
 -(void)createButtonOnNav {
     //self.navigationItem.title = dateLabel.text;
     NSDateFormatter *newFormat = [NSDateFormatter new];
-    [newFormat setDateFormat:@"EEEE dd"];
+    [newFormat setDateFormat:@"EEEE"];
+    
+    
     
     NSDate *workoutDate = (NSDate*)[workout valueForKey:@"Date"];
-    NSString *navTitle = [NSString stringWithFormat:@"%@%@",[newFormat stringFromDate:workoutDate],[self getSuffixForDate:workoutDate]];
+    NSString *navTitle = [NSString stringWithFormat:@"%@ (%@)",[newFormat stringFromDate:workoutDate],[self.dateformatter stringFromDate:workoutDate]];
     self.navigationItem.title = navTitle;
     
    // NSDateFormatter *testformatter = [NSDateFormatter new];

@@ -68,6 +68,10 @@
             [self.dateformatPicker selectRow:1 inComponent:0 animated:YES];
         } else if(dateIndex == 2) {
             [self.dateformatPicker selectRow:2 inComponent:0 animated:YES];
+        } else if(dateIndex == 3) {
+            [self.dateformatPicker selectRow:3 inComponent:0 animated:YES];
+        } else if(dateIndex == 4) {
+            [self.dateformatPicker selectRow:4 inComponent:0 animated:YES];
         }
         NSLog(@"Loaded date settings");
     }
@@ -134,7 +138,12 @@
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    pickerArray = [NSArray arrayWithObjects:@"25-03-16",@"25th March 16",@"Friday 25th", nil];
+    pickerArray = [NSArray arrayWithObjects:@"25-03-16",@"25th March 16",@"Friday 25th",@"Friday (25-03-16)",@"Friday 25th March 2016", nil];
+    
+
+    
+#warning Update required. Add new Date formats
+    // Add new item "(Friday) 25-03-16"
     
 }
 - (void)viewDidLoad {
@@ -273,6 +282,7 @@
         switch (indexPath.row) {
             case 0:
                 NSLog(@"Delete all workout days..");
+                [tableView deselectRowAtIndexPath:indexPath animated:YES];
                 [self deleteAllWorkoutsIndexPath:indexPath];
                 break;
             case 1:
@@ -282,6 +292,8 @@
             default:
                 break;
         }
+    } else if(indexPath.section == 0) {
+        [tableView deselectRowAtIndexPath:indexPath animated:YES]; // To ensure the top settings are not selectable.
     }
 }
 
@@ -289,7 +301,7 @@
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"This function is not available yet." preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+        // Removed func.
     }];
     [alert addAction:dismiss];
     

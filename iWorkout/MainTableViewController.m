@@ -107,11 +107,40 @@
         
         NSString *string = [NSString stringWithFormat:@"%@%@",[dayFormat stringFromDate:date],[self getSuffixForDate:date]];
         return string;
-    } else {
+        // 4. Friday (25-03-16)
+
+    } else if(dateIndex == 3) {
+        NSDateFormatter *format = [NSDateFormatter new];
+        [format setDateFormat:@"EEEE"];
+        
+        NSString *string = [NSString stringWithFormat:@"%@ (%@)", [format stringFromDate:date], [self.dateformatter stringFromDate:date]];
+        return string;
+    } else if(dateIndex == 4) {
+        // 5. Friday 25th March 2016
+        NSDateFormatter *dayOfWkFormat = [NSDateFormatter new];
+        [dayOfWkFormat setDateFormat:@"EEEE"];
+        NSDateFormatter *dayFormat = [NSDateFormatter new];
+        [dayFormat setDateFormat:@"dd"];
+        NSDateFormatter *restOfDateFormat = [NSDateFormatter new];
+        [restOfDateFormat setDateFormat:@"LLLL yyyy"];
+        
+        NSString *string = [NSString stringWithFormat:@"%@ %@%@ %@", [dayOfWkFormat stringFromDate:date], [dayFormat stringFromDate:date],[self getSuffixForDate:date], [restOfDateFormat stringFromDate:date]];
+        return string;
+    }
+    else {
         NSLog(@"ERROR: Please refer to getDatenameFromDate method!");
         return nil;
     }
+  
+}
+-(void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
     
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"SomethingChanged" object:nil];
+}
+-(void)SomethingChanged {
+    NSLog(@"Something changed!");
+    [self refreshDate];
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -121,6 +150,9 @@
     
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(SomethingChanged) name:@"SomethingChanged" object:nil];
+    
     self.dateformatter = [[NSDateFormatter alloc] init];
     [self.dateformatter setDateFormat:@"dd-MM-yy"];
     
@@ -285,10 +317,20 @@
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
     request.sortDescriptors = [NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"Date" ascending:NO]];
     
+    
+    // ATTEMPTING TO LOAD ONLY DATE
+    
+    //[request setPropertiesToFetch:@[@"Date"]];
+    // /END
+    
+    
     // Unsure about this...
     [request setFetchBatchSize:15];
     
-    self.frc = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:cdh.context sectionNameKeyPath:nil cacheName:nil];
+    //self.frc = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:cdh.context sectionNameKeyPath:nil cacheName:nil];
+    
+    // Caching data
+    self.frc = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:cdh.context sectionNameKeyPath:nil cacheName:@"WorkoutData"];
     //self.frc.delegate = self;
     
 }
@@ -327,20 +369,31 @@
         // And try this..
         cell.textLabel.text = [self getDatenameFromDate:(NSDate*)[object valueForKey:@"Date"]];
         
+#warning The UIImage is causing the slow loading of Tableview..Create smaller versions of red & green button.
+        
+        
         NSString *today = [self.dateformatter stringFromDate:[NSDate date]];
         if([todayText isEqualToString:today]) {
             //UIImage *image = [UIImage imageNamed:@"greenbutton.png"];
-            cell.imageView.image = [ThumbnailCreator createThumbnailWithImage:[UIImage imageNamed:@"greenbutton"]];
-            //NSLog(@"GREEN");
+            //cell.imageView.image = [ThumbnailCreator createThumbnailWithImage:[UIImage imageNamed:@"greenbutton"]];
+            cell.imageView.image = [self getImageForToday:YES];
         } else {
           //  UIImage *image = [UIImage imageNamed:@"redbutton.png"];
-            cell.imageView.image = [ThumbnailCreator createThumbnailWithImage:[UIImage imageNamed:@"redbutton"]];
-            //NSLog(@"RED");
+            //cell.imageView.image = [ThumbnailCreator createThumbnailWithImage:[UIImage imageNamed:@"redbutton"]];
+            cell.imageView.image = [self getImageForToday:NO];
+            
         }
     // Configure the cell...
     }
-    
     return cell;
+}
+
+-(UIImage*)getImageForToday:(BOOL)today {
+    if(today) {
+        return [UIImage imageNamed:@"new_greenbutton.png"];
+    } else {
+        return [UIImage imageNamed:@"new_redbutton.png"];
+    }
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
