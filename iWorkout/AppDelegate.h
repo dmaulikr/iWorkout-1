@@ -23,5 +23,6 @@
 +(NSArray*)getWorkouts;
 +(NSArray*)getUnits;
 
+-(BOOL)checkIfTodayExists;
 @end
 

@@ -13,11 +13,11 @@
 
 @implementation CoreDataHelper
 
-#define debugging 1
+#define debugging 0
 
 #pragma mark - FILES
 NSString *storeFilename = @"iWorkout.sqlite";
-NSString *sourceStoreFilename = @"DefaultData.sqlite";
+//NSString *sourceStoreFilename = @"DefaultData.sqlite";
 NSString *iCloudStoreFilename = @"iCloud.sqlite";
 
 
@@ -66,7 +66,7 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     
     return [[self applicationStoresDirectory] URLByAppendingPathComponent:storeFilename];
 }
-
+/*
 -(NSURL*)sourceStoreURL {
     if(debugging)
         NSLog(@"Running %@ '%@'", self.class, NSStringFromSelector(_cmd));
@@ -74,7 +74,7 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     return [NSURL fileURLWithPath:[[NSBundle mainBundle]
                 pathForResource:[sourceStoreFilename stringByDeletingPathExtension]
                                    ofType:[sourceStoreFilename pathExtension]]];
-}
+}*/
 
 
 #pragma mark - SETUP
@@ -96,7 +96,6 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
         NSLog(@"ERROR! No model found!");
         exit(0);
     }
-    //_model = [NSManagedObjectModel mergedModelFromBundles:nil];
     
     _coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:_model];
     
@@ -112,7 +111,7 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     //[_context setPersistentStoreCoordinator:_coordinator]; - NSInternalInconsistencyException - Context already has a coordinator; cannot replace
     [_context setParentContext:_parentContext]; // Set the parent context
     [_context setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
-    
+   /*
     // Set up of Import context
     _importContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
     [_importContext performBlockAndWait:^{
@@ -139,7 +138,7 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
         [_seedContext setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
         [_seedContext setUndoManager:nil]; // the default on iOS
     }];
-    _seedInProgress = NO;
+    _seedInProgress = NO;*/
     
     [self listenForStoreChanges];
     
@@ -155,36 +154,30 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     if(_store) {
         return; // Don't load store if it's already loaded
     }
-    
-    BOOL useMigrationManager = NO;
-    
-    if(useMigrationManager && [self isMigrationNecessaryForStore:[self storeURL]]) {
-        //[self performBackgroundManagedMigrationForStore:[self storeURL]];
-    } else {
         
-        
-        NSDictionary *options = @{NSSQLitePragmasOption: @{@"journal_mode":@"DELETE"},
+    NSDictionary *options = @{NSSQLitePragmasOption: @{@"journal_mode":@"DELETE"},
                                   NSInferMappingModelAutomaticallyOption:@YES,
                                   NSMigratePersistentStoresAutomaticallyOption:@YES};
         
         
         
-        NSError *error = nil;
-        _store = [_coordinator addPersistentStoreWithType:NSSQLiteStoreType
+    NSError *error = nil;
+    _store = [_coordinator addPersistentStoreWithType:NSSQLiteStoreType
                                             configuration:nil
                                                       URL:[self storeURL]
                                                   options:options
                                                     error:&error]; // Added 'options'
-        if(!_store) {
+    if(!_store) {
             NSLog(@"Failed to add store. Error %@", error);
             abort();
         }
-        else {
-            if(debugging)
-                NSLog(@"Successfully added store: %@", _store);
+    else {
+        if(debugging)
+            NSLog(@"Successfully added store: %@", _store);
         }
-    }
+    
 }
+/*
 -(void)loadSourceStore {
     if(debugging)
         NSLog(@"Running %@ '%@'", self.class, NSStringFromSelector(_cmd));
@@ -206,7 +199,7 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     } else {
         NSLog(@"Successfully added source store: %@", _sourceStore);
     }
-}
+}*/
 
 -(void)setupCoreData
 {
@@ -288,7 +281,7 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
         
     }];
 }
-
+/*
 #pragma mark - Migration Manager
 -(BOOL)isMigrationNecessaryForStore:(NSURL*)storeUrl {
     if(debugging)
@@ -402,7 +395,7 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     }
     return success;
 }
-/*
+
 -(void)performBackgroundManagedMigrationForStore:(NSURL*)storeURL {
     if(debugging)
         NSLog(@"Running %@ '%@'", self.class, NSStringFromSelector(_cmd));
@@ -530,9 +523,8 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
 {
     UIViewController *root = (UIViewController*)[UIApplication sharedApplication].keyWindow.rootViewController;
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    //[alert showViewController:alert sender:nil]; - Does this do anything ???
     
-    UIAlertAction *close = [UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertAction *close = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         [root dismissViewControllerAnimated:YES completion:nil];
     }];
     
@@ -541,8 +533,8 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     
 }
 
+/*
 #pragma mark - DATA IMPORT
-
 -(BOOL)isDefaultDataAlreadyImportedForStoreWithURL:(NSURL*)url
                                             ofType:(NSString*)type {
     if(debugging)
@@ -567,13 +559,13 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
         //[self replaceData:self.store]; REMOVE
     }
     return YES;
-}
-
+}*/
+/*
 -(void)checkIfDefaultDataNeedsImporting {
     if(debugging)
         NSLog(@"Running %@ '%@'", self.class, NSStringFromSelector(_cmd));
-    UIViewController *root = (UIViewController*)[UIApplication sharedApplication].keyWindow.rootViewController;
-    /*
+    //UIViewController *root = (UIViewController*)[UIApplication sharedApplication].keyWindow.rootViewController;
+ 
     if(![self isDefaultDataAlreadyImportedForStoreWithURL:[self storeURL] ofType:NSSQLiteStoreType]) {
         self.importAlertController = [UIAlertController alertControllerWithTitle:@"Import Default Data?" message:@"If you've never used Grocery Dude before then some default data might help you understand how to use it. Tap 'Import' to import default data. Tap 'Cancel' to skip the import, especially if you've done this before on other devices." preferredStyle:UIAlertControllerStyleAlert];
         
@@ -590,10 +582,10 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
         [self.importAlertController addAction:cancelAction];
         [root presentViewController:self.importAlertController animated:NO completion:nil];
     }
-     */
+ 
     NSLog(@"Default data unavailable.");
-}
-
+}*/
+/*
 -(void)importFromXML:(NSURL*)url {
     if(debugging)
         NSLog(@"Running %@ '%@'", self.class, NSStringFromSelector(_cmd));
@@ -606,14 +598,8 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SomethingChanged" object:nil];
     NSLog(@"***** END PARSE OF %@", url.path);
 }
-/* REMOVE
--(void)replaceData:(NSPersistentStore*)theStore {
-    NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithDictionary:[[theStore metadata] copy]];
-    
-    [dictionary removeObjectForKey:@"DefaultDataImported"];
-    [self.coordinator setMetadata:dictionary forPersistentStore:theStore];
-    [self saveContext];
-}*/
+*/
+
 -(void)setDefaultDataAsImportedForStore:(NSPersistentStore*)aStore {
     if(debugging)
         NSLog(@"Running %@ '%@'", self.class, NSStringFromSelector(_cmd));
@@ -654,12 +640,9 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     }
 }
 
-
+/*
 #pragma mark - UIALERTVIEW
 -(void)alertControllerChoseToImport:(BOOL)importBool {
-    /* Due to UIAlertView being deprecated, here we create a custom method for use with UIAlertController
-     * instead, making it as if UIAlertView still exists, in a way ;)
-     */
     if(importBool) {
         // User chose to import
         NSLog(@"Default Data Import Approved by User");
@@ -677,8 +660,7 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
         NSLog(@"Default Data Import Cancelled by User");
     }
     [self setDefaultDataAsImportedForStore:_store];
-    
-}
+}*/
 
 #pragma mark - UNIQUE ATTRIBUTE SELECTION 
 
@@ -688,7 +670,7 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
  * If you redeploy CoreDataImporter and CoreDataHelper to your own applications to import data,
  *  you will need to update this method with selected unique attributes specific to your own managed object model
  */
-
+/*
 -(NSDictionary*)selectedUniqueAttributes {
     if(debugging)
         NSLog(@"Running %@ '%@'", self.class, NSStringFromSelector(_cmd));
@@ -706,7 +688,7 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     NSDictionary *dictionary = [NSDictionary dictionaryWithObjects:attributes forKeys:entities];
     return dictionary;
 }
-
+*/
 
 
 
@@ -736,8 +718,8 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     if(![_coordinator removePersistentStore:_store error:&error]) {
         NSLog(@"Unable to remove persistent store: %@", error);
     }
-    [self resetContext:_sourceContext];
-    [self resetContext:_importContext];
+    //[self resetContext:_sourceContext];
+    //[self resetContext:_importContext];
     [self resetContext:_context];
     [self resetContext:_parentContext];
     _store = nil;
@@ -810,11 +792,11 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
 -(void)storesWillChange:(NSNotification*)n {
     if(debugging)
         NSLog(@"Running %@ '%@'", self.class, NSStringFromSelector(_cmd));
-    
+    /*
     [_importContext performBlockAndWait:^{
         [_importContext save:nil];
         [self resetContext:_importContext];
-    }];
+    }];*/
     [_context performBlockAndWait:^{
         [_context save:nil];
         [self resetContext:_context];
@@ -897,11 +879,11 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
 -(void)resetCoreData {
     if(debugging)
         NSLog(@"Running %@ '%@'", self.class, NSStringFromSelector(_cmd));
-    
+    /*
     [_importContext performBlockAndWait:^{
         [_importContext save:nil];
         [self resetContext:_importContext];
-    }];
+    }];*/
     
     [_context performBlockAndWait:^{
         [_context save:nil];
@@ -915,6 +897,7 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     _store = nil;
     _iCloudStore = nil;
 }
+
 /*
  For brevity, there will be no check performed to ensure that seeding was successful before deleting the iCloud data.
  In your own applications, you may wish to prompt the user or implement code to detect seeding status prior to deletion
@@ -947,6 +930,7 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
 }
 
 #pragma mark - ICLOUD SEEDING
+/*
 -(BOOL)loadNoniCloudStoreAsSeedStore {
     if(debugging)
         NSLog(@"Running %@ '%@'", self.class, NSStringFromSelector(_cmd));
@@ -975,7 +959,9 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     NSLog(@"Successfully loaded Non-iCloud Store as Seed Store: %@", _seedStore);
     return YES;
 }
+*/
 
+/*
 #pragma mark - ICLOUD RESET
 -(void)destroyAlliCloudDataForThisApplication {
     if(debugging)
@@ -1003,29 +989,16 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
         NSLog(@"*  Settings -> iCloud > Storage & Backup > Manage Storage > Show All *");
         NSLog(@"\n\n\n\n\n");
         abort();
-        /*
-            The application is force closed to ensure iCloud data is wiped cleanly.
-            This method shouldn't be called in a production application.
-         */
+ 
+           // The application is force closed to ensure iCloud data is wiped cleanly.
+           // This method shouldn't be called in a production application.
+ 
     } else {
         NSLog(@"\n\n FAILED to destroy iCloud content at URL: %@  Error: %@", [_iCloudStore URL], error);
     }
 }
 
-
-
-
-/*
- 
- 
- 
- 
- 
- 
- 
- 
- */
-
+*/
 
 @end
 

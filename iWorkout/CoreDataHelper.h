@@ -22,17 +22,19 @@
 @property (nonatomic, strong) NSTimer *importTimer;
 
 // Source Stack
+/*
 @property (nonatomic, readonly) NSManagedObjectContext          *sourceContext;
 @property (nonatomic, readonly) NSPersistentStoreCoordinator    *sourceCoordinator;
 @property (nonatomic, readonly) NSPersistentStore               *sourceStore;
 
 // Import context
 @property (nonatomic, readonly) NSManagedObjectContext *importContext;
-
+*/
 @property (nonatomic, readonly) NSManagedObjectContext          *context;
 @property (nonatomic, readonly) NSManagedObjectModel            *model;
 @property (nonatomic, readonly) NSPersistentStoreCoordinator    *coordinator;
 @property (nonatomic, readonly) NSPersistentStore               *store;
+
 
 // MigrationViewController
 //@property (nonatomic, retain) MigrationViewController *migrationVC;
@@ -43,13 +45,14 @@
 // XML Parser
 @property (nonatomic, strong) NSXMLParser *parser;
 
-
+/*
 // Seeding
 @property (nonatomic, readonly) NSManagedObjectContext          *seedContext;
 @property (nonatomic, readonly) NSPersistentStoreCoordinator    *seedCoordinator;
 @property (nonatomic, readonly) NSPersistentStore               *seedStore;
 //@property (nonatomic, retain)   UIAlertController               *seedAlertController;
 @property (nonatomic)           BOOL                            seedInProgress;
+*/
 
 -(void)setupCoreData;
 -(void)saveContext;

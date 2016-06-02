@@ -140,11 +140,6 @@
     
     pickerArray = [NSArray arrayWithObjects:@"25-03-16",@"25th March 16",@"Friday 25th",@"Friday (25-03-16)",@"Friday 25th March 2016", nil];
     
-
-    
-#warning Update required. Add new Date formats
-    // Add new item "(Friday) 25-03-16"
-    
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -156,6 +151,7 @@
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
 -(void)viewWillLayoutSubviews {
+    // This runs 3 times (?)
     [self setAppropriateLoadedSettings];
 }
 

@@ -14,5 +14,10 @@
 
 @property (nonatomic, strong) IBOutlet UILabel *startLabel;
 
+
+// Testing dynamics
+@property (nonatomic, strong) IBOutlet UIButton *settingsButton;
+@property (nonatomic, strong) UIDynamicAnimator *dynamicAnimator;
+
 @end
 

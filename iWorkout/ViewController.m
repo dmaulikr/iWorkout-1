@@ -29,6 +29,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    /*
+    CGPoint oldPositionOfButton = self.settingsButton.frame.origin;
+    [self testDynamicsWithOldPos:oldPositionOfButton];
+#warning The settings button isnt returning to proper position. Check that out
+    */
+    
     
     // Do any additional setup after loading the view, typically from a nib.
     /*
@@ -54,138 +60,48 @@
     [super viewDidAppear:animated];
     
     
-}/*
--(NSManagedObjectModel *)_model {
-    NSManagedObjectModel *model = [[NSManagedObjectModel alloc] init];
-    
-    NSEntityDescription *entity = [[NSEntityDescription alloc] init];
-    
-    [entity setName:@"Workout"];
-    [entity setManagedObjectClassName:@"Workout"];
-    
-    NSPropertyDescription *property = [[NSPropertyDescription alloc] init];
-    
-    //[entity setProperties:[self setupModelWithArray:ARRAY]];
-    
-    return model;
-}*/
-/*
--(NSAttributeType)getAttributeType:(NSString*)infoD {
-    if([infoD isEqualToString:@"Reps"]) {
-        return NSInteger16AttributeType;
-    } else if([infoD isEqualToString:@"Mins"] || [infoD isEqualToString:@"Km"] || [infoD isEqualToString:@"Miles"]) {
-        return NSFloatAttributeType;
-    }
-    NSLog(@"ERROR!! Unable to match attribute!");
-    return NAN;
-}
--(NSMutableArray*)setupModelWithArray:(NSArray*)arrayModel {
-    NSMutableArray *properties = [NSMutableArray new];
-    
-    NSAttributeDescription *dateAtt = [[NSAttributeDescription alloc] init];
-    [dateAtt setName:@"Date"];
-    [dateAtt setAttributeType:NSDateAttributeType];
-    [dateAtt setOptional:NO];
-    [properties addObject:dateAtt];
-    
-    [arrayModel enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        NSString *name = [obj valueForKey:@"WorkoutName"];
-        NSString *unit = [obj valueForKey:@"UnitOfMeasurement"];
-        
-        NSAttributeDescription *attribute = [[NSAttributeDescription alloc] init];
-        [attribute setName:name];
-        [attribute setAttributeType:[self getAttributeType:unit]];
-        [attribute setOptional:YES];
-        [attribute setDefaultValue:0];
-        [properties addObject:attribute];
-    }];
-    return properties;
-    
-}*/
-
-
-/*
- * Method for resetting all contents
- *
-
--(void)confirmFactoryReset {
-    UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"Erase All Content" message:@"Are you sure you want to continue erasing all data?" preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
-        [self eraseAllContent];
-    }];
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-        // determine what cancel will actually do lol
-    }];
-    
-    [alertC addAction:yesAction];
-    [alertC addAction:cancelAction];
-    [self presentViewController:alertC animated:YES completion:nil];
 }
 
--(void)eraseAllContent {
-    if([self removeSetupFile]) {
-        if([self removeStoresDirectory]) {
-            NSLog(@"Successfully erased all content!");
-            UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"Reset Complete" message:@"Application will now exit, please re-open iWorkout to start setup." preferredStyle:UIAlertControllerStyleAlert];
-            UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                exit(0);
-            }];
-            [alertC addAction:dismiss];
-            [self presentViewController:alertC animated:YES completion:nil];
-        }
-    }
-}
--(BOOL)removeSetupFile {
-    NSString *applicationDocumentsDirectoryPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *setupPath = [applicationDocumentsDirectoryPath stringByAppendingPathComponent:@"Setup.plist"];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSError *error;
+-(void)testDynamicsWithOldPos:(CGPoint)position {
+    __block float width, height;
+    width = self.settingsButton.frame.size.width;
+    height = self.settingsButton.frame.size.height;
     
-    if([fileManager fileExistsAtPath:setupPath]) {
-        if(![fileManager removeItemAtPath:setupPath error:&error]) {
-            NSLog(@"ERROR: %@", error.localizedDescription);
-            return NO;
-        } else {
-            NSLog(@"Successfully deleted setup file. ");
-            return YES;
-        }
-    } else {
-        NSLog(@"ERROR: File doesn't exist..");
-        return NO;
-    }
-}
-
-
--(BOOL)removeStoresDirectory {
-    NSString *applicationDocumentsDirectoryPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *storesDirectory = [applicationDocumentsDirectoryPath stringByAppendingPathComponent:@"Stores"];
-    //NSString *fullStorePath = @"iWorkout.sqlite"; - Just remove the directory instead...
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSError *error;
     
-    if([fileManager fileExistsAtPath:storesDirectory]) {
-        if(![fileManager removeItemAtPath:storesDirectory error:&error]) {
-            NSLog(@"ERROR: %@", error.localizedDescription);
-            return NO;
-        } else {
-            NSLog(@"Successfully deleted Stores directory. ");
-            return YES;
-        }
-    } else {
-        NSLog(@"ERROR: Stores directory doesn't exist..");
-        return NO;
-    }
+    self.dynamicAnimator = [[UIDynamicAnimator alloc] initWithReferenceView:self.view];
+    
+    UIGravityBehavior *gravity = [[UIGravityBehavior alloc] initWithItems:@[self.settingsButton]];
+    
+    //[gravity setGravityDirection:CGVectorMake(0.0f, 0.1f)];
+    
+    [self.dynamicAnimator addBehavior:gravity];
+    
+    UICollisionBehavior *collision = [[UICollisionBehavior alloc] initWithItems:@[self.settingsButton]];
+    collision.translatesReferenceBoundsIntoBoundary = YES;
+    [self.dynamicAnimator addBehavior:collision];
+    
+    
+    UISnapBehavior *snapBack = [[UISnapBehavior alloc] initWithItem:self.settingsButton snapToPoint:position];
+    [snapBack setDamping:1.0f];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.dynamicAnimator addBehavior:snapBack];
+        //[self.settingsButton setFrame:CGRectMake(position.x, position.y, width, height)];
+    });
+    
+    //self.settingsButton.frame.origin = position;
+    
+    
+    
+    
 }
-
- * END OF THE METHODS ---- (DELETION METHODS)
- */
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     if(self.class != [SetupViewController class]) {
     if([self setupDataExists]) {
-        NSString *setupPath = [[self applicationDocumentsDirectory] stringByAppendingPathComponent:@"Setup.plist"];
+        //NSString *setupPath = [[self applicationDocumentsDirectory] stringByAppendingPathComponent:@"Setup.plist"];
         NSLog(@"Found setup data!");
         /*
         NSArray *retrievedData = [[NSArray alloc] initWithContentsOfFile:setupPath];
@@ -286,5 +202,132 @@
 -(BOOL)prefersStatusBarHidden {
     return YES;
 }
+
+
+/*
+ -(NSManagedObjectModel *)_model {
+ NSManagedObjectModel *model = [[NSManagedObjectModel alloc] init];
+ 
+ NSEntityDescription *entity = [[NSEntityDescription alloc] init];
+ 
+ [entity setName:@"Workout"];
+ [entity setManagedObjectClassName:@"Workout"];
+ 
+ NSPropertyDescription *property = [[NSPropertyDescription alloc] init];
+ 
+ //[entity setProperties:[self setupModelWithArray:ARRAY]];
+ 
+ return model;
+ }*/
+/*
+ -(NSAttributeType)getAttributeType:(NSString*)infoD {
+ if([infoD isEqualToString:@"Reps"]) {
+ return NSInteger16AttributeType;
+ } else if([infoD isEqualToString:@"Mins"] || [infoD isEqualToString:@"Km"] || [infoD isEqualToString:@"Miles"]) {
+ return NSFloatAttributeType;
+ }
+ NSLog(@"ERROR!! Unable to match attribute!");
+ return NAN;
+ }
+ -(NSMutableArray*)setupModelWithArray:(NSArray*)arrayModel {
+ NSMutableArray *properties = [NSMutableArray new];
+ 
+ NSAttributeDescription *dateAtt = [[NSAttributeDescription alloc] init];
+ [dateAtt setName:@"Date"];
+ [dateAtt setAttributeType:NSDateAttributeType];
+ [dateAtt setOptional:NO];
+ [properties addObject:dateAtt];
+ 
+ [arrayModel enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+ NSString *name = [obj valueForKey:@"WorkoutName"];
+ NSString *unit = [obj valueForKey:@"UnitOfMeasurement"];
+ 
+ NSAttributeDescription *attribute = [[NSAttributeDescription alloc] init];
+ [attribute setName:name];
+ [attribute setAttributeType:[self getAttributeType:unit]];
+ [attribute setOptional:YES];
+ [attribute setDefaultValue:0];
+ [properties addObject:attribute];
+ }];
+ return properties;
+ 
+ }*/
+
+
+/*
+ * Method for resetting all contents
+ *
+ 
+ -(void)confirmFactoryReset {
+ UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"Erase All Content" message:@"Are you sure you want to continue erasing all data?" preferredStyle:UIAlertControllerStyleAlert];
+ UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+ [self eraseAllContent];
+ }];
+ UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+ // determine what cancel will actually do lol
+ }];
+ 
+ [alertC addAction:yesAction];
+ [alertC addAction:cancelAction];
+ [self presentViewController:alertC animated:YES completion:nil];
+ }
+ 
+ -(void)eraseAllContent {
+ if([self removeSetupFile]) {
+ if([self removeStoresDirectory]) {
+ NSLog(@"Successfully erased all content!");
+ UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"Reset Complete" message:@"Application will now exit, please re-open iWorkout to start setup." preferredStyle:UIAlertControllerStyleAlert];
+ UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+ exit(0);
+ }];
+ [alertC addAction:dismiss];
+ [self presentViewController:alertC animated:YES completion:nil];
+ }
+ }
+ }
+ -(BOOL)removeSetupFile {
+ NSString *applicationDocumentsDirectoryPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+ NSString *setupPath = [applicationDocumentsDirectoryPath stringByAppendingPathComponent:@"Setup.plist"];
+ NSFileManager *fileManager = [NSFileManager defaultManager];
+ NSError *error;
+ 
+ if([fileManager fileExistsAtPath:setupPath]) {
+ if(![fileManager removeItemAtPath:setupPath error:&error]) {
+ NSLog(@"ERROR: %@", error.localizedDescription);
+ return NO;
+ } else {
+ NSLog(@"Successfully deleted setup file. ");
+ return YES;
+ }
+ } else {
+ NSLog(@"ERROR: File doesn't exist..");
+ return NO;
+ }
+ }
+ 
+ 
+ -(BOOL)removeStoresDirectory {
+ NSString *applicationDocumentsDirectoryPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+ NSString *storesDirectory = [applicationDocumentsDirectoryPath stringByAppendingPathComponent:@"Stores"];
+ //NSString *fullStorePath = @"iWorkout.sqlite"; - Just remove the directory instead...
+ NSFileManager *fileManager = [NSFileManager defaultManager];
+ NSError *error;
+ 
+ if([fileManager fileExistsAtPath:storesDirectory]) {
+ if(![fileManager removeItemAtPath:storesDirectory error:&error]) {
+ NSLog(@"ERROR: %@", error.localizedDescription);
+ return NO;
+ } else {
+ NSLog(@"Successfully deleted Stores directory. ");
+ return YES;
+ }
+ } else {
+ NSLog(@"ERROR: Stores directory doesn't exist..");
+ return NO;
+ }
+ }
+ 
+ * END OF THE METHODS ---- (DELETION METHODS)
+ */
 
 @end

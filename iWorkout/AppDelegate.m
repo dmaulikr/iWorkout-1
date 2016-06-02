@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "DateChecker.h"
 
 @interface AppDelegate ()
 
@@ -160,7 +161,8 @@
     if([infoD isEqualToString:@"Reps"]) {
         return NSInteger16AttributeType;
     } else if([infoD isEqualToString:@"Mins"] || [infoD isEqualToString:@"Km"] || [infoD isEqualToString:@"Miles"]) {
-        return NSFloatAttributeType;
+        return NSDoubleAttributeType;
+        //return NSFloatAttributeType;
     }
     NSLog(@"ERROR!! Unable to match attribute!");
     return NAN;
@@ -202,38 +204,37 @@
     /*
      * Add function that checks latest database entry to ensure that latest date is created.
      */
-    NSDateFormatter *dateFormatter = [NSDateFormatter new];
-    [dateFormatter setDateFormat:@"dd-MM-yy"];
     
-    NSError *error;
-    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
-    [fetch setFetchLimit:1];
-    [fetch setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"Date" ascending:NO]]];
-    
-    
-    NSArray *fetchedObjects = [self.coreDataHelper.context executeFetchRequest:fetch error:&error];
-    if(fetchedObjects) {
-        NSManagedObject *obj = (NSManagedObject*)[fetchedObjects lastObject];
-        
-        NSString *lastDate = [dateFormatter stringFromDate:[obj valueForKey:@"Date"]];
-        NSString *todayDate = [dateFormatter stringFromDate:[NSDate date]];
-        
-        NSLog(@"Last date is: %@", lastDate);
-        //NSLog(@"Today is: %@", [dateFormatter stringFromDate:[NSDate date]]);
-        
-        if([todayDate isEqualToString:lastDate]) {
-            NSLog(@"Everything's smooth. Continuing with the date displayed.");
-        } else {
-            
-            if([lastDate compare:todayDate] == NSOrderedAscending) {
-                [self addTodayEntry];
-                NSLog(@"Added todays entry!");
-            }
-        }
-        
-        
+    if([self checkIfTodayExists]) {
+        NSLog(@"Smooth..");
+    } else {
+        NSLog(@"Today date doesnt exist, creating a new entry");
+        [self addTodayEntry];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"SomethingChanged" object:nil];
     }
+}
+
+-(BOOL)checkIfTodayExists {
+    NSError *error;
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
+    [fetchRequest setFetchLimit:1];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"Date" ascending:NO]]];
+
+    NSArray *fetchedObjects = [self.coreDataHelper.context executeFetchRequest:fetchRequest error:&error];
     
+    if(fetchedObjects) {
+        NSManagedObject *object = (NSManagedObject*)[fetchedObjects lastObject];
+        NSDate *fetchedDate = (NSDate*)[object valueForKey:@"Date"];
+        
+        BOOL isToday = [DateChecker isSameAsToday:fetchedDate];
+        
+        if(isToday) {
+            NSLog(@"Today entry exists");
+            return YES;
+        }
+        [_coreDataHelper.context refreshObject:object mergeChanges:NO];
+    }
+    return NO;
 }
 -(void)addTodayEntry {
     NSManagedObject *newObject = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:_coreDataHelper.context];
@@ -242,9 +243,7 @@
     [_coreDataHelper.context refreshObject:newObject mergeChanges:NO];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SomethingChanged" object:nil];
 }
--(void)refreshDate:(NSDate*)latestDate {
-    
-}
+
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.

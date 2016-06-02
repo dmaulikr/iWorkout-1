@@ -7,7 +7,7 @@
 //
 
 #import "WorkoutViewController.h"
-
+#import "DateFormat.h"
 
 @interface WorkoutViewController ()
 
@@ -67,10 +67,6 @@
     return [NSString stringWithFormat:@"Last modified: %@", lastModded];
 }
 -(NSString*)compareDates {
-    // USE THIS INSTEAD
-    // ****************
-    // http://stackoverflow.com/questions/10373911/how-to-calculate-time-difference-in-minutes-between-two-dates-in-ios
-    
     NSMutableString *string = [NSMutableString string];
     NSDate *dateModified = (NSDate*)[workout valueForKey:@"LastModified"];
     
@@ -118,31 +114,7 @@
     UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addReps)];
     self.navigationItem.rightBarButtonItem = addButton;
 }
--(NSString *)getSuffixForDate:(NSDate*)theDate
-{
-    NSDateFormatter *dayOf = [NSDateFormatter new];
-    [dayOf setDateFormat:@"dd"];
-    
-    int number = [[dayOf stringFromDate:theDate] intValue];
-    
-    NSString *suffix;
-    
-    int ones = number % 10;
-    int tens = (number/10) % 10;
-    
-    if (tens ==1) {
-        suffix = [NSString stringWithFormat:@"th"];
-    } else if (ones ==1){
-        suffix = [NSString stringWithFormat:@"st"];
-    } else if (ones ==2){
-        suffix = [NSString stringWithFormat:@"nd"];
-    } else if (ones ==3){
-        suffix = [NSString stringWithFormat:@"rd"];
-    } else {
-        suffix = [NSString stringWithFormat:@"th"];
-    }
-    return suffix;
-}
+
 
 -(void)setupData {
     workout = (NSManagedObject*)[cdh.context objectWithID:objectID];
@@ -167,18 +139,18 @@
     textOfLabel = textIn;
 }
 -(void)requestEntryToAddAtIndex:(NSInteger)indexPass {
-    __block BOOL isFloat;
+    __block BOOL isDouble;
     
     NSString *unitName = (NSString*)[arrayOfUnits objectAtIndex:_selectedIndexPath.row];
     if([unitName isEqualToString:@"Miles"] || [unitName isEqualToString:@"Km"] || [unitName isEqualToString:@"Mins"]) {
-        isFloat = YES;
+        isDouble = YES;
     } else {
-        isFloat = NO;
+        isDouble = NO;
     }
     
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Add" message:@"Enter data to add:" preferredStyle:UIAlertControllerStyleAlert];
     [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-        if(isFloat) {
+        if(isDouble) {
             textField.keyboardType = UIKeyboardTypeDecimalPad;
         }
         else {
@@ -187,9 +159,9 @@
     }];
     __block NSNumber *countToAdd;
     UIAlertAction *add = [UIAlertAction actionWithTitle:@"Add" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        if(isFloat) {
-            float oldValue = [[workout valueForKey:[arrayOfWorkouts objectAtIndex:indexPass]] floatValue];
-            NSNumber *newValue = [NSNumber numberWithFloat:(oldValue+[alertController.textFields.firstObject.text floatValue])];
+        if(isDouble) {
+            double oldValue = [[workout valueForKey:[arrayOfWorkouts objectAtIndex:indexPass]] doubleValue];
+            NSNumber *newValue = [NSNumber numberWithDouble:(oldValue+[alertController.textFields.firstObject.text doubleValue])];
             countToAdd = newValue;
         } else {
             int oldValue = [[workout valueForKey:[arrayOfWorkouts objectAtIndex:indexPass]] intValue];
@@ -250,7 +222,7 @@
     
     NSNumber *reps;
     if([unit isEqualToString:@"Miles"] || [unit isEqualToString:@"Km"] || [unit isEqualToString:@"Mins"]) {
-        reps = [NSNumber numberWithFloat:[[workout valueForKey:name] floatValue]];
+        reps = [NSNumber numberWithDouble:[[workout valueForKey:name] doubleValue]];
     } else {
         reps = [NSNumber numberWithInt:[[workout valueForKey:name] intValue]];
     }
