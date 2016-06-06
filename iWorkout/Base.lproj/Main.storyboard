@@ -18,56 +18,25 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tap to Start" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NKC-Z4-RQI">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Tap to Start" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NKC-Z4-RQI">
                                 <rect key="frame" x="102" y="488" width="117" height="34"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="34" id="bm7-dM-4Y5"/>
-                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="iWorkout" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="krz-35-Bba">
-                                <rect key="frame" x="23" y="44" width="278" height="98"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="98" id="753-yH-06d"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" name="ChalkboardSE-Regular" family="Chalkboard SE" pointSize="60"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SJt-9f-1a9">
-                                <rect key="frame" x="123" y="172" width="75" height="83"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="83" id="4wC-3i-Wep"/>
-                                    <constraint firstAttribute="width" constant="75" id="MFk-sh-0D6"/>
-                                </constraints>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SJt-9f-1a9">
+                                <rect key="frame" x="123" y="215" width="75" height="83"/>
                                 <state key="normal" image="settings.png"/>
                                 <connections>
                                     <segue destination="5Rf-eG-PKD" kind="show" id="oIQ-Vn-gBN"/>
                                 </connections>
                             </button>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="iworkout_logo.png" translatesAutoresizingMaskIntoConstraints="NO" id="42D-bb-wff">
+                                <rect key="frame" x="16" y="114" width="289" height="72"/>
+                            </imageView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <gestureRecognizers/>
-                        <constraints>
-                            <constraint firstItem="krz-35-Bba" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="topMargin" constant="44" id="055-mr-bAr"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="krz-35-Bba" secondAttribute="trailing" constant="3" id="5Ph-3d-RxC"/>
-                            <constraint firstItem="SJt-9f-1a9" firstAttribute="centerX" secondItem="NKC-Z4-RQI" secondAttribute="centerX" id="6LS-5K-MpA"/>
-                            <constraint firstItem="krz-35-Bba" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="7" id="EML-Aw-tMZ"/>
-                            <constraint firstItem="SJt-9f-1a9" firstAttribute="top" secondItem="krz-35-Bba" secondAttribute="bottom" constant="30" id="Jlp-ih-5Iu"/>
-                            <constraint firstItem="SJt-9f-1a9" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="K9q-Hr-kYv"/>
-                            <constraint firstItem="krz-35-Bba" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="topMargin" constant="49" id="KCP-wI-ZeB"/>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="NKC-Z4-RQI" secondAttribute="bottom" constant="46" id="RuA-fw-PRd"/>
-                            <constraint firstItem="NKC-Z4-RQI" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="86" id="WAI-Yv-gX6"/>
-                            <constraint firstItem="krz-35-Bba" firstAttribute="centerX" secondItem="NKC-Z4-RQI" secondAttribute="centerX" constant="3" id="vVx-pm-6Gx"/>
-                        </constraints>
-                        <variation key="default">
-                            <mask key="constraints">
-                                <exclude reference="KCP-wI-ZeB"/>
-                                <exclude reference="vVx-pm-6Gx"/>
-                            </mask>
-                        </variation>
                         <connections>
                             <outletCollection property="gestureRecognizers" destination="yY4-Oi-NHE" appends="YES" id="WIj-7I-PJd"/>
                         </connections>
@@ -576,6 +545,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="iworkout_logo.png" width="1004" height="223"/>
         <image name="settings.png" width="1742" height="1920"/>
     </resources>
 </document>
