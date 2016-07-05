@@ -16,7 +16,9 @@
 @implementation AppDelegate
 {
     NSString *applicationDocDir;
+    BOOL autoLockSetting;
 }
+
 
 +(NSString*)getPath {
     NSString *applicationDocDir = (NSString*)[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
@@ -181,15 +183,39 @@
     return NO;
 }
 
+-(void)setAutoLock:(BOOL)lockSet {
+    autoLockSetting = lockSet;
+    if(lockSet) {
+        [self switchLock:YES];
+    } else {
+        [self switchLock:NO];
+    }
+}
+-(void)switchLock:(BOOL)lockSetting {
+    if(lockSetting) {
+        [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
+        NSLog(@"Idle timer switched off");
+    } else {
+        [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
+        NSLog(@"Idle timer returned to natural state.");
+    }
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    
+    if(autoLockSetting) {
+        [self setAutoLock:YES];
+    }
     return YES;
 }
+
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
+    if(autoLockSetting) {
+        [self setAutoLock:NO];
+    }
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
@@ -200,17 +226,21 @@
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
     
-    NSLog(@"Read AppDelegate");
+    //NSLog(@"Read AppDelegate");
     /*
      * Add function that checks latest database entry to ensure that latest date is created.
      */
-    
+   
     if([self checkIfTodayExists]) {
-        NSLog(@"Smooth..");
+        NSLog(@"Today date exists.");
     } else {
         NSLog(@"Today date doesnt exist, creating a new entry");
+        if(_coreDataHelper.context) {
         [self addTodayEntry];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"SomethingChanged" object:nil];
+        } else {
+            //NSLog(@"ERROR: Context doesn't exist, check App Delegate.");
+        }
     }
 }
 
@@ -229,7 +259,7 @@
         BOOL isToday = [DateChecker isSameAsToday:fetchedDate];
         
         if(isToday) {
-            NSLog(@"Today entry exists");
+            //NSLog(@"Today entry exists");
             return YES;
         }
         [_coreDataHelper.context refreshObject:object mergeChanges:NO];
@@ -247,6 +277,10 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    if(autoLockSetting) {
+        [self switchLock:YES];
+        NSLog(@"Idle timer is DISABLED.");
+    }
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {

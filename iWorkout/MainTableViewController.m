@@ -67,21 +67,13 @@
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-
     
+    UIEdgeInsets inset = UIEdgeInsetsMake(5, 0, 0, 0);
+    self.tableView.contentInset = inset;
+    [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
     
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(SomethingChanged) name:@"SomethingChanged" object:nil];
-    
-    self.dateformatter = [[NSDateFormatter alloc] init];
-    [self.dateformatter setDateFormat:@"dd-MM-yy"];
-    
-    //NSLog(@"Date index is: %i", [[[NSUserDefaults standardUserDefaults] valueForKey:@"DateFormatIndex"] intValue]);
 
     
     UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshDate)];
@@ -97,6 +89,9 @@
         
         // Creating today entry
         [self addTodayEntry];
+        
+        /* ADD TEMP DATA FOR SCREENSHOTS
+        [self addTempData]; */
         
         // Updating view
         [self refreshDate];
@@ -116,7 +111,6 @@
 -(void)delayConfirm {
     // Update view
     [self refreshDate];
-    
     
     if([self hasLatestDateBeenCreated]) {
         NSLog(@"Successfully created todays entry!");
@@ -201,16 +195,43 @@
         BOOL isToday = [DateChecker areDatesEqual:date andDate:[NSDate date]];
         
         cell.textLabel.text = [DateFormat getDateStringFromDate:date withIndex:[self getDateIndex]];
-
+        cell.textLabel.backgroundColor = [UIColor clearColor];
+        
         if(isToday) {
             cell.imageView.image = [self getImageForToday:YES];
         } else {
             cell.imageView.image = [self getImageForToday:NO];
         }
+        
+        // Set background image
+        UIImage *background = [self cellBackgroundForRowAtIndexPath:indexPath];
+        
+        UIImageView *cellBackgroundView = [[UIImageView alloc] initWithImage:background];
+        cellBackgroundView.image = background;
+        cell.backgroundView = cellBackgroundView;
 
     }
     return cell;
 }
+
+-(UIImage*)cellBackgroundForRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSInteger rowCount = [self tableView:[self tableView] numberOfRowsInSection:0];
+    NSInteger rowIndex = indexPath.row;
+    UIImage *background = nil;
+    
+    if(rowIndex == 0) {
+        // Top row
+        background = [UIImage imageNamed:@"cell_top.png"];
+    } else if(rowIndex == rowCount - 1) {
+        // Bottom row
+        background = [UIImage imageNamed:@"cell_bottom.png"];
+    } else {
+        // All other rows inbetween
+        background = [UIImage imageNamed:@"cell_middle.png"];
+    }
+    return background;
+}
+
 
 -(UIImage*)getImageForToday:(BOOL)today {
     if(today) {
@@ -239,7 +260,8 @@
     [self getWeekNo:(NSDate*)[object valueForKey:@"Date"]];
     
     
-    NSString *dateL = [NSString stringWithFormat:@"%@", [self.dateformatter stringFromDate:[object valueForKey:@"Date"]]];
+    //NSString *dateL = [NSString stringWithFormat:@"%@", [self.dateformatter stringFromDate:[object valueForKey:@"Date"]]];
+    NSString *dateL = [NSString stringWithFormat:@"%@", [DateFormat getDateStringFromDate:[object valueForKey:@"Date"]]];
     
     [workoutVC setDateLabelText:dateL];
     
@@ -298,6 +320,42 @@
     [alert addAction:cancel];
     [self presentViewController:alert animated:YES completion:nil];
 }
+
+
+
+
+/* Temporary data being added */
+-(void)addTempData {
+    NSManagedObject *dayOne = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:cdh.context];
+    NSManagedObject *dayTwo = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:cdh.context];
+    NSManagedObject *dayThree = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:cdh.context];
+ 
+    NSDateFormatter *dateFormatter = [NSDateFormatter new];
+    [dateFormatter setDateFormat:@"dd-MM-yyyy HH:mm:ss"];
+ 
+    NSDate *dayOneDate = [dateFormatter dateFromString:@"20-06-2016 15:30:00"];
+    NSDate *dayTwoDate = [dateFormatter dateFromString:@"19-06-2016 16:30:00"];
+    NSDate *dayThreeDate = [dateFormatter dateFromString:@"18-06-2016 17:30:00"];
+ 
+    //dayOne.date = dayOneDate;
+    //dayTwo.date = dayTwoDate;
+    //dayThree.date = dayThreeDate;
+    [dayOne setValue:dayOneDate forKey:@"Date"];
+    [dayTwo setValue:dayTwoDate forKey:@"Date"];
+    [dayThree setValue:dayThreeDate forKey:@"Date"];
+ 
+    /* What other data do I add.....?
+     
+    dayOne.hours = [NSNumber numberWithDouble:2.0];
+    dayTwo.hours = [NSNumber numberWithDouble:4.0];
+    dayThree.hours = [NSNumber numberWithDouble:6.0];
+    */
+    
+ 
+ 
+    [cdh backgroundSaveContext];
+}
+
 
 
 

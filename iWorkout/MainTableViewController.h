@@ -13,6 +13,6 @@
 
 // FetchedResultsController
 @property (nonatomic, strong) NSFetchedResultsController *frc;
-@property (nonatomic, strong) NSDateFormatter *dateformatter;
+//@property (nonatomic, strong) NSDateFormatter *dateformatter;
 
 @end

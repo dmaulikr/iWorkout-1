@@ -25,9 +25,20 @@
 {
     return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
 }
+
+#warning TO DO:: Finish settings page up
+
 #pragma mark - VIEW
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    AppDelegate *appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+    
+    BOOL isAutoLockOn = [[[NSUserDefaults standardUserDefaults] valueForKey:@"DisableAutoLock"] boolValue];
+    
+    
+    NSLog(@"Auto lock is: %@", isAutoLockOn ? @"ON" : @"OFF");
+    [appDelegate setAutoLock:isAutoLockOn];
     
     /*
     CGPoint oldPositionOfButton = self.settingsButton.frame.origin;
@@ -182,13 +193,17 @@
         //CoreDataHelper *cdh = [(AppDelegate*)[[UIApplication sharedApplication] delegate] cdh];
         [(AppDelegate*)[[UIApplication sharedApplication] delegate] cdh];
         
-        // Initialize the presenting view
-        MainTableViewController *mainTVC = [self.storyboard instantiateViewControllerWithIdentifier:@"MainTableViewController"];
-        [self.navigationController pushViewController:mainTVC animated:YES];
+        [self presentMainView];
     } else {
         NSLog(@"ERROR: Setup isnt complete.");
     }
+}
+-(void)presentMainView {
+    // Initialize the presenting view
+    MainTableViewController *mainTVC = [self.storyboard instantiateViewControllerWithIdentifier:@"MainTableViewController"];
+    //MainViewController *mainVC = [self.storyboard instantiateViewControllerWithIdentifier:@"MainViewController"];
     
+    [self.navigationController pushViewController:mainTVC animated:YES];
 }
 
 -(void)tapGesture {
@@ -203,131 +218,5 @@
     return YES;
 }
 
-
-/*
- -(NSManagedObjectModel *)_model {
- NSManagedObjectModel *model = [[NSManagedObjectModel alloc] init];
- 
- NSEntityDescription *entity = [[NSEntityDescription alloc] init];
- 
- [entity setName:@"Workout"];
- [entity setManagedObjectClassName:@"Workout"];
- 
- NSPropertyDescription *property = [[NSPropertyDescription alloc] init];
- 
- //[entity setProperties:[self setupModelWithArray:ARRAY]];
- 
- return model;
- }*/
-/*
- -(NSAttributeType)getAttributeType:(NSString*)infoD {
- if([infoD isEqualToString:@"Reps"]) {
- return NSInteger16AttributeType;
- } else if([infoD isEqualToString:@"Mins"] || [infoD isEqualToString:@"Km"] || [infoD isEqualToString:@"Miles"]) {
- return NSFloatAttributeType;
- }
- NSLog(@"ERROR!! Unable to match attribute!");
- return NAN;
- }
- -(NSMutableArray*)setupModelWithArray:(NSArray*)arrayModel {
- NSMutableArray *properties = [NSMutableArray new];
- 
- NSAttributeDescription *dateAtt = [[NSAttributeDescription alloc] init];
- [dateAtt setName:@"Date"];
- [dateAtt setAttributeType:NSDateAttributeType];
- [dateAtt setOptional:NO];
- [properties addObject:dateAtt];
- 
- [arrayModel enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
- NSString *name = [obj valueForKey:@"WorkoutName"];
- NSString *unit = [obj valueForKey:@"UnitOfMeasurement"];
- 
- NSAttributeDescription *attribute = [[NSAttributeDescription alloc] init];
- [attribute setName:name];
- [attribute setAttributeType:[self getAttributeType:unit]];
- [attribute setOptional:YES];
- [attribute setDefaultValue:0];
- [properties addObject:attribute];
- }];
- return properties;
- 
- }*/
-
-
-/*
- * Method for resetting all contents
- *
- 
- -(void)confirmFactoryReset {
- UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"Erase All Content" message:@"Are you sure you want to continue erasing all data?" preferredStyle:UIAlertControllerStyleAlert];
- UIAlertAction *yesAction = [UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
- [self eraseAllContent];
- }];
- UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
- // determine what cancel will actually do lol
- }];
- 
- [alertC addAction:yesAction];
- [alertC addAction:cancelAction];
- [self presentViewController:alertC animated:YES completion:nil];
- }
- 
- -(void)eraseAllContent {
- if([self removeSetupFile]) {
- if([self removeStoresDirectory]) {
- NSLog(@"Successfully erased all content!");
- UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"Reset Complete" message:@"Application will now exit, please re-open iWorkout to start setup." preferredStyle:UIAlertControllerStyleAlert];
- UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
- exit(0);
- }];
- [alertC addAction:dismiss];
- [self presentViewController:alertC animated:YES completion:nil];
- }
- }
- }
- -(BOOL)removeSetupFile {
- NSString *applicationDocumentsDirectoryPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
- NSString *setupPath = [applicationDocumentsDirectoryPath stringByAppendingPathComponent:@"Setup.plist"];
- NSFileManager *fileManager = [NSFileManager defaultManager];
- NSError *error;
- 
- if([fileManager fileExistsAtPath:setupPath]) {
- if(![fileManager removeItemAtPath:setupPath error:&error]) {
- NSLog(@"ERROR: %@", error.localizedDescription);
- return NO;
- } else {
- NSLog(@"Successfully deleted setup file. ");
- return YES;
- }
- } else {
- NSLog(@"ERROR: File doesn't exist..");
- return NO;
- }
- }
- 
- 
- -(BOOL)removeStoresDirectory {
- NSString *applicationDocumentsDirectoryPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
- NSString *storesDirectory = [applicationDocumentsDirectoryPath stringByAppendingPathComponent:@"Stores"];
- //NSString *fullStorePath = @"iWorkout.sqlite"; - Just remove the directory instead...
- NSFileManager *fileManager = [NSFileManager defaultManager];
- NSError *error;
- 
- if([fileManager fileExistsAtPath:storesDirectory]) {
- if(![fileManager removeItemAtPath:storesDirectory error:&error]) {
- NSLog(@"ERROR: %@", error.localizedDescription);
- return NO;
- } else {
- NSLog(@"Successfully deleted Stores directory. ");
- return YES;
- }
- } else {
- NSLog(@"ERROR: Stores directory doesn't exist..");
- return NO;
- }
- }
- 
- * END OF THE METHODS ---- (DELETION METHODS)
- */
 
 @end

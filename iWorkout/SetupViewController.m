@@ -17,9 +17,6 @@ NSString * const customName = @"Create custom...";
 
 @implementation SetupViewController
 
-#warning Remove spaces from the workout name and replace with underscore (_)
-
-
 #warning Maybe consider replacing the '+' button with 'Add workout'
  
 

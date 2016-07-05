@@ -7,9 +7,9 @@
 //
 
 #import "SettingsTableViewController.h"
+#import "AppDelegate.h"
 
 @interface SettingsTableViewController () <UIPickerViewDelegate, UIPickerViewDataSource, UITableViewDelegate>
-
 
 @end
 
@@ -18,6 +18,9 @@
     NSArray *pickerArray;
 }
 
+#warning On tapping the Date Format, show a Popup view that lets you select a date instead.
+#warning FIX THE DATE FORMAT.
+
 -(IBAction)switchedOn:(id)sender
 {
     UISwitch *theSwitch = (UISwitch*)sender;
@@ -25,6 +28,17 @@
     
     if(switchTag == 1) {
         // Auto save
+        
+        UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"ERROR" message:@"Unable to switch off Auto Save.\nIt is automatically always switched ON" preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alertC addAction:[UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+            
+        }]];
+        [self presentViewController:alertC animated:YES completion:^{
+            [theSwitch setOn:YES];
+        }];
+        
+        /*
         if(theSwitch.on) {
             [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"AutoSaveData"];
             if([[NSUserDefaults standardUserDefaults] synchronize]) {
@@ -39,13 +53,16 @@
             } else {
                 NSLog(@"Error while saving settings");
             }
-        }
+         
+        }*/
     } else {
         // Auto Lock
         if(theSwitch.on) {
             [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"DisableAutoLock"];
             if([[NSUserDefaults standardUserDefaults] synchronize]) {
                 NSLog(@"Disable auto lock is now ON");
+                AppDelegate *appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+                [appDelegate setAutoLock:YES];
             } else {
                 NSLog(@"Error while saving settings");
             }
@@ -53,6 +70,8 @@
             [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:NO] forKey:@"DisableAutoLock"];
             if([[NSUserDefaults standardUserDefaults] synchronize]) {
                 NSLog(@"Disable auto lock is now OFF");
+                AppDelegate *appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+                [appDelegate setAutoLock:NO];
             } else {
                 NSLog(@"Error while saving settings");
             }
@@ -64,6 +83,7 @@
     // Load the date format
     if([self dateIndexExists]) {
         int dateIndex = [self getDateIndex];
+        NSLog(@"Date index: %i", dateIndex);
         if(dateIndex == 1) {
             [self.dateformatPicker selectRow:1 inComponent:0 animated:YES];
         } else if(dateIndex == 2) {
@@ -77,15 +97,17 @@
     }
     
     // Load Auto-Save settings
+    /*
     if([self autoSaveExists]) {
         // Set the appropriate existing switch on view
         BOOL autoSaveOn;
         autoSaveOn = [[[NSUserDefaults standardUserDefaults] valueForKey:@"AutoSaveData"] boolValue];
         [self.autoSaveSwitch setOn:autoSaveOn];
-        
     } else {
         [self.autoSaveSwitch setOn:NO];
     }
+    */
+    [self.autoSaveSwitch setOn:YES];
     
     // Load Auto-Lock settings
     if([self autoLockExists]){
@@ -93,6 +115,7 @@
         BOOL disableAutoLock;
         disableAutoLock = [[[NSUserDefaults standardUserDefaults] valueForKey:@"DisableAutoLock"] boolValue];
         [self.autoLockSwitch setOn:disableAutoLock];
+        NSLog(@"Auto lock is: %@", disableAutoLock ? @"ON" : @"OFF");
         
     } else {
         [self.autoLockSwitch setOn:NO];
@@ -140,7 +163,9 @@
     
     pickerArray = [NSArray arrayWithObjects:@"25-03-16",@"25th March 16",@"Friday 25th",@"Friday (25-03-16)",@"Friday 25th March 2016", nil];
     
+   // [self setAppropriateLoadedSettings];
 }
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -149,9 +174,13 @@
     
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    
+    //[self setAppropriateLoadedSettings];
 }
 -(void)viewWillLayoutSubviews {
     // This runs 3 times (?)
+    
+    
     [self setAppropriateLoadedSettings];
 }
 
@@ -279,7 +308,8 @@
             case 0:
                 NSLog(@"Delete all workout days..");
                 [tableView deselectRowAtIndexPath:indexPath animated:YES];
-                [self deleteAllWorkoutsIndexPath:indexPath];
+                //[self deleteAllWorkoutsIndexPath:indexPath];
+                [self confirmDeleteAllWorkouts];
                 break;
             case 1:
                 NSLog(@"Erasing all content...");
@@ -292,7 +322,7 @@
         [tableView deselectRowAtIndexPath:indexPath animated:YES]; // To ensure the top settings are not selectable.
     }
 }
-
+/*
 -(void)deleteAllWorkoutsIndexPath:(NSIndexPath*)indexPath {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"This function is not available yet." preferredStyle:UIAlertControllerStyleAlert];
     
@@ -302,6 +332,52 @@
     [alert addAction:dismiss];
     
     [self presentViewController:alert animated:YES completion:nil];
+}*/
+
+-(void)confirmDeleteAllWorkouts {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Confirm Delete" message:@"Are you sure you would like to delete all your current workout days?" preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"Confirm" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        [self deleteAllWorkouts];
+    }];
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        // Do nothing.
+    }];
+    [alert addAction:cancel];
+    [alert addAction:confirm];
+    [self presentViewController:alert animated:YES completion:nil];
+    
+}
+
+-(void)deleteAllWorkouts {
+    
+    @autoreleasepool {
+        NSError *error;
+        AppDelegate *appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+        NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
+        [fetch setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"Date" ascending:NO]]];
+        NSArray *fetchedObjects = [appDelegate.coreDataHelper.context executeFetchRequest:fetch error:&error];
+        
+        if(fetchedObjects) {
+            for(NSManagedObject *object in fetchedObjects) {
+                [appDelegate.coreDataHelper.context deleteObject:object];
+            }
+            NSLog(@"Successfully deleted objects.");
+            [appDelegate.coreDataHelper backgroundSaveContext];
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Success!" message:@"Successfully deleted all workouts" preferredStyle:UIAlertControllerStyleAlert];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:nil]];
+            [self presentViewController:alert animated:YES completion:nil];
+            
+        } else {
+            NSLog(@"ERROR: Unable to fetch objects!");
+            return;
+        }
+        
+
+        
+       
+        
+    }
 }
 
 //#pragma mark - Table view data source

@@ -11,7 +11,10 @@
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
+
 @property (strong, nonatomic) UIWindow *window;
+
+
 
 // Access to CoreDataHelper property
 @property (nonatomic, strong, readonly) CoreDataHelper *coreDataHelper;
@@ -24,5 +27,7 @@
 +(NSArray*)getUnits;
 
 -(BOOL)checkIfTodayExists;
+-(void)setAutoLock:(BOOL)lockSet;
+
 @end
 

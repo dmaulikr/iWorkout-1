@@ -18,25 +18,45 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Tap to Start" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NKC-Z4-RQI">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tap to Start" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NKC-Z4-RQI">
                                 <rect key="frame" x="102" y="488" width="117" height="34"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="34" id="6PW-Ev-K4r"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SJt-9f-1a9">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SJt-9f-1a9">
                                 <rect key="frame" x="123" y="215" width="75" height="83"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="75" id="Wgm-xB-vJ5"/>
+                                    <constraint firstAttribute="height" constant="83" id="sCG-CZ-wKT"/>
+                                </constraints>
                                 <state key="normal" image="settings.png"/>
                                 <connections>
                                     <segue destination="5Rf-eG-PKD" kind="show" id="oIQ-Vn-gBN"/>
                                 </connections>
                             </button>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="iworkout_logo.png" translatesAutoresizingMaskIntoConstraints="NO" id="42D-bb-wff">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="iworkout_logo.png" translatesAutoresizingMaskIntoConstraints="NO" id="42D-bb-wff">
                                 <rect key="frame" x="16" y="114" width="289" height="72"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="72" id="Drb-p1-tK4"/>
+                                </constraints>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <gestureRecognizers/>
+                        <constraints>
+                            <constraint firstItem="SJt-9f-1a9" firstAttribute="top" secondItem="42D-bb-wff" secondAttribute="bottom" constant="29" id="7C4-Br-WES"/>
+                            <constraint firstItem="42D-bb-wff" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="QI8-va-xso"/>
+                            <constraint firstItem="SJt-9f-1a9" firstAttribute="centerX" secondItem="NKC-Z4-RQI" secondAttribute="centerX" id="QlR-VT-OKw"/>
+                            <constraint firstItem="NKC-Z4-RQI" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="86" id="XJN-cQ-pJU"/>
+                            <constraint firstItem="42D-bb-wff" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="YAd-jz-Yxm"/>
+                            <constraint firstItem="42D-bb-wff" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="50" id="ccA-it-cGR"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="NKC-Z4-RQI" secondAttribute="bottom" constant="46" id="huH-vL-LcI"/>
+                            <constraint firstItem="42D-bb-wff" firstAttribute="centerX" secondItem="SJt-9f-1a9" secondAttribute="centerX" id="q5S-Ie-fPA"/>
+                        </constraints>
                         <connections>
                             <outletCollection property="gestureRecognizers" destination="yY4-Oi-NHE" appends="YES" id="WIj-7I-PJd"/>
                         </connections>
@@ -190,7 +210,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CMZ-Db-2P5" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-949" y="-229"/>
+            <point key="canvasLocation" x="-1217" y="-226"/>
         </scene>
         <!--iWorkout-->
         <scene sceneID="eEB-10-qvS">
@@ -228,7 +248,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="bQt-3p-3sA" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-403" y="-270"/>
+            <point key="canvasLocation" x="-277" y="-321"/>
         </scene>
         <!--Workout View Controller-->
         <scene sceneID="XDx-ma-Njw">
