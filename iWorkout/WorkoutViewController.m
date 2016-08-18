@@ -168,7 +168,10 @@
             NSNumber *newValue = [NSNumber numberWithInt:(oldValue+[alertController.textFields.firstObject.text intValue])];
             countToAdd = newValue;
         }
+        //NSLog(@"End editing: %@", [alertController.view endEditing:YES] ? @"Success" : @"Fail");
+#warning Experiment with EndEditing function to speed up keyboard dismissal
         [self addEntry:countToAdd toWorkoutAtIndex:indexPass];
+        
     }];
     UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDestructive handler:nil];
     
