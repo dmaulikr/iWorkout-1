@@ -79,7 +79,6 @@ NSString * const customName = @"Create custom...";
         NSLog(@"%@ (%@)", [obj valueForKey:@"WorkoutName"], [obj valueForKey:@"UnitOfMeasurement"]);
     }];
     [self dismissViewControllerAnimated:YES completion:nil];
-    
 
     NSString *path = [[self applicationDocumentsDirectory] stringByAppendingPathComponent:@"Setup.plist"];
     
@@ -243,15 +242,12 @@ NSString * const customName = @"Create custom...";
 
 -(void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
     [self becomeFirstResponder];
-   // NSLog(@"Selected new one!");
     [self.textField resignFirstResponder];
 }
-
 
 -(BOOL)prefersStatusBarHidden {
     return YES;
 }
-
 
 -(BOOL)isValidStringLength:(NSString*)string {
     if(string.length > 30) {

@@ -42,12 +42,9 @@
     
     [self createButtonOnNav];
     
-    // new feature
-    //self.lastModifiedLabel.text = [self getModified];
-    
-    [self lastModded];
+    [self setLastModded];
 }
--(void)lastModded {
+-(void)setLastModded {
     NSString *lastMod = [self compareDates];
     
     if(lastMod) {
@@ -96,7 +93,6 @@
     return nil;
 }
 -(void)createButtonOnNav {
-    //self.navigationItem.title = dateLabel.text;
     NSDateFormatter *newFormat = [NSDateFormatter new];
     [newFormat setDateFormat:@"EEEE"];
     
@@ -105,11 +101,6 @@
     NSDate *workoutDate = (NSDate*)[workout valueForKey:@"Date"];
     NSString *navTitle = [NSString stringWithFormat:@"%@ (%@)",[newFormat stringFromDate:workoutDate],[self.dateformatter stringFromDate:workoutDate]];
     self.navigationItem.title = navTitle;
-    
-   // NSDateFormatter *testformatter = [NSDateFormatter new];
-    //[testformatter setDateFormat:@"LLLL"];
-    
-    //NSLog(@"This is: %@", [NSString stringWithFormat:@"%@ %@",navTitle, [testformatter stringFromDate:workoutDate]]);
     
     UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addReps)];
     self.navigationItem.rightBarButtonItem = addButton;
@@ -150,6 +141,7 @@
     
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Add" message:@"Enter data to add:" preferredStyle:UIAlertControllerStyleAlert];
     [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        [textField setTextAlignment:NSTextAlignmentCenter];
         if(isDouble) {
             textField.keyboardType = UIKeyboardTypeDecimalPad;
         }
@@ -159,6 +151,7 @@
     }];
     __block NSNumber *countToAdd;
     UIAlertAction *add = [UIAlertAction actionWithTitle:@"Add" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        /*
         if(isDouble) {
             double oldValue = [[workout valueForKey:[arrayOfWorkouts objectAtIndex:indexPass]] doubleValue];
             NSNumber *newValue = [NSNumber numberWithDouble:(oldValue+[alertController.textFields.firstObject.text doubleValue])];
@@ -168,9 +161,19 @@
             NSNumber *newValue = [NSNumber numberWithInt:(oldValue+[alertController.textFields.firstObject.text intValue])];
             countToAdd = newValue;
         }
-        //NSLog(@"End editing: %@", [alertController.view endEditing:YES] ? @"Success" : @"Fail");
+        */
+        NSString *textfieldString = [alertController.textFields.firstObject text];
+        
+        [alertController.view endEditing:YES];
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+            [self addDataForIndex:indexPass withText:textfieldString IsDouble:isDouble];
+        });
+        
 #warning Experiment with EndEditing function to speed up keyboard dismissal
-        [self addEntry:countToAdd toWorkoutAtIndex:indexPass];
+        //NSLog(@"End editing: %@", [alertController.view endEditing:YES] ? @"Success" : @"Fail");
+
+        //[alertController.view endEditing:YES];
+        //[self addEntry:countToAdd toWorkoutAtIndex:indexPass];
         
     }];
     UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDestructive handler:nil];
@@ -180,11 +183,26 @@
     
     [self presentViewController:alertController animated:YES completion:nil];
 }
+-(void)addDataForIndex:(NSUInteger)index withText:(NSString*)textFieldData IsDouble:(BOOL)isDouble {
+    __block NSNumber *countToAdd;
+    if(isDouble) {
+        double oldValue = [[workout valueForKey:[arrayOfWorkouts objectAtIndex:index]] doubleValue];
+        NSNumber *newValue = [NSNumber numberWithDouble:(oldValue+[textFieldData doubleValue])];
+        countToAdd = newValue;
+    } else {
+        int oldValue = [[workout valueForKey:[arrayOfWorkouts objectAtIndex:index]] intValue];
+        NSNumber *newValue = [NSNumber numberWithInt:(oldValue+[textFieldData intValue])];
+        countToAdd = newValue;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self addEntry:countToAdd toWorkoutAtIndex:index];
+    });
+}
+
 -(void)modifiedData {
     [workout setValue:[NSDate date] forKey:@"LastModified"];
     
     // Change the date of when it was modified on the label
-    // this is temp.
     self.lastModifiedLabel.text = [NSString stringWithFormat:@"Last modified: %@", [self.modFormatter stringFromDate:[NSDate date]]];
 }
 -(void)addEntry:(NSNumber*)number toWorkoutAtIndex:(NSInteger)index {
@@ -231,8 +249,10 @@
     }
     
     
-    cell.textLabel.text = [NSString stringWithFormat:@"%@ = %@ (%@)", [self checkAndReplaceUnderscores:name], reps, unit];
+    //cell.textLabel.text = [NSString stringWithFormat:@"%@ = %@ (%@)", [self checkAndReplaceUnderscores:name], reps, unit];
     
+    // Removed brackets
+    cell.textLabel.text = [NSString stringWithFormat:@"%@ = %@ %@", [self checkAndReplaceUnderscores:name], reps, unit];
     
     return cell;
 }

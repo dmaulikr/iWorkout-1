@@ -8,6 +8,7 @@
 
 #import "SettingsTableViewController.h"
 #import "AppDelegate.h"
+#import "DateFormat.h"
 
 @interface SettingsTableViewController () <UIPickerViewDelegate, UIPickerViewDataSource, UITableViewDelegate>
 
@@ -16,10 +17,10 @@
 @implementation SettingsTableViewController
 {
     NSArray *pickerArray;
+    __block UITextField *textfieldForAlert;
 }
 
 #warning On tapping the Date Format, show a Popup view that lets you select a date instead.
-#warning FIX THE DATE FORMAT.
 
 -(IBAction)switchedOn:(id)sender
 {
@@ -29,7 +30,7 @@
     if(switchTag == 1) {
         // Auto save
         
-        UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"ERROR" message:@"Unable to switch off Auto Save.\nIt is automatically always switched ON" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"ERROR" message:@"Unable to switch off Auto Save.\nIt is automatically always switched ON\nApologies for any inconvenience caused" preferredStyle:UIAlertControllerStyleAlert];
         
         [alertC addAction:[UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
             
@@ -161,7 +162,11 @@
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    pickerArray = [NSArray arrayWithObjects:@"25-03-16",@"25th March 16",@"Friday 25th",@"Friday (25-03-16)",@"Friday 25th March 2016", nil];
+    
+    //pickerArray = [NSArray arrayWithObjects:@"25-03-16",@"25th March 16",@"Friday 25th",@"Friday (25-03-16)",@"Friday 25th March 2016", nil];
+    
+    // Moved the array of available dates to the DateFormat Class.
+    pickerArray = [[NSArray alloc] initWithArray:[DateFormat getAvailableDates]];
     
    // [self setAppropriateLoadedSettings];
 }
@@ -180,7 +185,7 @@
 -(void)viewWillLayoutSubviews {
     // This runs 3 times (?)
     
-    
+    NSLog(@"viewWillLayoutSubviews");
     [self setAppropriateLoadedSettings];
 }
 
@@ -210,6 +215,7 @@
 -(void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
     NSLog(@"Selected Dateformat Index: %i", (int)row);
     [self setSelectedDateFormat:(int)row];
+    [self updateAlertWithIndex:(int)row];
 }
 
 
@@ -303,6 +309,17 @@
 
 #pragma mark - Table View Delegate
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if(indexPath.section == 0) {
+        switch (indexPath.row) {
+            case 1:
+                [self displayDateSelection];
+                break;
+                
+            default:
+                break;
+        }
+    }
+    
     if(indexPath.section == 1) {
         switch (indexPath.row) {
             case 0:
@@ -333,6 +350,44 @@
     
     [self presentViewController:alert animated:YES completion:nil];
 }*/
+-(void)displayDateSelection {
+    //UIDatePicker *datePicker = [[UIDatePicker alloc] init];
+    
+    UIPickerView *pickerView = [[UIPickerView alloc] init];
+    [pickerView setDelegate:self];
+    [pickerView setDataSource:self];
+    
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Select Date Format" message:@"Select your preferred date style" preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        [textField setInputView:pickerView];
+        textfieldForAlert = textField;
+        
+    }];
+    UIAlertAction *select = [UIAlertAction actionWithTitle:@"Select" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        
+    }];
+    [alert addAction:select];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+-(void)updateAlertWithIndex:(int)index {
+    textfieldForAlert.text = [NSString stringWithString:[pickerArray objectAtIndex:index]];
+    
+}
+// TEMP
+-(void)doneEditingDate:(UIDatePicker*)sender {
+    NSLog(@"%@!", [DateFormat getDateStringFromDate:sender.date]);
+    
+    NSString *dateString;
+    /*
+    if([[self loadDateSettings] intValue] == 1) {
+        dateString = [NSString stringWithString:[DateFormat getUSStyleDate:sender.date]];
+    } else {
+        dateString = [NSString stringWithString:[DateFormat getUKStyleDate:sender.date]];
+    }
+    
+    textFieldToStoreDate.text = dateString;*/
+}
 
 -(void)confirmDeleteAllWorkouts {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Confirm Delete" message:@"Are you sure you would like to delete all your current workout days?" preferredStyle:UIAlertControllerStyleAlert];

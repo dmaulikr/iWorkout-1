@@ -20,6 +20,106 @@
 @implementation MainTableViewController
 {
     CoreDataHelper *cdh;
+    
+    // TESTING REFRESH CONTROL
+    UIRefreshControl *customRefreshControl;
+}
+
+
+// TESTING REFRESH CONTROL
+
+-(void)addRefreshControl {
+    customRefreshControl = [[UIRefreshControl alloc] init];
+    
+    // Unable to set different colour
+    [customRefreshControl setTintColor:[UIColor blueColor]];
+    
+    [customRefreshControl addTarget:self action:@selector(startRefresh) forControlEvents:UIControlEventValueChanged];
+    [self.tableView addSubview:customRefreshControl];
+}
+
+-(void)startRefresh {
+    [customRefreshControl beginRefreshing];
+    NSLog(@"Refreshing...");
+    [self performFetch];
+    [self.tableView reloadData];
+    NSLog(@"Done refreshing");
+    [customRefreshControl endRefreshing];
+}
+
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    UIEdgeInsets inset = UIEdgeInsetsMake(5, 0, 0, 0);
+    self.tableView.contentInset = inset;
+    [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
+    
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(SomethingChanged) name:@"SomethingChanged" object:nil];
+    
+    
+    UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshDate)];
+    
+    self.navigationItem.rightBarButtonItem = refreshButton;
+    
+    [self configureFetch];
+    [self performFetch];
+    
+    // Check to make sure objects are returned, otherwise create todays entry
+    if(self.frc.fetchedObjects.count <= 0) {
+        NSLog(@"No data found!");
+        
+        // Creating today entry
+        [self addTodayEntry];
+        
+        /* ADD TEMP DATA FOR SCREENSHOTS
+         [self addTempData]; */
+        
+        // Updating view
+        [self refreshDate];
+    }
+    
+    
+    // Check to make sure todays entry exists
+    if([self hasLatestDateBeenCreated]) {
+        NSLog(@"Latest entry is todays date, everythings a go.");
+    } else {
+        NSLog(@"Latest entry is not todays date, attempting to add todays date");
+        [self addTodayEntry];
+        [self performSelector:@selector(delayConfirm) withObject:nil afterDelay:0.1]; // Added short delay to ensure DB has a lil time to load.
+    }
+    [self addRefreshControl];
+}
+-(void)configureFetch {
+    cdh = [(AppDelegate*)[[UIApplication sharedApplication] delegate] cdh];
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
+    request.sortDescriptors = [NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"Date" ascending:NO]];
+    
+    // Unsure about this...
+    [request setFetchBatchSize:15];
+    
+    // Caching data
+    self.frc = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:cdh.context sectionNameKeyPath:nil cacheName:@"WorkoutData"];
+    
+    // Don't need to set up delegate as updates made are automatically synced
+    //self.frc.delegate = self;
+}
+
+-(void)performFetch {
+    if(self.frc) {
+        [self.frc.managedObjectContext performBlockAndWait:^{
+            NSError *error = nil;
+            if(![self.frc performFetch:&error]) {
+                NSLog(@"Failed to perform fetch: %@", error);
+            } else {
+                NSLog(@"Fetch performed successfully!"); // I added this in, unnecessary
+            }
+            [self.tableView reloadData];
+        }];
+    } else {
+        NSLog(@"Failed to fetch, the fetched results controller is nil.");
+    }
 }
 -(BOOL)hasLatestDateBeenCreated {
     AppDelegate *appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
@@ -28,7 +128,8 @@
         NSLog(@"Smooth sailing.");
         return YES;
     } else {
-        NSLog(@"Today doesnt exist!");
+        NSLog(@"@@@@@@@@@@@@@@@@@@@@@@@@@");
+        NSLog(@"ERROR: Today doesnt exist!");
         return NO;
     }
 }
@@ -37,15 +138,17 @@
     [self.tableView reloadData];
 }
 
+
+// Performs a check whether a custom date selection exists
 -(BOOL)dateIndexExists {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-
     if([userDefaults valueForKey:@"DateFormatIndex"]) {
         return YES;
     } else {
         return NO;
     }
 }
+// If a custom date is selected, it's index is then loaded
 -(int)getDateIndex {
     if([self dateIndexExists]) {
         NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -65,49 +168,7 @@
     NSLog(@"Something changed!");
     [self refreshDate];
 }
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
-    UIEdgeInsets inset = UIEdgeInsetsMake(5, 0, 0, 0);
-    self.tableView.contentInset = inset;
-    [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
-    
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(SomethingChanged) name:@"SomethingChanged" object:nil];
 
-    
-    UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshDate)];
-    
-    self.navigationItem.rightBarButtonItem = refreshButton;
-    
-    [self configureFetch];
-    [self performFetch];
-    
-    // Check to make sure objects are returned, otherwise create todays entry
-    if(self.frc.fetchedObjects.count <= 0) {
-        NSLog(@"No data found!");
-        
-        // Creating today entry
-        [self addTodayEntry];
-        
-        /* ADD TEMP DATA FOR SCREENSHOTS
-        [self addTempData]; */
-        
-        // Updating view
-        [self refreshDate];
-    }
-    
-    
-    // Check to make sure todays entry exists
-    if([self hasLatestDateBeenCreated]) {
-        NSLog(@"Latest entry is todays date, everythings a go.");
-    } else {
-        NSLog(@"Latest entry is not todays date, attempting to add todays date");
-        [self addTodayEntry];
-        [self performSelector:@selector(delayConfirm) withObject:nil afterDelay:0.1]; // Added short delay to ensure DB has a lil time to load.
-    }
-
-}
 -(void)delayConfirm {
     // Update view
     [self refreshDate];
@@ -129,40 +190,6 @@
     [cdh.context refreshObject:newObject mergeChanges:NO];
 }
 
-
--(void)performFetch {
-    if(self.frc) {
-        [self.frc.managedObjectContext performBlockAndWait:^{
-            
-            NSError *error = nil;
-            
-            if(![self.frc performFetch:&error]) {
-                NSLog(@"Failed to perform fetch: %@", error);
-            } else {
-                NSLog(@"Fetch performed successfully!"); // I added this in, unnecessary
-            }
-            [self.tableView reloadData];
-        }];
-    } else {
-        NSLog(@"Failed to fetch, the fetched results controller is nil.");
-    }
-}
--(void)configureFetch {
-    cdh = [(AppDelegate*)[[UIApplication sharedApplication] delegate] cdh];
-    
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
-    request.sortDescriptors = [NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"Date" ascending:NO]];
-    
-    // Unsure about this...
-    [request setFetchBatchSize:15];
-
-    // Caching data
-    self.frc = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:cdh.context sectionNameKeyPath:nil cacheName:@"WorkoutData"];
-    
-    // Don't need to set up delegate as updates made are automatically synced
-    //self.frc.delegate = self;
-    
-}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -232,7 +259,7 @@
     return background;
 }
 
-
+#pragma mark - OTHER
 -(UIImage*)getImageForToday:(BOOL)today {
     if(today) {
         return [UIImage imageNamed:@"new_greenbutton.png"];
@@ -240,7 +267,7 @@
         return [UIImage imageNamed:@"new_redbutton.png"];
     }
 }
-
+#warning Complete the sorting by week (This week, last week, 2 weeks ago, etc..)
 -(void)getWeekNo:(NSDate*)date {
     NSCalendar *calendar = [NSCalendar currentCalendar];
     NSInteger dateComp = [calendar component:NSCalendarUnitWeekOfYear fromDate:date];
@@ -324,7 +351,8 @@
 
 
 
-/* Temporary data being added */
+// Method to add data
+/*
 -(void)addTempData {
     NSManagedObject *dayOne = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:cdh.context];
     NSManagedObject *dayTwo = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:cdh.context];
@@ -344,17 +372,18 @@
     [dayTwo setValue:dayTwoDate forKey:@"Date"];
     [dayThree setValue:dayThreeDate forKey:@"Date"];
  
-    /* What other data do I add.....?
+    //What other data do I add.....?
      
     dayOne.hours = [NSNumber numberWithDouble:2.0];
     dayTwo.hours = [NSNumber numberWithDouble:4.0];
     dayThree.hours = [NSNumber numberWithDouble:6.0];
-    */
+ 
     
  
  
     [cdh backgroundSaveContext];
 }
+*/
 
 
 

@@ -10,6 +10,10 @@
 
 @implementation DateFormat
 
++(NSArray*)getAvailableDates {
+    return [NSArray arrayWithObjects:@"25-03-16",@"25th March 16",@"Friday 25th",@"Friday (25-03-16)",@"Friday 25th March 2016", nil];
+}
+
 +(NSString *)getSuffixForDate:(NSDate*)theDate
 {
     NSDateFormatter *dayOf = [NSDateFormatter new];

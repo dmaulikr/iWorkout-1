@@ -10,6 +10,7 @@
 
 @interface DateFormat : NSObject
 
++(NSArray*)getAvailableDates;
 +(NSString *)getSuffixForDate:(NSDate*)theDate;
 +(NSString*)getDateStringFromDate:(NSDate*)date;
 +(NSString*)getDateStringFromDate:(NSDate*)date withIndex:(int)index;
