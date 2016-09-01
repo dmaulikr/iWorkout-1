@@ -85,15 +85,19 @@
     if([self dateIndexExists]) {
         int dateIndex = [self getDateIndex];
         NSLog(@"Date index: %i", dateIndex);
+        /*
         if(dateIndex == 1) {
             [self.dateformatPicker selectRow:1 inComponent:0 animated:YES];
+            
         } else if(dateIndex == 2) {
             [self.dateformatPicker selectRow:2 inComponent:0 animated:YES];
         } else if(dateIndex == 3) {
             [self.dateformatPicker selectRow:3 inComponent:0 animated:YES];
         } else if(dateIndex == 4) {
             [self.dateformatPicker selectRow:4 inComponent:0 animated:YES];
-        }
+        }*/
+        
+        [self.dateStyleLabel setText:[pickerArray objectAtIndex:dateIndex]];
         NSLog(@"Loaded date settings");
     }
     
@@ -362,6 +366,11 @@
     [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
         [textField setInputView:pickerView];
         textfieldForAlert = textField;
+        [textField setTextAlignment:NSTextAlignmentCenter];
+        
+        int rowIndex = [self getDateIndex];
+        [pickerView selectRow:rowIndex inComponent:0 animated:YES];
+        [textField setText:[pickerArray objectAtIndex:rowIndex]];
         
     }];
     UIAlertAction *select = [UIAlertAction actionWithTitle:@"Select" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {

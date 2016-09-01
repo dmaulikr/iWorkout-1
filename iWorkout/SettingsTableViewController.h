@@ -14,6 +14,7 @@
 //@property (nonatomic, strong) IBOutlet UITableView *tableView;
 @property (nonatomic, strong) IBOutlet UIPickerView *dateformatPicker;
 
+@property (nonatomic, strong) IBOutlet UILabel *dateStyleLabel;
 
 // Switches
 @property (nonatomic, strong) IBOutlet UISwitch *autoSaveSwitch;

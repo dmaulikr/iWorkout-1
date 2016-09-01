@@ -428,21 +428,20 @@
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ajv-lO-X8J">
-                                                    <rect key="frame" x="140" y="-5" width="180" height="54"/>
-                                                    <connections>
-                                                        <outlet property="dataSource" destination="5Rf-eG-PKD" id="qo4-yo-2Z9"/>
-                                                        <outlet property="delegate" destination="5Rf-eG-PKD" id="wqV-5P-v4c"/>
-                                                    </connections>
-                                                </pickerView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Sq1-m3-pxV">
+                                                    <rect key="frame" x="139" y="11" width="173" height="21"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstAttribute="bottomMargin" secondItem="Sq1-m3-pxV" secondAttribute="bottom" constant="3" id="CSn-hd-GND"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="Sq1-m3-pxV" secondAttribute="trailing" id="J30-zK-KfW"/>
+                                                <constraint firstItem="Sq1-m3-pxV" firstAttribute="leading" secondItem="J2E-wj-sVD" secondAttribute="trailing" constant="7" id="LX3-KZ-hCe"/>
                                                 <constraint firstItem="J2E-wj-sVD" firstAttribute="centerY" secondItem="zbb-87-7Uo" secondAttribute="centerY" id="XV5-Hj-xQl"/>
                                                 <constraint firstItem="J2E-wj-sVD" firstAttribute="top" secondItem="zbb-87-7Uo" secondAttribute="topMargin" constant="3" id="ZD5-c9-bYy"/>
-                                                <constraint firstItem="Ajv-lO-X8J" firstAttribute="centerY" secondItem="J2E-wj-sVD" secondAttribute="centerY" id="fIR-p1-BOh"/>
-                                                <constraint firstItem="Ajv-lO-X8J" firstAttribute="top" secondItem="zbb-87-7Uo" secondAttribute="topMargin" constant="-13" id="nLh-ui-aCq"/>
-                                                <constraint firstAttribute="trailing" secondItem="Ajv-lO-X8J" secondAttribute="trailing" id="q4s-vs-iQa"/>
-                                                <constraint firstItem="Ajv-lO-X8J" firstAttribute="leading" secondItem="J2E-wj-sVD" secondAttribute="trailing" constant="8" symbolic="YES" id="w1a-uh-fst"/>
+                                                <constraint firstItem="Sq1-m3-pxV" firstAttribute="top" secondItem="zbb-87-7Uo" secondAttribute="topMargin" constant="3" id="gex-1S-Jzj"/>
                                                 <constraint firstItem="J2E-wj-sVD" firstAttribute="leading" secondItem="zbb-87-7Uo" secondAttribute="leadingMargin" constant="5" id="z1d-zN-gaP"/>
                                             </constraints>
                                         </tableViewCellContentView>
@@ -537,7 +536,7 @@
                     <connections>
                         <outlet property="autoLockSwitch" destination="IRI-RV-kTk" id="YCF-Sq-g3U"/>
                         <outlet property="autoSaveSwitch" destination="87n-Kt-doZ" id="QAM-8x-CWm"/>
-                        <outlet property="dateformatPicker" destination="Ajv-lO-X8J" id="luD-wU-rqR"/>
+                        <outlet property="dateStyleLabel" destination="Sq1-m3-pxV" id="fHn-eX-f72"/>
                         <outlet property="tableView" destination="lCq-Gm-g4E" id="IYl-kW-ERs"/>
                     </connections>
                 </tableViewController>
