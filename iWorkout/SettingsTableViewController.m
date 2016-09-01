@@ -378,7 +378,7 @@
 -(void)doneEditingDate:(UIDatePicker*)sender {
     NSLog(@"%@!", [DateFormat getDateStringFromDate:sender.date]);
     
-    NSString *dateString;
+    //NSString *dateString;
     /*
     if([[self loadDateSettings] intValue] == 1) {
         dateString = [NSString stringWithString:[DateFormat getUSStyleDate:sender.date]];
