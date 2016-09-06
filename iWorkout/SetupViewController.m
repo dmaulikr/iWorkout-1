@@ -8,17 +8,16 @@
 
 #import "SetupViewController.h"
 
+#define DebugMode 0
 
 @interface SetupViewController () <UIPickerViewDataSource, UIPickerViewDelegate, UITableViewDataSource, UITableViewDelegate>
 
 @end
 
-NSString * const customName = @"Create custom...";
+//NSString * const customName = @"Create custom...";
 
 @implementation SetupViewController
 
-#warning Maybe consider replacing the '+' button with 'Add workout'
- 
 
 -(NSString *)applicationDocumentsDirectory
 {
@@ -30,7 +29,7 @@ NSString * const customName = @"Create custom...";
     // Do any additional setup after loading the view.
     
     // Set up the default array of units and customWorkouts
-    self.defaultUnits = [[NSMutableArray alloc] initWithObjects:@"Choose one...",@"Reps",@"Km",@"Miles",@"Mins", nil];
+    self.defaultUnits = [[NSMutableArray alloc] initWithObjects:@"Choose from below..",@"Reps",@"Km",@"Miles",@"Mins", nil];
     
     
     self.customWorkouts = [[NSMutableArray alloc] init];
@@ -76,18 +75,24 @@ NSString * const customName = @"Create custom...";
     }
     
     [self.customData enumerateObjectsUsingBlock:^(NSMutableDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        NSLog(@"%@ (%@)", [obj valueForKey:@"WorkoutName"], [obj valueForKey:@"UnitOfMeasurement"]);
+        if(DebugMode) {
+            NSLog(@"%@ (%@)", [obj valueForKey:@"WorkoutName"], [obj valueForKey:@"UnitOfMeasurement"]);
+        }
     }];
     [self dismissViewControllerAnimated:YES completion:nil];
 
     NSString *path = [[self applicationDocumentsDirectory] stringByAppendingPathComponent:@"Setup.plist"];
     
     if(![self.customData writeToFile:path atomically:YES]) {
-        NSLog(@"ERROR: Unable to write to file.");
+        if(DebugMode) {
+            NSLog(@"ERROR: Unable to write to file.");
+        }
     } else {
     [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"SetupComplete"];
     [[NSUserDefaults standardUserDefaults] synchronize];
-        NSLog(@"Success!");
+        if(DebugMode) {
+            NSLog(@"Success!");
+        }
     }
     
 }
@@ -127,17 +132,23 @@ NSString * const customName = @"Create custom...";
     
     if(![self illegalRowSelected:selectedRow]) {
             [self addDataWithName:self.textField.text];
+        if(DebugMode) {
             NSLog(@"Selected: %@", (NSString*)[self.defaultUnits objectAtIndex:selectedRow]);
+        }
             [self.unitPicker selectRow:0 inComponent:0 animated:YES];
         }
 
 }
 -(BOOL)illegalRowSelected:(int)selectedRowIn {
     if(selectedRowIn == -1) {
-        NSLog(@"Nothing selected!");
+        if(DebugMode) {
+            NSLog(@"Nothing selected!");
+        }
         return YES;
     } else if(selectedRowIn == 0) {
-        NSLog(@"NOT THAT EITHER");
+        if(DebugMode) {
+            NSLog(@"NOT THAT EITHER");
+        }
         [self displayWarningAlertWithTitle:@"Choose a unit" andMessage:@"Please select a unit of measurement"];
         return YES;
     } else {

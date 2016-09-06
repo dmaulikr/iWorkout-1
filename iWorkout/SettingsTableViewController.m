@@ -10,6 +10,8 @@
 #import "AppDelegate.h"
 #import "DateFormat.h"
 
+#define DebugMode 0
+
 @interface SettingsTableViewController () <UIPickerViewDelegate, UIPickerViewDataSource, UITableViewDelegate>
 
 @end
@@ -61,20 +63,28 @@
         if(theSwitch.on) {
             [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"DisableAutoLock"];
             if([[NSUserDefaults standardUserDefaults] synchronize]) {
-                NSLog(@"Disable auto lock is now ON");
+                if(DebugMode) {
+                    NSLog(@"Disable auto lock is now ON");
+                }
                 AppDelegate *appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
                 [appDelegate setAutoLock:YES];
             } else {
-                NSLog(@"Error while saving settings");
+                if(DebugMode) {
+                    NSLog(@"Error while saving settings");
+                }
             }
         } else {
             [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:NO] forKey:@"DisableAutoLock"];
             if([[NSUserDefaults standardUserDefaults] synchronize]) {
-                NSLog(@"Disable auto lock is now OFF");
+                if(DebugMode) {
+                    NSLog(@"Disable auto lock is now OFF");
+                }
                 AppDelegate *appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
                 [appDelegate setAutoLock:NO];
             } else {
-                NSLog(@"Error while saving settings");
+                if(DebugMode) {
+                    NSLog(@"Error while saving settings");
+                }
             }
         }
     }
@@ -84,21 +94,18 @@
     // Load the date format
     if([self dateIndexExists]) {
         int dateIndex = [self getDateIndex];
-        NSLog(@"Date index: %i", dateIndex);
-        /*
-        if(dateIndex == 1) {
-            [self.dateformatPicker selectRow:1 inComponent:0 animated:YES];
-            
-        } else if(dateIndex == 2) {
-            [self.dateformatPicker selectRow:2 inComponent:0 animated:YES];
-        } else if(dateIndex == 3) {
-            [self.dateformatPicker selectRow:3 inComponent:0 animated:YES];
-        } else if(dateIndex == 4) {
-            [self.dateformatPicker selectRow:4 inComponent:0 animated:YES];
-        }*/
         
         [self.dateStyleLabel setText:[pickerArray objectAtIndex:dateIndex]];
-        NSLog(@"Loaded date settings");
+        if(DebugMode) {
+            NSLog(@"Date index: %i", dateIndex);
+            NSLog(@"Loaded date settings");
+        }
+        
+    } else {
+        if(DebugMode) {
+            NSLog(@"No date index exists.. Set to default.");
+        }
+        [self.dateStyleLabel setText:[pickerArray objectAtIndex:0]];
     }
     
     // Load Auto-Save settings
@@ -120,7 +127,9 @@
         BOOL disableAutoLock;
         disableAutoLock = [[[NSUserDefaults standardUserDefaults] valueForKey:@"DisableAutoLock"] boolValue];
         [self.autoLockSwitch setOn:disableAutoLock];
-        NSLog(@"Auto lock is: %@", disableAutoLock ? @"ON" : @"OFF");
+        if(DebugMode) {
+            NSLog(@"Auto lock is: %@", disableAutoLock ? @"ON" : @"OFF");
+        }
         
     } else {
         [self.autoLockSwitch setOn:NO];
@@ -166,13 +175,8 @@
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    
-    //pickerArray = [NSArray arrayWithObjects:@"25-03-16",@"25th March 16",@"Friday 25th",@"Friday (25-03-16)",@"Friday 25th March 2016", nil];
-    
     // Moved the array of available dates to the DateFormat Class.
     pickerArray = [[NSArray alloc] initWithArray:[DateFormat getAvailableDates]];
-    
-   // [self setAppropriateLoadedSettings];
 }
 
 - (void)viewDidLoad {
@@ -188,8 +192,7 @@
 }
 -(void)viewWillLayoutSubviews {
     // This runs 3 times (?)
-    
-    NSLog(@"viewWillLayoutSubviews");
+
     [self setAppropriateLoadedSettings];
 }
 
@@ -200,9 +203,7 @@
 #pragma mark - UIPickerView
 
 -(NSString*)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
-    
     NSString *title = (NSString*)[pickerArray objectAtIndex:row];
-    
     
     return title;
 }
@@ -217,7 +218,9 @@
 }
 
 -(void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
-    NSLog(@"Selected Dateformat Index: %i", (int)row);
+    if(DebugMode) {
+        NSLog(@"Selected Dateformat Index: %i", (int)row);
+    }
     [self setSelectedDateFormat:(int)row];
     [self updateAlertWithIndex:(int)row];
 }
@@ -230,8 +233,9 @@
         [self eraseAllContent];
     }];
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-        // determine what cancel will actually do lol
-        NSLog(@"Cancelled reset");
+        if(DebugMode) {
+            NSLog(@"Cancelled reset");
+        }
     }];
     
     [alertC addAction:yesAction];
@@ -242,7 +246,9 @@
 -(void)eraseAllContent {
     if([self removeSetupFile]) {
         if([self removeStoresDirectory]) {
-            NSLog(@"Successfully erased all content!");
+            if(DebugMode) {
+                NSLog(@"Successfully erased all content!");
+            }
             UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"Reset Complete" message:@"Application will now exit, please re-open iWorkout to start setup." preferredStyle:UIAlertControllerStyleAlert];
             UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 exit(0);
@@ -260,14 +266,20 @@
     
     if([fileManager fileExistsAtPath:setupPath]) {
         if(![fileManager removeItemAtPath:setupPath error:&error]) {
-            NSLog(@"ERROR: %@", error.localizedDescription);
+            if(DebugMode) {
+                NSLog(@"ERROR: %@", error.localizedDescription);
+            }
             return NO;
         } else {
-            NSLog(@"Successfully deleted setup file. ");
+            if(DebugMode) {
+                NSLog(@"Successfully deleted setup file. ");
+            }
             return YES;
         }
     } else {
-        NSLog(@"ERROR: File doesn't exist..");
+        if(DebugMode) {
+            NSLog(@"ERROR: File doesn't exist..");
+        }
         return NO;
     }
 }
@@ -282,14 +294,20 @@
     
     if([fileManager fileExistsAtPath:storesDirectory]) {
         if(![fileManager removeItemAtPath:storesDirectory error:&error]) {
-            NSLog(@"ERROR: %@", error.localizedDescription);
+            if(DebugMode) {
+                NSLog(@"ERROR: %@", error.localizedDescription);
+            }
             return NO;
         } else {
-            NSLog(@"Successfully deleted Stores directory. ");
+            if(DebugMode) {
+                NSLog(@"Successfully deleted Stores directory. ");
+            }
             return YES;
         }
     } else {
-        NSLog(@"ERROR: Stores directory doesn't exist..");
+        if(DebugMode) {
+            NSLog(@"ERROR: Stores directory doesn't exist..");
+        }
         return NO;
     }
 }
@@ -300,12 +318,16 @@
     if(indexOfDateFormat == 0) {
         [[NSUserDefaults standardUserDefaults] setValue:@0 forKey:@"DateFormatIndex"];
         if([[NSUserDefaults standardUserDefaults] synchronize]) {
-            NSLog(@"Success!");
+            if(DebugMode) {
+                NSLog(@"Success!");
+            }
         }
     } else {
         [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithInt:indexOfDateFormat] forKey:@"DateFormatIndex"];
         if([[NSUserDefaults standardUserDefaults] synchronize]) {
-            NSLog(@"Success!");
+            if(DebugMode) {
+                NSLog(@"Success!");
+            }
         }
     }
 
@@ -327,13 +349,17 @@
     if(indexPath.section == 1) {
         switch (indexPath.row) {
             case 0:
-                NSLog(@"Delete all workout days..");
+                if(DebugMode) {
+                    NSLog(@"Delete all workout days..");
+                }
                 [tableView deselectRowAtIndexPath:indexPath animated:YES];
                 //[self deleteAllWorkoutsIndexPath:indexPath];
                 [self confirmDeleteAllWorkouts];
                 break;
             case 1:
-                NSLog(@"Erasing all content...");
+                if(DebugMode) {
+                    NSLog(@"Erasing all content...");
+                }
                 [self confirmFactoryReset];
                 break;
             default:
@@ -355,8 +381,6 @@
     [self presentViewController:alert animated:YES completion:nil];
 }*/
 -(void)displayDateSelection {
-    //UIDatePicker *datePicker = [[UIDatePicker alloc] init];
-    
     UIPickerView *pickerView = [[UIPickerView alloc] init];
     [pickerView setDelegate:self];
     [pickerView setDataSource:self];
@@ -374,28 +398,13 @@
         
     }];
     UIAlertAction *select = [UIAlertAction actionWithTitle:@"Select" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        
+        textfieldForAlert = nil;
     }];
     [alert addAction:select];
     [self presentViewController:alert animated:YES completion:nil];
 }
 -(void)updateAlertWithIndex:(int)index {
     textfieldForAlert.text = [NSString stringWithString:[pickerArray objectAtIndex:index]];
-    
-}
-// TEMP
--(void)doneEditingDate:(UIDatePicker*)sender {
-    NSLog(@"%@!", [DateFormat getDateStringFromDate:sender.date]);
-    
-    //NSString *dateString;
-    /*
-    if([[self loadDateSettings] intValue] == 1) {
-        dateString = [NSString stringWithString:[DateFormat getUSStyleDate:sender.date]];
-    } else {
-        dateString = [NSString stringWithString:[DateFormat getUKStyleDate:sender.date]];
-    }
-    
-    textFieldToStoreDate.text = dateString;*/
 }
 
 -(void)confirmDeleteAllWorkouts {
@@ -414,7 +423,6 @@
 }
 
 -(void)deleteAllWorkouts {
-    
     @autoreleasepool {
         NSError *error;
         AppDelegate *appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
@@ -426,21 +434,20 @@
             for(NSManagedObject *object in fetchedObjects) {
                 [appDelegate.coreDataHelper.context deleteObject:object];
             }
-            NSLog(@"Successfully deleted objects.");
+            if(DebugMode) {
+                NSLog(@"Successfully deleted objects.");
+            }
             [appDelegate.coreDataHelper backgroundSaveContext];
             UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Success!" message:@"Successfully deleted all workouts" preferredStyle:UIAlertControllerStyleAlert];
             [alert addAction:[UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:nil]];
             [self presentViewController:alert animated:YES completion:nil];
             
         } else {
-            NSLog(@"ERROR: Unable to fetch objects!");
+            if(DebugMode) {
+                NSLog(@"ERROR: Unable to fetch objects!");
+            }
             return;
         }
-        
-
-        
-       
-        
     }
 }
 

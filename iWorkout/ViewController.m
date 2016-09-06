@@ -12,6 +12,7 @@
 #import "MainTableViewController.h"
 #import "Workout.h"
 
+#define DebugMode 0
 @interface ViewController ()
 
 @end
@@ -26,8 +27,6 @@
     return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
 }
 
-#warning TO DO:: Finish settings page up
-
 #pragma mark - VIEW
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -36,8 +35,6 @@
     
     BOOL isAutoLockOn = [[[NSUserDefaults standardUserDefaults] valueForKey:@"DisableAutoLock"] boolValue];
     
-    
-    NSLog(@"Auto lock is: %@", isAutoLockOn ? @"ON" : @"OFF");
     [appDelegate setAutoLock:isAutoLockOn];
     
     /*
@@ -112,17 +109,14 @@
     
     if(self.class != [SetupViewController class]) {
     if([self setupDataExists]) {
-        //NSString *setupPath = [[self applicationDocumentsDirectory] stringByAppendingPathComponent:@"Setup.plist"];
-        NSLog(@"Found setup data!");
-        /*
-        NSArray *retrievedData = [[NSArray alloc] initWithContentsOfFile:setupPath];
-        
-        [retrievedData enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSLog(@"Name: %@  & Unit: %@", [obj valueForKey:@"WorkoutName"], [obj valueForKey:@"UnitOfMeasurement"]);
-        }];*/
+        if(DebugMode) {
+            NSLog(@"Found setup data!");
+        }
         [self readyToStart:YES];
     } else {
-        NSLog(@"No data found!");
+        if(DebugMode) {
+            NSLog(@"No data found!");
+        }
         [self readyToStart:NO];
     }
     }
@@ -143,12 +137,16 @@
     if([[[NSUserDefaults standardUserDefaults] valueForKey:@"SetupComplete"] boolValue]) {
         i++;
         if([[NSFileManager defaultManager] fileExistsAtPath:setupPath]) {
-            NSLog(@"Setup has been set up fully!");
+            if(DebugMode) {
+                NSLog(@"Setup has been set up fully!");
+            }
             return YES;
         }
     }
     if(i == 1) {
-        NSLog(@"ERROR: Found plist file but not UserDefaults data");
+        if(DebugMode) {
+            NSLog(@"ERROR: Found plist file but not UserDefaults data");
+        }
     }
     return NO;
 }
@@ -186,8 +184,9 @@
 }
 -(void)loadData {
     // Load DB
-    
-    NSLog(@"Setup is: %@", [AppDelegate isSetupComplete] ? @"READY" : @"NOT READY");
+    if(DebugMode) {
+        NSLog(@"Setup is: %@", [AppDelegate isSetupComplete] ? @"READY" : @"NOT READY");
+    }
     if([AppDelegate isSetupComplete]) {
         // Load DB
         //CoreDataHelper *cdh = [(AppDelegate*)[[UIApplication sharedApplication] delegate] cdh];
@@ -195,20 +194,21 @@
         
         [self presentMainView];
     } else {
-        NSLog(@"ERROR: Setup isnt complete.");
+        if(DebugMode) {
+            NSLog(@"ERROR: Setup isnt complete.");
+        }
     }
 }
 -(void)presentMainView {
     // Initialize the presenting view
     MainTableViewController *mainTVC = [self.storyboard instantiateViewControllerWithIdentifier:@"MainTableViewController"];
-    //MainViewController *mainVC = [self.storyboard instantiateViewControllerWithIdentifier:@"MainViewController"];
     
     [self.navigationController pushViewController:mainTVC animated:YES];
 }
-
+/*
 -(void)tapGesture {
     NSLog(@"Tap");
-}
+}*/
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

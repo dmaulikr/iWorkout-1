@@ -9,6 +9,8 @@
 #import "AppDelegate.h"
 #import "DateChecker.h"
 
+#define DebugMode 0
+
 @interface AppDelegate ()
 
 @end
@@ -57,7 +59,9 @@
         }];
         
     } else {
-        NSLog(@"ERROR: Setup file not found.");
+        if(DebugMode) {
+            NSLog(@"ERROR: Setup file not found.");
+        }
         exit(0);
     }
     return [workouts copy];
@@ -77,29 +81,20 @@
         }];
         
     } else {
-        NSLog(@"ERROR: Setup file not found.");
+        if(DebugMode) {
+            NSLog(@"ERROR: Setup file not found.");
+        }
         exit(0);
     }
     return [units copy];
 }
 
-/*
-+(NSArray*)testMethod {
-    
-     NSString *setupPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"Setup.plist"];
-    NSMutableArray *newArray = [NSMutableArray array];
-    
-        NSArray *array = [NSArray arrayWithContentsOfFile:setupPath];
-        [array enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSString *name = [obj valueForKey:@"WorkoutName"];
-            NSLog(@"(Testmethod) Workout name: %@", name);
-            [newArray addObject:name];
-        }];
-    return (NSArray*)[newArray copy];
-}*/
+
 +(NSManagedObjectModel*)getModel {
     if(![self isSetupComplete]) {
-        NSLog(@"ERROR! No data found!");
+        if(DebugMode) {
+            NSLog(@"ERROR! No data found!");
+        }
         return nil;
     }
     NSString *applicationDocDir = (NSString*)[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
@@ -166,7 +161,9 @@
         return NSDoubleAttributeType;
         //return NSFloatAttributeType;
     }
-    NSLog(@"ERROR!! Unable to match attribute!");
+    if(DebugMode) {
+        NSLog(@"ERROR!! Unable to match attribute!");
+    }
     return NAN;
 }
 +(BOOL)isSetupComplete {
@@ -194,10 +191,14 @@
 -(void)switchLock:(BOOL)lockSetting {
     if(lockSetting) {
         [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
-        NSLog(@"Idle timer switched off");
+        if(DebugMode) {
+            NSLog(@"Idle timer switched off");
+        }
     } else {
         [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
-        NSLog(@"Idle timer returned to natural state.");
+        if(DebugMode) {
+            NSLog(@"Idle timer returned to natural state.");
+        }
     }
 }
 
@@ -232,9 +233,13 @@
      */
    
     if([self checkIfTodayExists]) {
-        NSLog(@"Today date exists.");
+        if(DebugMode) {
+            NSLog(@"Today date exists.");
+        }
     } else {
-        NSLog(@"Today date doesnt exist, creating a new entry");
+        if(DebugMode) {
+            NSLog(@"Today date doesnt exist, creating a new entry");
+        }
         if(_coreDataHelper.context) {
         [self addTodayEntry];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"SomethingChanged" object:nil];
@@ -259,7 +264,6 @@
         BOOL isToday = [DateChecker isSameAsToday:fetchedDate];
         
         if(isToday) {
-            //NSLog(@"Today entry exists");
             return YES;
         }
         [_coreDataHelper.context refreshObject:object mergeChanges:NO];
@@ -279,7 +283,9 @@
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     if(autoLockSetting) {
         [self switchLock:YES];
-        NSLog(@"Idle timer is DISABLED.");
+        if(DebugMode) {
+            NSLog(@"Idle timer is DISABLED.");
+        }
     }
 }
 

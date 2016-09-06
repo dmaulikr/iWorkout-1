@@ -9,6 +9,8 @@
 #import "WorkoutViewController.h"
 #import "DateFormat.h"
 
+#define DebugMode 0
+
 @interface WorkoutViewController ()
 
 @end
@@ -68,7 +70,9 @@
     NSDate *dateModified = (NSDate*)[workout valueForKey:@"LastModified"];
     
     if(!dateModified) {
-        NSLog(@"ERROR: No last modified date found");
+        if(DebugMode) {
+            NSLog(@"ERROR: No last modified date found");
+        }
         return nil;
     }
 
@@ -87,7 +91,9 @@
     }
     
     if(string) {
-        NSLog(@"Date was modified: %@ ago", string);
+        if(DebugMode) {
+            NSLog(@"Date was modified: %@ ago", string);
+        }
         return string;
     }
     return nil;
@@ -169,12 +175,6 @@
             [self addDataForIndex:indexPass withText:textfieldString IsDouble:isDouble];
         });
         
-#warning Experiment with EndEditing function to speed up keyboard dismissal
-        //NSLog(@"End editing: %@", [alertController.view endEditing:YES] ? @"Success" : @"Fail");
-
-        //[alertController.view endEditing:YES];
-        //[self addEntry:countToAdd toWorkoutAtIndex:indexPass];
-        
     }];
     UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDestructive handler:nil];
     
@@ -217,7 +217,9 @@
 }
 -(void)addReps {
     if(!_selectedIndexPath) {
-        NSLog(@"Nothing is selected.");
+        if(DebugMode) {
+            NSLog(@"Nothing is selected.");
+        }
         return;
     } else {
         [self requestEntryToAddAtIndex:_selectedIndexPath.row];
@@ -261,7 +263,9 @@
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSLog(@"You selected: %@", [arrayOfWorkouts objectAtIndex:indexPath.row]);
+    if(DebugMode) {
+        NSLog(@"You selected: %@", [arrayOfWorkouts objectAtIndex:indexPath.row]);
+    }
     
     [_selectedWorkout setString:[arrayOfWorkouts objectAtIndex:indexPath.row]];
     _selectedIndexPath = indexPath;

@@ -14,6 +14,8 @@
 #import "DateFormat.h"
 #import "DateChecker.h"
 
+#define DebugMode 0
+
 @interface MainTableViewController () 
 @end
 
@@ -31,6 +33,7 @@
 -(void)addRefreshControl {
     customRefreshControl = [[UIRefreshControl alloc] init];
     
+    
     // Unable to set different colour
     [customRefreshControl setTintColor:[UIColor blueColor]];
     
@@ -40,13 +43,23 @@
 
 -(void)startRefresh {
     [customRefreshControl beginRefreshing];
-    NSLog(@"Refreshing...");
+    if(DebugMode) {
+        NSLog(@"Refreshing...");
+    }
     [self performFetch];
     [self.tableView reloadData];
-    NSLog(@"Done refreshing");
+    if(DebugMode) {
+        NSLog(@"Done refreshing");
+    }
     [customRefreshControl endRefreshing];
 }
-
+-(void)showHelp {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Help" message:@"Tap a selected date to add your workouts\nTo refresh the page drag the table downwards\n\nTo restart and set up new workouts, \nOr to change the date style please tap Back and then press the Settings icon." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:nil];
+    [alert addAction:dismiss];
+    [self presentViewController:alert animated:YES completion:nil];
+    
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -59,21 +72,22 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(SomethingChanged) name:@"SomethingChanged" object:nil];
     
     
-    UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshDate)];
+    UIBarButtonItem *helpButton = [[UIBarButtonItem alloc] initWithTitle:@"?" style:UIBarButtonItemStyleDone target:self action:@selector(showHelp)];
     
-    self.navigationItem.rightBarButtonItem = refreshButton;
+    self.navigationItem.rightBarButtonItem = helpButton;
     
     [self configureFetch];
     [self performFetch];
     
     // Check to make sure objects are returned, otherwise create todays entry
     if(self.frc.fetchedObjects.count <= 0) {
-        NSLog(@"No data found!");
-        
+        if(DebugMode) {
+            NSLog(@"No data found!");
+        }
         // Creating today entry
         [self addTodayEntry];
         
-        /* ADD TEMP DATA FOR SCREENSHOTS
+        /* ADD TEMPORARY DATA FOR SCREENSHOTS in iTunes Connect
          [self addTempData]; */
         
         // Updating view
@@ -83,9 +97,13 @@
     
     // Check to make sure todays entry exists
     if([self hasLatestDateBeenCreated]) {
-        NSLog(@"Latest entry is todays date, everythings a go.");
+        if(DebugMode) {
+            NSLog(@"Latest entry is todays date, everythings a go.");
+        }
     } else {
-        NSLog(@"Latest entry is not todays date, attempting to add todays date");
+        if(DebugMode) {
+            NSLog(@"Latest entry is not todays date, attempting to add todays date");
+        }
         [self addTodayEntry];
         [self performSelector:@selector(delayConfirm) withObject:nil afterDelay:0.1]; // Added short delay to ensure DB has a lil time to load.
     }
@@ -111,25 +129,34 @@
         [self.frc.managedObjectContext performBlockAndWait:^{
             NSError *error = nil;
             if(![self.frc performFetch:&error]) {
-                NSLog(@"Failed to perform fetch: %@", error);
+                if(DebugMode) {
+                    NSLog(@"Failed to perform fetch: %@", error);
+                }
             } else {
-                NSLog(@"Fetch performed successfully!"); // I added this in, unnecessary
+                if(DebugMode) {
+                    NSLog(@"Fetch performed successfully!");
+                }
             }
             [self.tableView reloadData];
         }];
     } else {
-        NSLog(@"Failed to fetch, the fetched results controller is nil.");
+        if(DebugMode) {
+            NSLog(@"Failed to fetch, the fetched results controller is nil.");
+        }
     }
 }
 -(BOOL)hasLatestDateBeenCreated {
     AppDelegate *appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
     
     if([appDelegate checkIfTodayExists]) {
-        NSLog(@"Smooth sailing.");
+        if(DebugMode) {
+            NSLog(@"Smooth sailing.");
+        }
         return YES;
     } else {
-        NSLog(@"@@@@@@@@@@@@@@@@@@@@@@@@@");
-        NSLog(@"ERROR: Today doesnt exist!");
+        if(DebugMode) {
+            NSLog(@"ERROR: Today doesnt exist!");
+        }
         return NO;
     }
 }
@@ -165,7 +192,9 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"SomethingChanged" object:nil];
 }
 -(void)SomethingChanged {
-    NSLog(@"Something changed!");
+    if(DebugMode) {
+        NSLog(@"Something changed!");
+    }
     [self refreshDate];
 }
 
@@ -174,10 +203,13 @@
     [self refreshDate];
     
     if([self hasLatestDateBeenCreated]) {
-        NSLog(@"Successfully created todays entry!");
+        if(DebugMode) {
+            NSLog(@"Successfully created todays entry!");
+        }
     } else {
-        NSLog(@"ERROR: This is taking longer than usual, re-trying...");
-        
+        if(DebugMode) {
+            NSLog(@"ERROR: This is taking longer than usual, re-trying...");
+        }
         // Recursively return to this function until DB has loaded, just in case of a slow load. We want to make sure that todays entry gets
         // added regardless of how slow your iPhone is :)
         [self performSelector:@selector(delayConfirm) withObject:nil afterDelay:0.2];
@@ -272,30 +304,33 @@
     NSCalendar *calendar = [NSCalendar currentCalendar];
     NSInteger dateComp = [calendar component:NSCalendarUnitWeekOfYear fromDate:date];
     
-    NSLog(@"Week %i",(int) dateComp);
+    if(DebugMode) {
+        NSLog(@"Week %i",(int) dateComp);
+    }
     
 }
 #pragma mark - TABLE VIEW DELEGATE
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     WorkoutViewController *workoutVC = [self.storyboard instantiateViewControllerWithIdentifier:@"WorkoutViewController"];
-    //NSDictionary *dict = (NSDictionary*)[self.frc objectAtIndexPath:indexPath];
-    
+
     NSManagedObject *object = [self.frc objectAtIndexPath:indexPath];
     
     // Testing this..
-    [self getWeekNo:(NSDate*)[object valueForKey:@"Date"]];
+    // WEEK SORTING TEMPORARY DISABLED.
+    //[self getWeekNo:(NSDate*)[object valueForKey:@"Date"]];
+
     
+    NSString *dateLabel = [NSString stringWithFormat:@"%@", [DateFormat getDateStringFromDate:[object valueForKey:@"Date"] withIndex:4]];
     
-    //NSString *dateL = [NSString stringWithFormat:@"%@", [self.dateformatter stringFromDate:[object valueForKey:@"Date"]]];
-    NSString *dateL = [NSString stringWithFormat:@"%@", [DateFormat getDateStringFromDate:[object valueForKey:@"Date"]]];
-    
-    [workoutVC setDateLabelText:dateL];
+    [workoutVC setDateLabelText:dateLabel];
     
     if([cdh.context obtainPermanentIDsForObjects:[NSArray arrayWithObject:object] error:nil]) {
         [workoutVC sendObject:object.objectID];
     } else {
-        NSLog(@"ERROR: No ID found for selected object.");
+        if(DebugMode) {
+            NSLog(@"ERROR: No ID found for selected object.");
+        }
     }
     
     
@@ -328,15 +363,17 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.tableView reloadData];
         });
-        
-        NSLog(@"Deleted object");
+        if(DebugMode) {
+            NSLog(@"Deleted object");
+        }
         //[self dismissViewControllerAnimated:YES completion:nil];
         
     }];
     UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
         // do nothing.
-        NSLog(@"Cancelled by user.");
-        
+        if(DebugMode) {
+            NSLog(@"Cancelled by user.");
+        }
         dispatch_async(dispatch_get_main_queue(), ^{
             [tableView reloadData];
         });

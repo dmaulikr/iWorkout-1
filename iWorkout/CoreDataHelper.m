@@ -91,9 +91,13 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     }
     if([AppDelegate isSetupComplete]) {
         _model = [AppDelegate getModel];
-        NSLog(@"Successfully created model!");
+        if(debugging) {
+            NSLog(@"Successfully created model!");
+        }
     } else {
-        NSLog(@"ERROR! No model found!");
+        if(debugging) {
+            NSLog(@"ERROR! No model found!");
+        }
         exit(0);
     }
     
@@ -168,7 +172,9 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
                                                   options:options
                                                     error:&error]; // Added 'options'
     if(!_store) {
+        if(debugging) {
             NSLog(@"Failed to add store. Error %@", error);
+        }
             abort();
         }
     else {
@@ -248,13 +254,19 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     if([_context hasChanges]) {
         NSError *error;
         if([_context save:&error]) {
-            NSLog(@"_context SAVED changes to persistent store");
+            if(debugging) {
+                NSLog(@"_context SAVED changes to persistent store");
+            }
         } else {
-            NSLog(@"Failed to save _context: %@", error);
+            if(debugging) {
+                NSLog(@"Failed to save _context: %@", error);
+            }
             [self showValidationError:error];
         }
     } else {
-        NSLog(@"Skipped _context SAVE, there are no changes!");
+        if(debugging) {
+            NSLog(@"Skipped _context SAVE, there are no changes!");
+        }
     }
 }
 
@@ -270,13 +282,19 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
         if([_parentContext hasChanges]) {
             NSError *error = nil;
             if([_parentContext save:&error]) {
-                NSLog(@"_parentContext SAVED changes to the persistent store");
+                if(debugging) {
+                    NSLog(@"_parentContext SAVED changes to the persistent store");
+                }
             } else {
-                NSLog(@"_parentContext FAILED to save: %@", error);
+                if(debugging) {
+                    NSLog(@"_parentContext FAILED to save: %@", error);
+                }
                 [self showValidationError:error];
             }
         } else {
-            NSLog(@"_parentContext SKIPPED saving as there are no changes");
+            if(debugging) {
+                NSLog(@"_parentContext SKIPPED saving as there are no changes");
+            }
         }
         
     }];
@@ -633,9 +651,13 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
         if(![fileManager copyItemAtURL:defaultDataURL
                                  toURL:self.storeURL
                                  error:&error]) {
-            NSLog(@"DefaultData.sqlite copy FAIL: %@", error.localizedDescription);
+            if(debugging) {
+                NSLog(@"DefaultData.sqlite copy FAIL: %@", error.localizedDescription);
+            }
         } else {
-            NSLog(@"A copy of DefaultData.sqlite was set as the initial store for %@", self.storeURL.path);
+            if(debugging) {
+                NSLog(@"A copy of DefaultData.sqlite was set as the initial store for %@", self.storeURL.path);
+            }
         }
     }
 }
@@ -716,7 +738,9 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     BOOL success = NO;
     NSError *error = nil;
     if(![_coordinator removePersistentStore:_store error:&error]) {
-        NSLog(@"Unable to remove persistent store: %@", error);
+        if(debugging) {
+            NSLog(@"Unable to remove persistent store: %@", error);
+        }
     }
     //[self resetContext:_sourceContext];
     //[self resetContext:_importContext];
@@ -769,12 +793,16 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     _iCloudStore = [_coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:[self iCloudStoreURL] options:options error:&error];
     
     if(_iCloudStore) {
-        NSLog(@"** The iCloud Store has been successfully configured at '%@' **", _iCloudStore.URL.path);
+        if(debugging) {
+            NSLog(@"** The iCloud Store has been successfully configured at '%@' **", _iCloudStore.URL.path);
+        }
        // [self confirmMergeWithiCloud];
         //[self destroyAlliCloudDataForThisApplication];
         return YES;
     }
-    NSLog(@"** FAILED to configure the iCloud Store: %@ **", error);
+    if(debugging) {
+        NSLog(@"** FAILED to configure the iCloud Store: %@ **", error);
+    }
     return NO;
 }
 
@@ -872,7 +900,9 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     for (NSPersistentStore *s in psc.persistentStores) {
         NSError *error = nil;
         if(![psc removePersistentStore:s error:&error]) {
-            NSLog(@"Error removing persistent store: %@", error);
+            if(debugging) {
+                NSLog(@"Error removing persistent store: %@", error);
+            }
         }
     }
 }
@@ -910,7 +940,9 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
         NSPersistentStoreCoordinator *psc = ps.persistentStoreCoordinator;
         NSError *error = nil;
         if(![psc removePersistentStore:ps error:&error]) {
-            NSLog(@"ERROR removing store from the coordinator: %@", error);
+            if(debugging) {
+                NSLog(@"ERROR removing store from the coordinator: %@", error);
+            }
             return NO; // Fail
         } else {
             ps = nil;
@@ -923,9 +955,13 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     NSError *error = nil;
     
     if(![[NSFileManager defaultManager] removeItemAtURL:url error:&error]) {
-        NSLog(@"Failed to delete '%@' from '%@'", [url lastPathComponent], [url URLByDeletingLastPathComponent]);
+        if(debugging) {
+            NSLog(@"Failed to delete '%@' from '%@'", [url lastPathComponent], [url URLByDeletingLastPathComponent]);
+        }
     } else {
-        NSLog(@"Deleted '%@' from '%@'", [url lastPathComponent], [url URLByDeletingLastPathComponent]);
+        if(debugging) {
+            NSLog(@"Deleted '%@' from '%@'", [url lastPathComponent], [url URLByDeletingLastPathComponent]);
+        }
     }
 }
 
@@ -1002,27 +1038,3 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
 
 @end
 
-
-
-
-
-
-
-
-
-
-
-/*
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- */
