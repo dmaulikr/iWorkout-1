@@ -12,7 +12,8 @@
 #import "MainTableViewController.h"
 #import "Workout.h"
 
-#define DebugMode 0
+#define DebugMode 1
+
 @interface ViewController ()
 
 @end
@@ -43,7 +44,6 @@
 #warning The settings button isnt returning to proper position. Check that out
     */
     
-    
     // Do any additional setup after loading the view, typically from a nib.
     /*
     DBFileExists = NO;
@@ -64,12 +64,7 @@
     
 }
 
--(void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    
-    
-}
-
+/*
 -(void)testDynamicsWithOldPos:(CGPoint)position {
     __block float width, height;
     width = self.settingsButton.frame.size.width;
@@ -98,30 +93,29 @@
     });
     
     //self.settingsButton.frame.origin = position;
-    
-    
-    
-    
-}
+}*/
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
     if(self.class != [SetupViewController class]) {
-    if([self setupDataExists]) {
-        if(DebugMode) {
-            NSLog(@"Found setup data!");
-        }
+        
+    if([AppDelegate isFirstTimeSetupComplete]) {
         [self readyToStart:YES];
+        //NSLog(@"First time setup complete!");
     } else {
-        if(DebugMode) {
-            NSLog(@"No data found!");
-        }
         [self readyToStart:NO];
+        //NSLog(@"First time setup not complete!");
     }
     }
+ 
     
     [self.navigationController setNavigationBarHidden:YES];
+    [self.navigationController.navigationBar setTranslucent:NO];
+    [self.navigationController.navigationBar setBarTintColor:[UIColor colorWithRed:0.03 green:0.24 blue:0.58 alpha:1.0]];
+    [self.navigationController.navigationBar setTintColor:[UIColor whiteColor]];
+    [self.navigationController.navigationBar setBackgroundColor:[UIColor blueColor]];
+    [self.navigationController.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];
 }
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
@@ -130,6 +124,7 @@
 }
 
 #pragma mark - SETUP
+/*
 -(BOOL)setupDataExists {
     int i = 0;
     NSString *setupPath = [[self applicationDocumentsDirectory] stringByAppendingPathComponent:@"Setup.plist"];
@@ -148,20 +143,22 @@
             NSLog(@"ERROR: Found plist file but not UserDefaults data");
         }
     }
-    return NO;
-}
+    //return NO;
+    return YES;
+}*/
+/*
 -(void)loadWorkouts {
-    /*
+ 
     if([self setupDataExists]) {
         DBFileExists = YES;
-    }*/
+    }
     
     if(DBFileExists) {
         [self readyToStart:YES];
     } else {
         [self readyToStart:NO];
     }
-}
+}*/
 -(void)readyToStart:(BOOL)startBool {
     if(startBool) {
         self.tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(loadData)];
@@ -185,13 +182,11 @@
 -(void)loadData {
     // Load DB
     if(DebugMode) {
-        NSLog(@"Setup is: %@", [AppDelegate isSetupComplete] ? @"READY" : @"NOT READY");
+        NSLog(@"Setup is: %@", [AppDelegate isFirstTimeSetupComplete] ? @"READY" : @"NOT READY");
     }
-    if([AppDelegate isSetupComplete]) {
+    if([AppDelegate isFirstTimeSetupComplete]) {
         // Load DB
-        //CoreDataHelper *cdh = [(AppDelegate*)[[UIApplication sharedApplication] delegate] cdh];
         [(AppDelegate*)[[UIApplication sharedApplication] delegate] cdh];
-        
         [self presentMainView];
     } else {
         if(DebugMode) {

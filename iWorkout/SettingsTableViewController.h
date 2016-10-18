@@ -17,7 +17,6 @@
 @property (nonatomic, strong) IBOutlet UILabel *dateStyleLabel;
 
 // Switches
-@property (nonatomic, strong) IBOutlet UISwitch *autoSaveSwitch;
 @property (nonatomic, strong) IBOutlet UISwitch *autoLockSwitch;
 
 

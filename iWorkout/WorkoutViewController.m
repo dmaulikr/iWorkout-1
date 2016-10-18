@@ -8,144 +8,132 @@
 
 #import "WorkoutViewController.h"
 #import "DateFormat.h"
+#import "LastModified.h"
+#import "Date.h"
+#import "Exercise.h"
+#import "ExerciseList.h"
+#import "ExerciseLister.h"
+#import "ExerciseAdder.h"
 
-#define DebugMode 0
+#define DebugMode 1
 
 @interface WorkoutViewController ()
-
 @end
 
 @implementation WorkoutViewController
 {
-    NSString *textOfLabel;
+    //NSString *textOfLabel;
     CoreDataHelper *cdh;
     
     NSManagedObjectID *objectID;
-    NSManagedObject *workout;
+    Date *dateObject;
     NSArray *arrayOfUnits;
     NSArray *arrayOfWorkouts;
 }
-@synthesize dateLabel, dataDict;
+@synthesize dateLabel;
 
+#pragma mark - SETUP/LOADING DATA
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.dateformatter = [[NSDateFormatter alloc] init];
-    [self.dateformatter setDateFormat:@"dd-MM-yy"];
+
     self.modFormatter = [[NSDateFormatter alloc] init];
-    
-    //[self.modFormatter setDateFormat:@"dd-MM-yy HH:mm:ss"];
     [self.modFormatter setDateFormat:@"HH:mm:ss"];
     
     cdh = [(AppDelegate*)[[UIApplication sharedApplication] delegate] cdh];
-    dateLabel.text = textOfLabel;
     
     [self setupData];
-    
     [self createButtonOnNav];
-    
-    [self setLastModded];
+    [self getLastModded];
+    [self setDateLabelTextToDaysPassed];
+    [self createToolbar];
 }
--(void)setLastModded {
-    NSString *lastMod = [self compareDates];
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     
-    if(lastMod) {
-        self.lastModifiedLabel.text = [NSString stringWithFormat:@"%@ (%@ ago)", [self getModified], lastMod];
-    }
-    else {
-        self.lastModifiedLabel.text = [self getModified];
-    }
+    arrayOfWorkouts = [ExerciseLister getArrayOfWorkouts:cdh.context];
+    
+    [self.navigationController setToolbarHidden:NO];
 }
--(NSString*)getModified {
-
-    NSString *lastModded = [self.modFormatter stringFromDate:(NSDate*)[workout valueForKey:@"LastModified"]];
-    
-    if([lastModded isEqualToString:@""] || !lastModded) {
-        return @"Last modified: never modified";
-    }
-    return [NSString stringWithFormat:@"Last modified: %@", lastModded];
+-(void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [self.navigationController setToolbarHidden:YES];
 }
--(NSString*)compareDates {
-    NSMutableString *string = [NSMutableString string];
-    NSDate *dateModified = (NSDate*)[workout valueForKey:@"LastModified"];
+-(void)toolbarUndo {
+    NSLog(@"Undo!");
+}
+-(void)toolbarEdit {
+    NSLog(@"Edit!");
+}
+-(void)createToolbar {
+#warning Disabling Toolbar until functionality is available.
+    /*
+    UIBarButtonItem *undoButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemUndo target:self action:@selector(toolbarUndo)];
+    UIBarButtonItem *space = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    UIBarButtonItem *edit = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(toolbarEdit)];
     
-    if(!dateModified) {
-        if(DebugMode) {
-            NSLog(@"ERROR: No last modified date found");
-        }
-        return nil;
-    }
-
-    NSTimeInterval timePassed = [[NSDate date] timeIntervalSinceDate:dateModified];
-    
-    if((timePassed/60) > 60) {
-        if(((timePassed/60)/60) > 24) {
-            [string appendString:[NSString stringWithFormat:@"%.0f days", (((timePassed/60)/60)/24)]];
-        } else {
-            [string appendString:[NSString stringWithFormat:@"%.2f hours", (timePassed/60)/60]];
-        }
-    } else if((timePassed/60) < 1) {
-        [string appendString:[NSString stringWithFormat:@"%.0f seconds", timePassed]];
+    [self setToolbarItems:@[undoButton, space, edit]];*/
+}
+-(void)setDateLabelTextToDaysPassed {
+    int DaysPassed = [DateFormat getDaysPassed:dateObject.date];
+    if(DaysPassed == 0) {
+        self.dateLabel.text = @"Today";
+    } else if(DaysPassed == 1) {
+        self.dateLabel.text = @"Yesterday";
     } else {
-        [string appendString:[NSString stringWithFormat:@"%.0f minutes", timePassed/60]];
+        self.dateLabel.text = [NSString stringWithFormat:@"%i days ago", DaysPassed];
     }
-    
-    if(string) {
-        if(DebugMode) {
-            NSLog(@"Date was modified: %@ ago", string);
-        }
-        return string;
-    }
-    return nil;
 }
 -(void)createButtonOnNav {
-    NSDateFormatter *newFormat = [NSDateFormatter new];
-    [newFormat setDateFormat:@"EEEE"];
+    NSDateFormatter *dayOfWeekFormat = [NSDateFormatter new];
+    [dayOfWeekFormat setDateFormat:@"EEEE"];
+    NSDateFormatter *dateformatter = [[NSDateFormatter alloc] init];
+    [dateformatter setDateFormat:@"dd-MM-yy"];
+    NSDate *workoutDateNew = dateObject.date;
     
-    
-    
-    NSDate *workoutDate = (NSDate*)[workout valueForKey:@"Date"];
-    NSString *navTitle = [NSString stringWithFormat:@"%@ (%@)",[newFormat stringFromDate:workoutDate],[self.dateformatter stringFromDate:workoutDate]];
+    NSString *navTitle = [NSString stringWithFormat:@"%@ (%@)",[dayOfWeekFormat stringFromDate:workoutDateNew],[dateformatter stringFromDate:workoutDateNew]];
     self.navigationItem.title = navTitle;
     
-    UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addReps)];
-    self.navigationItem.rightBarButtonItem = addButton;
-}
-
-
--(void)setupData {
-    workout = (NSManagedObject*)[cdh.context objectWithID:objectID];
+    //UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addReps)];
     
-    arrayOfUnits = [AppDelegate getUnits];
-    arrayOfWorkouts = [AppDelegate getWorkouts];
+    UIBarButtonItem *helpButton = [[UIBarButtonItem alloc] initWithTitle:@"?" style:UIBarButtonItemStyleDone target:self action:@selector(showHelp)];
+    
+    self.navigationItem.rightBarButtonItem = helpButton;
 }
--(void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-
+-(void)setupData {
+    dateObject = [cdh.context objectWithID:objectID];
+    
+    arrayOfUnits = [self getArrayOfUnits];
+    arrayOfWorkouts = [ExerciseLister getArrayOfWorkouts:cdh.context];
+}
+-(NSArray*)getArrayOfUnits {
+    NSArray *unitArray = [NSArray arrayWithObjects:@"Reps",@"Reps", nil];
+    return unitArray;
 }
 -(void)sendObject:(NSManagedObjectID*)objIn {
-    //managedObject = objIn;
-    
     objectID = objIn;
 }
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+
+#pragma mark - DATE MODIFIED FUNCTIONS
+-(void)getLastModded {
+    self.lastModifiedLabel.text = [self getModified];
 }
--(void)setDateLabelText:(NSString*)textIn {
-    textOfLabel = textIn;
-}
--(void)requestEntryToAddAtIndex:(NSInteger)indexPass {
-    __block BOOL isDouble;
-    
-    NSString *unitName = (NSString*)[arrayOfUnits objectAtIndex:_selectedIndexPath.row];
-    if([unitName isEqualToString:@"Miles"] || [unitName isEqualToString:@"Km"] || [unitName isEqualToString:@"Mins"]) {
-        isDouble = YES;
+-(NSString*)getModified {
+    NSString *lastModded = [self.modFormatter stringFromDate:dateObject.lastModified];
+    if([lastModded isEqualToString:@""] || !lastModded) {
+        return @"Last modified: never modified";
     } else {
-        isDouble = NO;
+        NSString *lastModComparedToNow = [LastModified compareDates:dateObject.lastModified];
+        return [NSString stringWithFormat:@"Last modified: %@ (%@ ago)", lastModded, lastModComparedToNow];
     }
-    
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Add" message:@"Enter data to add:" preferredStyle:UIAlertControllerStyleAlert];
+}
+
+#pragma mark - ADDING DATA
+
+-(void)requestEntryToAddToExercise:(Exercise*)exercise isDouble:(BOOL)isDouble {
+    //BOOL isDouble = [exercise.isDouble boolValue];
+    NSLog(@"isDouble = %@", isDouble ? @"YES" : @"NO");
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Add" message:@"Enter count to add:" preferredStyle:UIAlertControllerStyleAlert];
     [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
         [textField setTextAlignment:NSTextAlignmentCenter];
         if(isDouble) {
@@ -155,26 +143,14 @@
             textField.keyboardType = UIKeyboardTypeNumberPad;
         }
     }];
-    __block NSNumber *countToAdd;
     UIAlertAction *add = [UIAlertAction actionWithTitle:@"Add" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        /*
-        if(isDouble) {
-            double oldValue = [[workout valueForKey:[arrayOfWorkouts objectAtIndex:indexPass]] doubleValue];
-            NSNumber *newValue = [NSNumber numberWithDouble:(oldValue+[alertController.textFields.firstObject.text doubleValue])];
-            countToAdd = newValue;
-        } else {
-            int oldValue = [[workout valueForKey:[arrayOfWorkouts objectAtIndex:indexPass]] intValue];
-            NSNumber *newValue = [NSNumber numberWithInt:(oldValue+[alertController.textFields.firstObject.text intValue])];
-            countToAdd = newValue;
-        }
-        */
         NSString *textfieldString = [alertController.textFields.firstObject text];
         
         [alertController.view endEditing:YES];
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-            [self addDataForIndex:indexPass withText:textfieldString IsDouble:isDouble];
+            //[self addDataForIndex:indexPass withText:textfieldString IsDouble:isDouble];
+            [self addDataForExercise:exercise withText:textfieldString];
         });
-        
     }];
     UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDestructive handler:nil];
     
@@ -183,38 +159,52 @@
     
     [self presentViewController:alertController animated:YES completion:nil];
 }
--(void)addDataForIndex:(NSUInteger)index withText:(NSString*)textFieldData IsDouble:(BOOL)isDouble {
-    __block NSNumber *countToAdd;
-    if(isDouble) {
-        double oldValue = [[workout valueForKey:[arrayOfWorkouts objectAtIndex:index]] doubleValue];
-        NSNumber *newValue = [NSNumber numberWithDouble:(oldValue+[textFieldData doubleValue])];
-        countToAdd = newValue;
-    } else {
-        int oldValue = [[workout valueForKey:[arrayOfWorkouts objectAtIndex:index]] intValue];
-        NSNumber *newValue = [NSNumber numberWithInt:(oldValue+[textFieldData intValue])];
-        countToAdd = newValue;
-    }
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self addEntry:countToAdd toWorkoutAtIndex:index];
-    });
-}
+
 
 -(void)modifiedData {
-    [workout setValue:[NSDate date] forKey:@"LastModified"];
+    dateObject.lastModified = [NSDate date];
+    [cdh backgroundSaveContext];
     
     // Change the date of when it was modified on the label
     self.lastModifiedLabel.text = [NSString stringWithFormat:@"Last modified: %@", [self.modFormatter stringFromDate:[NSDate date]]];
+    NSLog(@"New modified date: %@", [self.modFormatter stringFromDate:[NSDate date]]);
 }
--(void)addEntry:(NSNumber*)number toWorkoutAtIndex:(NSInteger)index {
+-(void)addDataForExercise:(Exercise*)exercise withText:(NSString*)textfieldData {
+    __block NSNumber *countToAdd;
+    BOOL isDouble = [exercise.isDouble boolValue];
     
-    [workout setValue:number forKey:[arrayOfWorkouts objectAtIndex:index]];
+    if(isDouble) {
+        double newDouble = [textfieldData doubleValue] + [exercise.count doubleValue];
+        countToAdd = [NSNumber numberWithDouble:newDouble];
+    } else {
+        int newInt = [textfieldData intValue] + [exercise.count intValue];
+        countToAdd = [NSNumber numberWithInt:newInt];
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self addEntry:countToAdd toWorkout:exercise];
+    });
+}
+
+-(void)addEntry:(NSNumber*)number toWorkout:(Exercise*)exercise {
+
+    [exercise setCount:number];
     
     // New feature:
     [self modifiedData];
     
+    [self refreshViews];
+}
+-(void)refreshViews {
     [cdh backgroundSaveContext];
     [self.tableView reloadData];
 }
+-(void)showHelp {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Help" message:@"Tap an Exercise to add data\nIf you would like to add more Exercises, go to Settings and Add/Edit your Exercises" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:nil];
+    [alert addAction:dismiss];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+/*
 -(void)addReps {
     if(!_selectedIndexPath) {
         if(DebugMode) {
@@ -222,55 +212,93 @@
         }
         return;
     } else {
-        [self requestEntryToAddAtIndex:_selectedIndexPath.row];
+       // [self requestEntryToAddAtIndex:_selectedIndexPath.row];
     }
-    
     [self unSelectRowAtIndexPath:_selectedIndexPath];
     
     _selectedWorkout = nil;
     _selectedIndexPath = nil;
-    
-}
+}*/
 -(NSString*)checkAndReplaceUnderscores:(NSString*)string {
     return [string stringByReplacingOccurrencesOfString:@"_" withString:@" "];
 }
+#pragma mark - TableView Methods
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
     
     int rowNum = (int)indexPath.row;
+    BOOL isDouble;
     
-    NSString *name = (NSString*)[arrayOfWorkouts objectAtIndex:rowNum];
+    ExerciseList *excList = [[ExerciseLister getArrayOfWorkouts:cdh.context] objectAtIndex:rowNum];
     
-    NSString *unit = (NSString*)[arrayOfUnits objectAtIndex:rowNum];
+    NSString *name = excList.name;
+    __block Exercise *selectedExercise;
     
-    NSNumber *reps;
-    if([unit isEqualToString:@"Miles"] || [unit isEqualToString:@"Km"] || [unit isEqualToString:@"Mins"]) {
-        reps = [NSNumber numberWithDouble:[[workout valueForKey:name] doubleValue]];
+    [dateObject.exercise enumerateObjectsUsingBlock:^(Exercise * _Nonnull obj, BOOL * _Nonnull stop) {
+        if([obj.name isEqualToString:name]) {
+            selectedExercise = obj;
+            *stop = YES;
+        }
+    }];
+    if(!selectedExercise) {
+        NSLog(@"No workout found!");
+        ExerciseAdder *excAdder = [[ExerciseAdder alloc] initWithContext:cdh.context];
+        [excAdder findMissingExercisesForObject:dateObject];
+        
     } else {
-        reps = [NSNumber numberWithInt:[[workout valueForKey:name] intValue]];
+    isDouble = [selectedExercise.isDouble boolValue];
+        NSString *displayName = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
+    if(isDouble) {
+        cell.textLabel.text = [NSString stringWithFormat:@"%@ = %.1f", displayName, [selectedExercise.count doubleValue]];
+    } else {
+        cell.textLabel.text = [NSString stringWithFormat:@"%@ = %i", displayName, [selectedExercise.count intValue]];
     }
-    
-    
-    //cell.textLabel.text = [NSString stringWithFormat:@"%@ = %@ (%@)", [self checkAndReplaceUnderscores:name], reps, unit];
-    
-    // Removed brackets
-    cell.textLabel.text = [NSString stringWithFormat:@"%@ = %@ %@", [self checkAndReplaceUnderscores:name], reps, unit];
+    }
     
     return cell;
 }
--(void)unSelectRowAtIndexPath:(NSIndexPath*)indexPath {
-    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+-(void)findMissingExerciseForDate:(Date*)currentObject {
+    ExerciseAdder *excAdder = [[ExerciseAdder alloc] initWithContext:cdh.context];
+    [excAdder findMissingExercisesForObject:currentObject];
+    [self refreshViews];
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(DebugMode) {
-        NSLog(@"You selected: %@", [arrayOfWorkouts objectAtIndex:indexPath.row]);
-    }
+    BOOL isDouble;
+    ExerciseList *exerciseListObject = [arrayOfWorkouts objectAtIndex:indexPath.row];
+    isDouble = [exerciseListObject.isDouble boolValue];
     
-    [_selectedWorkout setString:[arrayOfWorkouts objectAtIndex:indexPath.row]];
+    if(DebugMode) {
+        NSLog(@"You selected: %@", exerciseListObject.name);
+    }
+    //[_selectedWorkout setString:[arrayOfWorkouts objectAtIndex:indexPath.row]];
+
+    
     _selectedIndexPath = indexPath;
     
-    [self addReps];
+    
+    //ExerciseList *exerciseListObject = [arrayOfWorkouts objectAtIndex:indexPath.row];
+    NSString *selectedName = exerciseListObject.name;
+    __block Exercise *selectedExercise;
+    
+    [dateObject.exercise enumerateObjectsUsingBlock:^(Exercise * _Nonnull obj, BOOL * _Nonnull stop) {
+        if([obj.name isEqualToString:selectedName]) {
+            NSLog(@"Found exercise (isDouble: %@)", [obj.isDouble boolValue] ? @"YES" : @"NO");
+            selectedExercise = obj;
+            *stop = YES;
+        }
+    }];
+    if(!selectedExercise) {
+        NSLog(@"ERROR: NO EXERCISE FOUND!");
+        [self findMissingExerciseForDate:dateObject];
+    }
+    [self requestEntryToAddToExercise:selectedExercise isDouble:isDouble];
+
+    [self unSelectRowAtIndexPath:indexPath];
+
+}
+-(void)unSelectRowAtIndexPath:(NSIndexPath*)indexPath {
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -279,9 +307,13 @@
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return arrayOfWorkouts.count;
 }
+#pragma mark - OTHERS
 -(BOOL)prefersStatusBarHidden {
     return NO;
 }
-
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
 
 @end

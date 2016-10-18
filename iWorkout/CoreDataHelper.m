@@ -13,7 +13,7 @@
 
 @implementation CoreDataHelper
 
-#define debugging 0
+#define debugging 1
 
 #pragma mark - FILES
 NSString *storeFilename = @"iWorkout.sqlite";
@@ -89,8 +89,11 @@ NSString *iCloudStoreFilename = @"iCloud.sqlite";
     if(!self) {
         return nil;
     }
-    if([AppDelegate isSetupComplete]) {
-        _model = [AppDelegate getModel];
+    // TEMP 
+    if([AppDelegate isSetupComplete] || YES) {
+        //_model = [AppDelegate getModel];
+        _model = [[NSManagedObjectModel alloc] initWithContentsOfURL:[[NSBundle mainBundle] URLForResource:@"Model" withExtension:@"momd"]];
+        
         if(debugging) {
             NSLog(@"Successfully created model!");
         }

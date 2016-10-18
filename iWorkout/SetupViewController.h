@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import <CoreData/CoreData.h>
+#import "CoreDataHelper.h"
 
 @interface SetupViewController : ViewController
 
@@ -20,5 +21,9 @@
 
 // custom
 @property (nonatomic, strong) NSMutableArray *customData;
+
+// New
+@property (nonatomic, strong) CoreDataHelper *coreDataHelper;
+@property (nonatomic, strong) NSFetchedResultsController *frc;
 
 @end

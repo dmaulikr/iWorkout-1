@@ -13,7 +13,34 @@
 +(NSArray*)getAvailableDates {
     return [NSArray arrayWithObjects:@"25-03-16",@"25th March 16",@"Friday 25th",@"Friday (25-03-16)",@"Friday 25th March 2016", nil];
 }
-
++(NSString*)dateToString:(NSDate*)date {
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"dd/MM/yyyy"];
+    return [dateFormatter stringFromDate:date];
+}
++(NSDate*)getStartDate:(NSString*)dateString {
+    NSDateFormatter *dateFormatter = [NSDateFormatter new];
+    [dateFormatter setDateFormat:@"dd/MM/yyyy HH:mm:ss"];
+    [dateFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"GMT"]];
+    NSDate *newDate = [dateFormatter dateFromString:[NSString stringWithFormat:@"%@ 00:00:00",dateString]];
+    if(!newDate) {
+        NSLog(@"ERROR: Failed to create date!!");
+        return nil;
+    }
+    return newDate;
+}
++(NSDate*)getEndDate:(NSString*)dateString {
+    NSDateFormatter *dateFormatter = [NSDateFormatter new];
+    [dateFormatter setDateFormat:@"dd/MM/yyyy HH:mm:ss"];
+    [dateFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"GMT"]];
+    
+    NSDate *newDate = [dateFormatter dateFromString:[NSString stringWithFormat:@"%@ 23:59:59",dateString]];
+    if(!newDate) {
+        NSLog(@"ERROR: Failed to create date!!");
+        return nil;
+    }
+    return newDate;
+}
 +(NSString *)getSuffixForDate:(NSDate*)theDate
 {
     NSDateFormatter *dayOf = [NSDateFormatter new];
@@ -68,8 +95,10 @@
     } else if(index == 2) {
         // 3. Friday 25th
         NSDateFormatter *dayFormat = [NSDateFormatter new];
-        [dayFormat setDateFormat:@"EEEE dd"];
-        NSString *string = [NSString stringWithFormat:@"%@%@",[dayFormat stringFromDate:date],[self getSuffixForDate:date]];
+        [dayFormat setDateFormat:@"EEEE"];
+        NSDateFormatter *numberFormat = [NSDateFormatter new];
+        [numberFormat setDateFormat:@"dd"];
+        NSString *string = [NSString stringWithFormat:@"%@ %@%@",[dayFormat stringFromDate:date], [self cleanDigits:[numberFormat stringFromDate:date]], [self getSuffixForDate:date]];
         return string;
     } else if(index == 3) {
         // 4. Friday (25-03-16)
@@ -87,7 +116,7 @@
         [dayFormat setDateFormat:@"dd"];
         NSDateFormatter *restOfDateFormat = [NSDateFormatter new];
         [restOfDateFormat setDateFormat:@"LLLL yyyy"];
-        NSString *string = [NSString stringWithFormat:@"%@ %@%@ %@", [dayOfWkFormat stringFromDate:date], [DateFormat cleanDigits:[dayFormat stringFromDate:date]],[self getSuffixForDate:date], [restOfDateFormat stringFromDate:date]];
+        NSString *string = [NSString stringWithFormat:@"%@ %@%@ %@", [dayOfWkFormat stringFromDate:date], [self cleanDigits:[dayFormat stringFromDate:date]],[self getSuffixForDate:date], [restOfDateFormat stringFromDate:date]];
         return string;
     }
     else {
@@ -96,5 +125,48 @@
     }
 }
 
++(int)getDaysPassed:(NSDate*)dateCreated {
+    //NSMutableString *string = [NSMutableString string];
+    //NSDate *dateModified = (NSDate*)[workout valueForKey:@"LastModified"];
+    
+    if(!dateCreated) {
+        NSLog(@"ERROR: No date found");
+        return 0;
+    }
+    NSDateFormatter *day = [NSDateFormatter new];
+    NSDateFormatter *monthNYear = [NSDateFormatter new];
+    [day setDateFormat:@"dd"];
+    [monthNYear setDateFormat:@"MM-yy"];
+    
+    if([[monthNYear stringFromDate:dateCreated] isEqualToString:[monthNYear stringFromDate:[NSDate date]]]) {
+        
+        int dayIndexToday = [[day stringFromDate:[NSDate date]] intValue];
+        int dayIndexCreated = [[day stringFromDate:dateCreated] intValue];
+        int daysPassed = dayIndexToday-dayIndexCreated;
+        NSLog(@"It was %i days ago", daysPassed);
+        return daysPassed;
+    }
+    else {
+        return 0;
+    }
+    /*
+    NSTimeInterval timePassed = [[NSDate date] timeIntervalSinceDate:dateCreated];
+    
+    int daysPassed;
+    
+    if((timePassed/60) > 60) {
+        if(((timePassed/60)/60) > 24) {
+            [string appendString:[NSString stringWithFormat:@"%.0f days", (((timePassed/60)/60)/24)]];
+        } else if((timePassed/60)/60 > 12) {
+            daysPassed = 1;
+        }
+    }
+    
+    if(string) {
+        NSLog(@"Date was modified: %@ ago", string);
+        return string;
+    }
+    return nil;*/
+}
 
 @end

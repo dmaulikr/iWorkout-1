@@ -15,9 +15,10 @@
 @property (nonatomic, strong) IBOutlet UILabel *startLabel;
 
 
-// Testing dynamics
+// Testing dynamic animator.. Leaving these unavailable for now.
+#warning Get this UIButton either connected or removed.
 @property (nonatomic, strong) IBOutlet UIButton *settingsButton;
-@property (nonatomic, strong) UIDynamicAnimator *dynamicAnimator;
+//@property (nonatomic, strong) UIDynamicAnimator *dynamicAnimator;
 
 @end
 

@@ -13,8 +13,16 @@
 #import "WorkoutViewController.h"
 #import "DateFormat.h"
 #import "DateChecker.h"
+#import "Date.h"
+#import "ExerciseList.h"
+#import "Exercise.h"
+#import "SettingsTableViewController.h"
+#import "CleanupClass.h"
+#import "SetupViewController.h"
+#import "ExerciseAdder.h"
+#import "ExerciseLister.h"
 
-#define DebugMode 0
+#define DebugMode 1
 
 @interface MainTableViewController () 
 @end
@@ -22,8 +30,6 @@
 @implementation MainTableViewController
 {
     CoreDataHelper *cdh;
-    
-    // TESTING REFRESH CONTROL
     UIRefreshControl *customRefreshControl;
 }
 
@@ -54,31 +60,110 @@
     [customRefreshControl endRefreshing];
 }
 -(void)showHelp {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Help" message:@"Tap a selected date to add your workouts\nTo refresh the page drag the table downwards\n\nTo restart and set up new workouts, \nOr to change the date style please tap Back and then press the Settings icon." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Help" message:@"Tap a selected date to add your workouts\nTo refresh the page drag the table downwards\n\nTo Add or Edit your Exercises, \nOr to change the Date Format please tap Back and then tap the Settings icon." preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:nil];
     [alert addAction:dismiss];
     [self presentViewController:alert animated:YES completion:nil];
+}
+-(UIBarButtonItem*)getSettingsIcon {
+    UIBarButtonItem *settingsButton = [[UIBarButtonItem alloc] initWithTitle:@"\u2699" style:UIBarButtonItemStylePlain target:self action:@selector(showSettings)];
+    
+    UIFont *customFont = [UIFont fontWithName:@"Helvetica" size:24.0];
+    NSDictionary *fontDictionary = @{NSFontAttributeName : customFont};
+    [settingsButton setTitleTextAttributes:fontDictionary forState:UIControlStateNormal];
+    return settingsButton;
+}
+-(void)showSettings {
+    SettingsTableViewController *settingsView = [self.storyboard instantiateViewControllerWithIdentifier:@"SettingsTableViewController"];
+    [self.navigationController pushViewController:settingsView animated:YES];
+}
+-(void)performCleanup {
+    CleanupClass *cleanUp = [[CleanupClass alloc] initWithCoreDataContext:cdh.context];
+    [cleanUp removeEmptyDates];
+    [self startRefresh];
     
 }
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
+-(void)setupView {
+    [self setTitle:@"iWorkout"];
+    [self.navigationController setNavigationBarHidden:NO];
+    [self.navigationController.navigationBar setTranslucent:NO];
+    [self.navigationController.navigationBar setBarTintColor:[UIColor colorWithRed:0.03 green:0.24 blue:0.58 alpha:1.0]];
+    [self.navigationController.navigationBar setTintColor:[UIColor whiteColor]];
+    [self.navigationController.navigationBar setBackgroundColor:[UIColor blueColor]];
+    [self.navigationController.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];
     
     UIEdgeInsets inset = UIEdgeInsetsMake(5, 0, 0, 0);
     self.tableView.contentInset = inset;
     [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
     
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(SomethingChanged) name:@"SomethingChanged" object:nil];
-    
-    
     UIBarButtonItem *helpButton = [[UIBarButtonItem alloc] initWithTitle:@"?" style:UIBarButtonItemStyleDone target:self action:@selector(showHelp)];
     
     self.navigationItem.rightBarButtonItem = helpButton;
+    self.navigationItem.leftBarButtonItem = [self getSettingsIcon];
     
-    [self configureFetch];
-    [self performFetch];
+    [self addRefreshControl];
+}
+-(void)checkForNewExercises {
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"NewExercises"] != nil) {
+        NSLog(@"Found new exercises to add!");
+        NSArray *newExercises = [[NSUserDefaults standardUserDefaults] objectForKey:@"NewExercises"];
     
+        NSFetchRequest *fetchDates = [NSFetchRequest fetchRequestWithEntityName:@"Date"];
+        [fetchDates setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"date" ascending:NO]]];
+        NSArray *fetchedDates = [cdh.context executeFetchRequest:fetchDates error:nil];
+        
+    if(fetchedDates > 0) {
+        ExerciseAdder *excAdder = [[ExerciseAdder alloc] initWithContext:cdh.context];
+        if([excAdder addNewExercisesForArrayOfDates:fetchedDates withNewExercises:newExercises]) {
+            NSLog(@"Added new exercises!");
+            [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"NewExercises"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        } else {
+            NSLog(@"Failed to add new exercises. Refer to Maintableviewcontroller.");
+        }
+    } else {
+        NSLog(@"No dates fetched.");
+    }
+    }
+}
+-(void)startSetup {
+    // Display setup
+    SetupViewController *setupVC = [self.storyboard instantiateViewControllerWithIdentifier:@"SetupViewController"];
+    
+    setupVC.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    [self.navigationController presentViewController:setupVC animated:YES completion:nil];
+}
+-(BOOL)isFirstSetupIsComplete {
+    if([[[NSUserDefaults standardUserDefaults] valueForKey:@"FirstSetup"] boolValue]) {
+        return YES;
+    }
+    return NO;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    [self setupView];/*
+    if(![self isFirstSetupIsComplete]) {
+        [self startSetup];
+    } else {
+    
+    [self setupView];
+    //[self configureFetch];
+    //[self performFetch];
+    
+        }*/
+}
+-(void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    if(![self isFirstSetupIsComplete]) {
+        [self startSetup];
+    } else {
+        [self configureFetch];
+        [self performFetch];
+        
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(SomethingChanged) name:@"SomethingChanged" object:nil];
     // Check to make sure objects are returned, otherwise create todays entry
     if(self.frc.fetchedObjects.count <= 0) {
         if(DebugMode) {
@@ -87,13 +172,9 @@
         // Creating today entry
         [self addTodayEntry];
         
-        /* ADD TEMPORARY DATA FOR SCREENSHOTS in iTunes Connect
-         [self addTempData]; */
-        
         // Updating view
         [self refreshDate];
     }
-    
     
     // Check to make sure todays entry exists
     if([self hasLatestDateBeenCreated]) {
@@ -107,22 +188,38 @@
         [self addTodayEntry];
         [self performSelector:@selector(delayConfirm) withObject:nil afterDelay:0.1]; // Added short delay to ensure DB has a lil time to load.
     }
-    [self addRefreshControl];
+    
+        [self checkForNewExercises];
+        [self refreshDate];
+        //[self addTempData];
+        /*
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            [self performCleanup];
+        });*/
+    }
+    
 }
+
+
 -(void)configureFetch {
     cdh = [(AppDelegate*)[[UIApplication sharedApplication] delegate] cdh];
-    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
-    request.sortDescriptors = [NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"Date" ascending:NO]];
+    //NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Date"];
+    request.sortDescriptors = [NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"date" ascending:NO]];
+    
+    
     
     // Unsure about this...
     [request setFetchBatchSize:15];
     
     // Caching data
-    self.frc = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:cdh.context sectionNameKeyPath:nil cacheName:@"WorkoutData"];
+    self.frc = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:cdh.context sectionNameKeyPath:nil cacheName:@"Dates"];
     
     // Don't need to set up delegate as updates made are automatically synced
-    //self.frc.delegate = self;
+    // self.frc.delegate = self;
 }
+
 
 -(void)performFetch {
     if(self.frc) {
@@ -216,8 +313,10 @@
     }
 }
 -(void)addTodayEntry {
-    NSManagedObject *newObject = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:cdh.context];
-    [newObject setValue:[NSDate date] forKey:@"Date"];
+    //NSManagedObject *newObject = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:cdh.context];
+    Date *newObject = [NSEntityDescription insertNewObjectForEntityForName:@"Date" inManagedObjectContext:cdh.context];
+    //[newObject setValue:[NSDate date] forKey:@"Date"];
+    [newObject setDate:[NSDate date]];
     [cdh backgroundSaveContext];
     [cdh.context refreshObject:newObject mergeChanges:NO];
 }
@@ -244,7 +343,6 @@
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
     
     if(self.frc.fetchedObjects) {
@@ -299,6 +397,22 @@
         return [UIImage imageNamed:@"new_redbutton.png"];
     }
 }
+-(NSArray*)getListOfExercises {
+    NSFetchRequest *exerciseListFetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"ExerciseList"];
+    [exerciseListFetchRequest setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"name" ascending:NO]]];
+    NSError *excListError;
+    
+    NSArray *exerciseListRetrieved = [cdh.context executeFetchRequest:exerciseListFetchRequest error:&excListError];
+    if(excListError) {
+        NSLog(@"Exercise List Fetch) ERROR: %@", excListError.localizedDescription);
+        return nil;
+    }
+    if(exerciseListRetrieved.count <= 0) {
+        NSLog(@"ERROR: No list found!");
+        return nil;
+    }
+    return exerciseListRetrieved;
+}
 #warning Complete the sorting by week (This week, last week, 2 weeks ago, etc..)
 -(void)getWeekNo:(NSDate*)date {
     NSCalendar *calendar = [NSCalendar currentCalendar];
@@ -307,33 +421,77 @@
     if(DebugMode) {
         NSLog(@"Week %i",(int) dateComp);
     }
-    
 }
-#pragma mark - TABLE VIEW DELEGATE
+-(NSPredicate*)getDatePredicateForDate:(NSDate*)date {
+    /*
+    NSDate *startDate = [[NSDate alloc] init];
+    NSDate *endDate = [[NSDate alloc] init];
+    */
+    NSDate *startDate = [DateFormat getStartDate:[DateFormat dateToString:date]];
+    NSDate *endDate = [DateFormat getEndDate:[DateFormat dateToString:date]];
 
+    NSPredicate *predicate = [[NSPredicate alloc] init];
+    predicate = [NSPredicate predicateWithFormat:@"(%K > %@) AND (%K < %@)" argumentArray:@[@"date.date",startDate, @"date.date", endDate]];
+    return predicate;
+}
+
+#pragma mark - TABLE VIEW DELEGATE
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     WorkoutViewController *workoutVC = [self.storyboard instantiateViewControllerWithIdentifier:@"WorkoutViewController"];
 
-    NSManagedObject *object = [self.frc objectAtIndexPath:indexPath];
-    
     // Testing this..
     // WEEK SORTING TEMPORARY DISABLED.
     //[self getWeekNo:(NSDate*)[object valueForKey:@"Date"]];
-
     
-    NSString *dateLabel = [NSString stringWithFormat:@"%@", [DateFormat getDateStringFromDate:[object valueForKey:@"Date"] withIndex:4]];
     
-    [workoutVC setDateLabelText:dateLabel];
+    Date *currentObject = [self.frc objectAtIndexPath:indexPath];
+    NSDate *selectedDate = currentObject.date;
     
-    if([cdh.context obtainPermanentIDsForObjects:[NSArray arrayWithObject:object] error:nil]) {
-        [workoutVC sendObject:object.objectID];
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Exercise"];
+    [fetchRequest setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"date.date" ascending:NO]]];
+    [fetchRequest setPredicate:[self getDatePredicateForDate:selectedDate]];
+    
+    NSError *error;
+    NSArray *objectsRetrieved = [cdh.context executeFetchRequest:fetchRequest error:&error];
+    
+    if(error) {
+        NSLog(@"(Exercise Fetch) ERROR: %@", error.localizedDescription);
+    }
+    
+    if(objectsRetrieved.count <= 0) {
+        NSLog(@"No objects found.");
+        ExerciseAdder *excAdder = [[ExerciseAdder alloc] initWithContext:cdh.context];
+        [excAdder addExercisesForObject:currentObject];
+        [cdh backgroundSaveContext];
+        
+    } else if(objectsRetrieved.count != [ExerciseLister getArrayOfWorkouts:cdh.context].count) {
+        NSLog(@"Missing exercises...");
+        ExerciseAdder *excAdder = [[ExerciseAdder alloc] initWithContext:cdh.context];
+        [excAdder findMissingExercisesForObject:currentObject];
+        
+    }
+    
+    else {
+        NSLog(@"Objects retrieved: %i", (int) objectsRetrieved.count);
+       /* for(Exercise *excObj in objectsRetrieved) {
+            NSLog(@"Exc name: %@ & Date: %@", excObj.name, excObj.date.date);
+        }*/
+    }
+    
+    
+    //NSString *dateLabel = [NSString stringWithFormat:@"%@", [DateFormat getDateStringFromDate:currentObject.date withIndex:4]];
+    //[workoutVC setDateLabelText:dateLabel];
+    NSError *errorForID;
+    if([cdh.context obtainPermanentIDsForObjects:[NSArray arrayWithObject:currentObject] error:&errorForID]) {
+        [workoutVC sendObject:currentObject.objectID];
     } else {
         if(DebugMode) {
             NSLog(@"ERROR: No ID found for selected object.");
         }
+        if(errorForID) {
+            NSLog(@"ERROR: %@", errorForID.localizedDescription);
+        }
     }
-    
-    
     [self.navigationController pushViewController:workoutVC animated:YES];
 }
 
@@ -342,14 +500,11 @@
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Delete the row from the data source
-        
         [self confirmThenDeleteForIndex:indexPath onTableview:tableView];
-        
     }
 }
 -(void)confirmThenDeleteForIndex:(NSIndexPath *)indexPath onTableview:(UITableView*)tableView {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Confirm Delete" message:@"Are you sure you want to delete entry?" preferredStyle:UIAlertControllerStyleAlert];
-    
     UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"Confirm" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         [tableView beginUpdates];
         [cdh.context performBlockAndWait:^{
@@ -379,7 +534,6 @@
         });
     }];
     
-
     [alert addAction:confirm];
     [alert addAction:cancel];
     [self presentViewController:alert animated:YES completion:nil];
@@ -388,39 +542,44 @@
 
 
 
-// Method to add data
-/*
+// Methods to add temporary data
+
 -(void)addTempData {
-    NSManagedObject *dayOne = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:cdh.context];
-    NSManagedObject *dayTwo = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:cdh.context];
-    NSManagedObject *dayThree = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:cdh.context];
- 
-    NSDateFormatter *dateFormatter = [NSDateFormatter new];
-    [dateFormatter setDateFormat:@"dd-MM-yyyy HH:mm:ss"];
- 
-    NSDate *dayOneDate = [dateFormatter dateFromString:@"20-06-2016 15:30:00"];
-    NSDate *dayTwoDate = [dateFormatter dateFromString:@"19-06-2016 16:30:00"];
-    NSDate *dayThreeDate = [dateFormatter dateFromString:@"18-06-2016 17:30:00"];
- 
-    //dayOne.date = dayOneDate;
-    //dayTwo.date = dayTwoDate;
-    //dayThree.date = dayThreeDate;
-    [dayOne setValue:dayOneDate forKey:@"Date"];
-    [dayTwo setValue:dayTwoDate forKey:@"Date"];
-    [dayThree setValue:dayThreeDate forKey:@"Date"];
- 
-    //What other data do I add.....?
-     
-    dayOne.hours = [NSNumber numberWithDouble:2.0];
-    dayTwo.hours = [NSNumber numberWithDouble:4.0];
-    dayThree.hours = [NSNumber numberWithDouble:6.0];
- 
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        Date *dayOne = [NSEntityDescription insertNewObjectForEntityForName:@"Date" inManagedObjectContext:cdh.context];
+        Date *dayTwo = [NSEntityDescription insertNewObjectForEntityForName:@"Date" inManagedObjectContext:cdh.context];
+        Date *dayThree = [NSEntityDescription insertNewObjectForEntityForName:@"Date" inManagedObjectContext:cdh.context];
+        Date *dayFour = [NSEntityDescription insertNewObjectForEntityForName:@"Date" inManagedObjectContext:cdh.context];
+        Date *dayFive = [NSEntityDescription insertNewObjectForEntityForName:@"Date" inManagedObjectContext:cdh.context];
+        Date *daySix = [NSEntityDescription insertNewObjectForEntityForName:@"Date" inManagedObjectContext:cdh.context];
+        Date *daySeven = [NSEntityDescription insertNewObjectForEntityForName:@"Date" inManagedObjectContext:cdh.context];
+        
+        NSDateFormatter *dateFormatter = [NSDateFormatter new];
+        [dateFormatter setDateFormat:@"dd-MM-yyyy HH:mm:ss"];
+        
+        NSDate *dayOneDate = [dateFormatter dateFromString:@"10-10-2016 15:30:00"];
+        NSDate *dayTwoDate = [dateFormatter dateFromString:@"11-10-2016 16:30:00"];
+        NSDate *dayThreeDate = [dateFormatter dateFromString:@"12-10-2016 17:30:00"];
+        NSDate *dayFourDate = [dateFormatter dateFromString:@"13-10-2016 17:30:00"];
+        NSDate *dayFiveDate = [dateFormatter dateFromString:@"14-10-2016 17:30:00"];
+        NSDate *daySixDate = [dateFormatter dateFromString:@"15-10-2016 17:30:00"];
+        NSDate *daySevenDate = [dateFormatter dateFromString:@"16-10-2016 17:30:00"];
+        
+        
+        dayOne.date = dayOneDate;
+        dayTwo.date = dayTwoDate;
+        dayThree.date = dayThreeDate;
+        dayFour.date = dayFourDate;
+        dayFive.date = dayFiveDate;
+        daySix.date = daySixDate;
+        daySeven.date = daySevenDate;
+    });
     
- 
- 
     [cdh backgroundSaveContext];
+    NSLog(@"Added temporary data!");
 }
-*/
+
 
 
 

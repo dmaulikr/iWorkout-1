@@ -9,8 +9,9 @@
 #import "SettingsTableViewController.h"
 #import "AppDelegate.h"
 #import "DateFormat.h"
+#import "SetupViewController.h"
 
-#define DebugMode 0
+#define DebugMode 1
 
 @interface SettingsTableViewController () <UIPickerViewDelegate, UIPickerViewDataSource, UITableViewDelegate>
 
@@ -20,45 +21,16 @@
 {
     NSArray *pickerArray;
     __block UITextField *textfieldForAlert;
+    BOOL isLoadingActive;
 }
 
-#warning On tapping the Date Format, show a Popup view that lets you select a date instead.
 
 -(IBAction)switchedOn:(id)sender
 {
     UISwitch *theSwitch = (UISwitch*)sender;
     int switchTag = (int)theSwitch.tag;
     
-    if(switchTag == 1) {
-        // Auto save
-        
-        UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"ERROR" message:@"Unable to switch off Auto Save.\nIt is automatically always switched ON\nApologies for any inconvenience caused" preferredStyle:UIAlertControllerStyleAlert];
-        
-        [alertC addAction:[UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
-            
-        }]];
-        [self presentViewController:alertC animated:YES completion:^{
-            [theSwitch setOn:YES];
-        }];
-        
-        /*
-        if(theSwitch.on) {
-            [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"AutoSaveData"];
-            if([[NSUserDefaults standardUserDefaults] synchronize]) {
-                NSLog(@"Auto save is now ON");
-            } else {
-                NSLog(@"Error while saving settings");
-            }
-        } else {
-            [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:NO] forKey:@"AutoSaveData"];
-            if([[NSUserDefaults standardUserDefaults] synchronize]) {
-                NSLog(@"Auto save is now OFF");
-            } else {
-                NSLog(@"Error while saving settings");
-            }
-         
-        }*/
-    } else {
+    if(switchTag == 2) {
         // Auto Lock
         if(theSwitch.on) {
             [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"DisableAutoLock"];
@@ -107,20 +79,7 @@
         }
         [self.dateStyleLabel setText:[pickerArray objectAtIndex:0]];
     }
-    
-    // Load Auto-Save settings
-    /*
-    if([self autoSaveExists]) {
-        // Set the appropriate existing switch on view
-        BOOL autoSaveOn;
-        autoSaveOn = [[[NSUserDefaults standardUserDefaults] valueForKey:@"AutoSaveData"] boolValue];
-        [self.autoSaveSwitch setOn:autoSaveOn];
-    } else {
-        [self.autoSaveSwitch setOn:NO];
-    }
-    */
-    [self.autoSaveSwitch setOn:YES];
-    
+
     // Load Auto-Lock settings
     if([self autoLockExists]){
         // Set the appropriate existing switch on view
@@ -130,7 +89,6 @@
         if(DebugMode) {
             NSLog(@"Auto lock is: %@", disableAutoLock ? @"ON" : @"OFF");
         }
-        
     } else {
         [self.autoLockSwitch setOn:NO];
     }
@@ -145,15 +103,7 @@
         return NO;
     }
 }
--(BOOL)autoSaveExists {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    
-    if([userDefaults valueForKey:@"AutoSaveData"]) {
-        return YES;
-    } else {
-        return NO;
-    }
-}
+
 -(BOOL)dateIndexExists {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     
@@ -174,14 +124,16 @@
 }
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
+    isLoadingActive = NO;
     // Moved the array of available dates to the DateFormat Class.
     pickerArray = [[NSArray alloc] initWithArray:[DateFormat getAvailableDates]];
+    
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self setTitle:@"Settings"];
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
     
@@ -189,11 +141,30 @@
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
     
     //[self setAppropriateLoadedSettings];
+    UIBarButtonItem *helpButton = [[UIBarButtonItem alloc] initWithTitle:@"?" style:UIBarButtonItemStyleDone target:self action:@selector(showHelp)];
+    
+    self.navigationItem.rightBarButtonItem = helpButton;
+    
 }
 -(void)viewWillLayoutSubviews {
     // This runs 3 times (?)
+    
+    if(!isLoadingActive) {
+        isLoadingActive = YES;
+        NSLog(@"Loading....");
+        [self performSelectorOnMainThread:@selector(setAppropriateLoadedSettings) withObject:nil waitUntilDone:YES];
+        
+        //[self setAppropriateLoadedSettings];
+        isLoadingActive = NO;
+        NSLog(@"Loading complete!");
+    }
+}
 
-    [self setAppropriateLoadedSettings];
+-(void)showHelp {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Help" message:@"Tap the Date on the Date Format to change the format\nTap \'Clear all days\' to start your workouts from today\nTap \'Factory Reset\' if you would like to erase all data and start new" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:nil];
+    [alert addAction:dismiss];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -330,13 +301,22 @@
             }
         }
     }
-
+}
+-(void)openSetupPage {
+    NSLog(@"Opening setup page...");
+    SetupViewController *setupVC = [self.storyboard instantiateViewControllerWithIdentifier:@"SetupViewController"];
+    
+    setupVC.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    [self.navigationController presentViewController:setupVC animated:YES completion:nil];
 }
 
 #pragma mark - Table View Delegate
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if(indexPath.section == 0) {
         switch (indexPath.row) {
+            case 0:
+                [self openSetupPage];
+                break;
             case 1:
                 [self displayDateSelection];
                 break;
@@ -426,7 +406,8 @@
     @autoreleasepool {
         NSError *error;
         AppDelegate *appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-        NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
+        //NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
+        NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Exercise"];
         [fetch setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"Date" ascending:NO]]];
         NSArray *fetchedObjects = [appDelegate.coreDataHelper.context executeFetchRequest:fetch error:&error];
         

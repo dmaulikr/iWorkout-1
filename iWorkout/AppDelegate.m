@@ -8,8 +8,9 @@
 
 #import "AppDelegate.h"
 #import "DateChecker.h"
+#import "Date.h"
 
-#define DebugMode 0
+#define DebugMode 1
 
 @interface AppDelegate ()
 
@@ -179,6 +180,12 @@
     }
     return NO;
 }
++(BOOL)isFirstTimeSetupComplete {
+    if([[[NSUserDefaults standardUserDefaults] valueForKey:@"FirstSetup"] boolValue]) {
+        return YES;
+    }
+    return NO;
+}
 
 -(void)setAutoLock:(BOOL)lockSet {
     autoLockSetting = lockSet;
@@ -192,7 +199,7 @@
     if(lockSetting) {
         [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
         if(DebugMode) {
-            NSLog(@"Idle timer switched off");
+            NSLog(@"Idle timer DISABLED to prevent iPhone from locking.");
         }
     } else {
         [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
@@ -251,28 +258,32 @@
 
 -(BOOL)checkIfTodayExists {
     NSError *error;
-    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
+    //NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Date"];
     [fetchRequest setFetchLimit:1];
-    [fetchRequest setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"Date" ascending:NO]]];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"date" ascending:NO]]];
 
     NSArray *fetchedObjects = [self.coreDataHelper.context executeFetchRequest:fetchRequest error:&error];
     
     if(fetchedObjects) {
-        NSManagedObject *object = (NSManagedObject*)[fetchedObjects lastObject];
-        NSDate *fetchedDate = (NSDate*)[object valueForKey:@"Date"];
+        Date *fetchedObject = [fetchedObjects lastObject];
         
-        BOOL isToday = [DateChecker isSameAsToday:fetchedDate];
+        BOOL isToday = [DateChecker isSameAsToday:fetchedObject.date];
+        NSLog(@"Does todays date exist? %@", isToday ? @"YES" : @"NO");
         
         if(isToday) {
             return YES;
         }
-        [_coreDataHelper.context refreshObject:object mergeChanges:NO];
+        [_coreDataHelper.context refreshObject:fetchedObject mergeChanges:NO];
     }
     return NO;
 }
 -(void)addTodayEntry {
-    NSManagedObject *newObject = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:_coreDataHelper.context];
-    [newObject setValue:[NSDate date] forKey:@"Date"];
+    //NSManagedObject *newObject = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:_coreDataHelper.context];
+    Date *newObject = [NSEntityDescription insertNewObjectForEntityForName:@"Date" inManagedObjectContext:_coreDataHelper.context];
+    //[newObject setValue:[NSDate date] forKey:@"Date"];
+    [newObject setDate:[NSDate date]];
+    NSLog(@"Added %@ as a new date object.", [NSDate date]);
     [_coreDataHelper backgroundSaveContext];
     [_coreDataHelper.context refreshObject:newObject mergeChanges:NO];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SomethingChanged" object:nil];

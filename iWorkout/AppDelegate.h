@@ -11,10 +11,7 @@
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
-
 @property (strong, nonatomic) UIWindow *window;
-
-
 
 // Access to CoreDataHelper property
 @property (nonatomic, strong, readonly) CoreDataHelper *coreDataHelper;
@@ -28,6 +25,7 @@
 
 -(BOOL)checkIfTodayExists;
 -(void)setAutoLock:(BOOL)lockSet;
++(BOOL)isFirstTimeSetupComplete;
 
 @end
 

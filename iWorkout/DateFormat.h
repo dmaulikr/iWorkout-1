@@ -15,4 +15,9 @@
 +(NSString*)getDateStringFromDate:(NSDate*)date;
 +(NSString*)getDateStringFromDate:(NSDate*)date withIndex:(int)index;
 
++(NSString*)dateToString:(NSDate*)date;
++(NSDate*)getStartDate:(NSString*)dateString;
++(NSDate*)getEndDate:(NSString*)dateString;
++(int)getDaysPassed:(NSDate*)dateCreated;
+
 @end

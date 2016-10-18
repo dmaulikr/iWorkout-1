@@ -14,7 +14,6 @@
     NSDateFormatter *dateFormatter = [NSDateFormatter new];
     [dateFormatter setDateFormat:@"dd-MM-yy"];
     
-    
     NSString *todayString = [dateFormatter stringFromDate:[NSDate date]];
     NSString *otherDateString = [dateFormatter stringFromDate:date];
     
@@ -23,7 +22,6 @@
     } else {
         return NO;
     }
-    
 }
 
 +(BOOL)areDatesEqual:(NSDate*)firstDate andDate:(NSDate*)secondDate {
