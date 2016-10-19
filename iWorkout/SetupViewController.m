@@ -8,11 +8,13 @@
 
 #import "SetupViewController.h"
 #import "AppDelegate.h"
-#import "ExerciseList.h"
+#import "ExerciseList+CoreDataClass.h"
+#import "Date+CoreDataClass.h"
+#import "Exercise+CoreDataClass.h"
 
 #define DebugMode 1
 
-@interface SetupViewController () <UIPickerViewDataSource, UIPickerViewDelegate, UITableViewDataSource, UITableViewDelegate, NSFetchedResultsControllerDelegate>
+@interface SetupViewController () <UIPickerViewDataSource, UIPickerViewDelegate, UITableViewDataSource, UITableViewDelegate, NSFetchedResultsControllerDelegate, UITextFieldDelegate>
 
 @end
 
@@ -22,6 +24,7 @@
 {
     BOOL firstSetupExists;
     NSMutableArray *newExercises;
+    UITextField *unitTextFieldHolder;
 }
 
 -(NSString *)applicationDocumentsDirectory
@@ -48,16 +51,17 @@
     //self.customData = [[NSMutableArray alloc] init];
     
     // Set up the unit pickerView
-    self.unitPicker.delegate = self;
-    self.unitPicker.dataSource = self;
+    //self.unitPicker.delegate = self;
+    //self.unitPicker.dataSource = self;
     
-    [self.unitPicker reloadAllComponents];
+    //[self.unitPicker reloadAllComponents];
     
     // Set up table view
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.allowsSelection = YES;
     
+    self.unitTextField.delegate = self;
     
     if([[[NSUserDefaults standardUserDefaults] valueForKey:@"FirstSetup"] boolValue]) {
         firstSetupExists = YES;
@@ -73,8 +77,18 @@
     self.textField.autocorrectionType = UITextAutocorrectionTypeNo;
     
 }
+-(void)viewDidAppear:(BOOL)animated {
+    if(!firstSetupExists) {
+        [self displayFirstTimeWelcome];
+    }
+}
 
-
+-(void)displayFirstTimeWelcome {
+    UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"Welcome to iWorkout" message:@"Please enter the exercises you would like to track,\nDon't worry, you can always change them later" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *ok = [UIAlertAction actionWithTitle:@"Ok, thanks!" style:UIAlertActionStyleDefault handler:nil];
+    [alertC addAction:ok];
+    [self presentViewController:alertC animated:YES completion:nil];
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -89,17 +103,12 @@
     
     [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
         [textField setInputView:pickerView];
-        //textfieldForAlert = textField;
+        unitTextFieldHolder = textField;
         [textField setTextAlignment:NSTextAlignmentCenter];
-        
-        //int rowIndex = [self getDateIndex];
-        //[pickerView selectRow:rowIndex inComponent:0 animated:YES];
-        //[textField setText:[pickerArray objectAtIndex:rowIndex]];
-        
     }];
     UIAlertAction *select = [UIAlertAction actionWithTitle:@"Select" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        //textfieldForAlert = nil;
-        //NSLog(@"You selected %@", [pickerView ][pickerView selectedRowInComponent:0]);
+        [self.unitTextField setText:unitTextFieldHolder.text];
+        unitTextFieldHolder = nil;
     }];
     [alert addAction:select];
     [self presentViewController:alert animated:YES completion:nil];
@@ -107,7 +116,7 @@
 
 #pragma mark - ACTIONS
 -(IBAction)help:(id)sender {
-    UIAlertController *helpController = [UIAlertController alertControllerWithTitle:@"Instructions of use" message:@"Please enter a workout name and a unit of measurement to match, and continue doing so until you have all your workouts listed below.\n\ne.g. Workout name: Pushups\nUnit of measurement: Reps\n\n Workout name: Cycling\nUnit of measurement: Km" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *helpController = [UIAlertController alertControllerWithTitle:@"Instructions of use" message:@"Please enter a exercise name and a unit of measurement to match, and continue doing so until you have all your exercises listed below.\n\ne.g. Exercise name: Pushups\nUnit of measurement: Reps\n\n Exercise name: Cycling\nUnit of measurement: Km" preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault
                                                     handler:^(UIAlertAction * _Nonnull action) {
@@ -118,48 +127,19 @@
     
 }
 
--(void)createExercises {
-    
-}
-
 -(IBAction)done:(id)sender {
-    /*
-    if(self.customData.count <= 0) {
-        [self displayAlertwithTitle:@"Error: No entries added" withMessage:@"No workouts have been added.\nTap 'Help' on the top-left for more help."];
-        return;
-    }
-    
-    [self.customData enumerateObjectsUsingBlock:^(NSMutableDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if(DebugMode) {
-            NSLog(@"%@ (%@)", [obj valueForKey:@"WorkoutName"], [obj valueForKey:@"UnitOfMeasurement"]);
-        }
-    }];
-    [self dismissViewControllerAnimated:YES completion:nil];
-
-    NSString *path = [[self applicationDocumentsDirectory] stringByAppendingPathComponent:@"Setup.plist"];
-    
-    if(![self.customData writeToFile:path atomically:YES]) {
-        if(DebugMode) {
-            NSLog(@"ERROR: Unable to write to file.");
-        }
-    } else {
-    [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"SetupComplete"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-        if(DebugMode) {
-            NSLog(@"Success!");
-        }
-    }*/
     if(self.frc.fetchedObjects.count <= 0) {
-        [self displayAlertwithTitle:@"Error: No entries added" withMessage:@"No workouts have been added.\nTap 'Help' on the top-left for more help."];
-    }
-    
-    NSFetchRequest *totalExercises = [NSFetchRequest fetchRequestWithEntityName:@"ExerciseList"];
+        [self displayErrorAlertWithTitle:@"Error: No entries added" andMessage:@"No exercises have been added.\nTap 'Help' on the top-left for more help."];
+    } else {
+        [self.coreDataHelper backgroundSaveContext];
+    /*NSFetchRequest *totalExercises = [NSFetchRequest fetchRequestWithEntityName:@"ExerciseList"];
     [totalExercises setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"name" ascending:NO]]];
     NSArray *allObjects = [self.coreDataHelper.context executeFetchRequest:totalExercises error:nil];
-    
+     */
+    /*
     [allObjects enumerateObjectsUsingBlock:^(ExerciseList *_Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         NSLog(@"Exercise name: %@  &  isDouble: %@", obj.name, [obj.isDouble boolValue] ? @"Yes" : @"No");
-    }];
+    }];*/
     if(!firstSetupExists) {
         [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"FirstSetup"];
         [[NSUserDefaults standardUserDefaults] synchronize];
@@ -167,81 +147,46 @@
     } else {
         [[NSUserDefaults standardUserDefaults] setObject:newExercises forKey:@"NewExercises"];
         [[NSUserDefaults standardUserDefaults] synchronize];
-        
     }
-
-
-
     [self dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 
--(void)displayWarningAlertWithTitle:(NSString*)title andMessage:(NSString*)message {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [self.textField resignFirstResponder];
-        [self.unitPicker becomeFirstResponder];
-    }];
-    [alertController addAction:dismiss];
-    [self presentViewController:alertController animated:YES completion:nil];
-}
 -(void)displayErrorAlertWithTitle:(NSString*)title andMessage:(NSString*)message {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:nil];
     
-    UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        //
-    }];
     [alertController addAction:dismiss];
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
 -(IBAction)addWorkout:(id)sender {
     if(!self.textField.text || [self.textField.text isEqualToString:@""]) {
-        [self displayErrorAlertWithTitle:@"ERROR: Empty name" andMessage:@"Please enter a workout name"];
+        [self displayErrorAlertWithTitle:@"Empty Exercise Name" andMessage:@"Please enter a exercise name"];
         return;
     }
-    
+    if(!self.unitTextField.text || [self.unitTextField.text isEqualToString:@""]) {
+        [self displayErrorAlertWithTitle:@"Unit not selected" andMessage:@"Please select a unit to match your exercise"];
+        return;
+    }
     if(![self isValidStringLength:self.textField.text]) {
         [self displayErrorAlertWithTitle:@"Invalid String Length" andMessage:@"Please keep the workout name below 30 characters."];
         return;
     }
-    int selectedRow = (int) [self.unitPicker selectedRowInComponent:0];
-    
-    
-    if(![self illegalRowSelected:selectedRow]) {
-        
-        [self addExerciseWithName:[self replaceSpacesWithUnderscores:self.textField.text]];
-        
-        //[self addDataWithName:self.textField.text];
-        if(DebugMode) {
-            NSLog(@"Selected: %@", (NSString*)[self.defaultUnits objectAtIndex:selectedRow]);
-        }
-            [self.unitPicker selectRow:0 inComponent:0 animated:YES];
-        }
 
-}
--(BOOL)illegalRowSelected:(int)selectedRowIn {
-    if(selectedRowIn == -1) {
-        if(DebugMode) {
-            NSLog(@"Nothing selected!");
-        }
-        return YES;
-    } else if(selectedRowIn == 0) {
-        if(DebugMode) {
-            NSLog(@"NOT THAT EITHER");
-        }
-        [self displayWarningAlertWithTitle:@"Choose a unit" andMessage:@"Please select a unit of measurement"];
-        return YES;
+    NSString *exerciseName = [self replaceSpacesWithUnderscores:[self changeFirstLetterToUppercase:self.textField.text]];
+    if([self doesExerciseExist:exerciseName]) {
+        [self displayErrorAlertWithTitle:@"Exercise Already Exists" andMessage:@"The exercise you entered already exists."];
     } else {
-        return NO;
+        [self addExerciseWithName:exerciseName];
     }
 }
+
 -(NSString*)changeFirstLetterToUppercase:(NSString*)receivedString {
     BOOL isLowercase = [[NSCharacterSet lowercaseLetterCharacterSet] characterIsMember:[receivedString characterAtIndex:0]];
     if(isLowercase) {
         NSString *firstLetter = [NSString stringWithFormat:@"%c",[receivedString characterAtIndex:0]];
         NSString *upperCaseString = [firstLetter uppercaseString];
-            
         NSString *newString = [receivedString stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:upperCaseString];
             return newString;
         } else {
@@ -256,25 +201,19 @@
 
 -(void)addExerciseWithName:(NSString*)name {
     [self.textField resignFirstResponder];
-    
-    if(![self doesExerciseExist:name]) {
-        if([self isValidString:name]) {
-            NSString *unit = [self.defaultUnits objectAtIndex:[self.unitPicker selectedRowInComponent:0]];
-            NSString *newName = [self changeFirstLetterToUppercase:name];
-            if([unit isEqualToString:@"Reps"]) {
-                [self addExerciseWithName:newName isDouble:NO];
-            } else {
-                [self addExerciseWithName:newName isDouble:YES];
-            }
+    if([self isValidString:name]) {
+        NSString *unit = [self.unitTextField text];
+        if([unit isEqualToString:@"Reps"]) {
+            [self addExerciseWithName:name andUnit:unit isDouble:NO];
         } else {
-            [self displayAlertwithTitle:@"Invalid Characters" withMessage:[NSString stringWithFormat:@"The entry '%@' \ncontains illegal characters. No symbols please", name]];
+            [self addExerciseWithName:name andUnit:unit isDouble:YES];
         }
     } else {
-        [self displayWarningAlertWithTitle:@"ERROR" andMessage:@"Workout already exists."];
+        [self displayErrorAlertWithTitle:@"Invalid Characters" andMessage:[NSString stringWithFormat:@"The name '%@' contains illegal characters. No symbols please", name]];
     }
-    
     [self reloadView];
     self.textField.text = @"";
+    self.unitTextField.text = @"";
 }
 -(void)reloadView {
     [self performFetch];
@@ -318,13 +257,13 @@
     }];
     return doesExerciseExist;
 }
--(void)addExerciseWithName:(NSString*)name isDouble:(BOOL)isDouble {
+-(void)addExerciseWithName:(NSString*)name andUnit:(NSString*)excUnit isDouble:(BOOL)isDouble {
     ExerciseList *exercise = [NSEntityDescription insertNewObjectForEntityForName:@"ExerciseList" inManagedObjectContext:self.coreDataHelper.context];
     
     exercise.name = name;
     exercise.isDouble = [NSNumber numberWithBool:isDouble];
-    NSLog(@"Added Exercise %@ (isBool: %@)", name, isDouble ? @"true" : @"false");
-    
+    exercise.unit = [NSString stringWithFormat:@"%@",excUnit];
+
     [self.coreDataHelper backgroundSaveContext];
     if(firstSetupExists) {
         // This means we're in editing mode.
@@ -334,41 +273,7 @@
         [newExercises addObject:dict];
     }
 }
-/*
--(void)addDataWithName:(NSString*)name {
-    [self.textField resignFirstResponder];
-    
-    NSString *newName;
-    NSString *first = [name substringToIndex:1];
-    
-    // Replacing all occurences of spaces ' ' with underscores '_'
-    newName = [[NSString stringWithFormat:@"%@%@", [first uppercaseString], [name substringFromIndex:1]] stringByReplacingOccurrencesOfString:@" " withString:@"_"];
-    
-    
-    if(![self entryAlreadyExists:newName]) {
-        NSString *unit = [self.defaultUnits objectAtIndex:[self.unitPicker selectedRowInComponent:0]];
-        if([self isValidString:newName]) {
-        [self addDictWithName:newName andUnit:unit];
-        } else {
-            [self displayAlertwithTitle:@"Invalid Characters" withMessage:[NSString stringWithFormat:@"The entry '%@' \ncontains illegal characters. No symbols please", newName]];
-        }
-        
-    } else {
-        [self displayWarningAlertWithTitle:@"ERROR" andMessage:@"Workout already exists."];
-    }
-    
-    [self.tableView reloadData];
-    self.textField.text = @"";
-}
 
--(void)addDictWithName:(NSString*)name andUnit:(NSString*)unit {
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-    [dict setValue:name forKey:@"WorkoutName"];
-    [dict setValue:unit forKey:@"UnitOfMeasurement"];
-    
-    [self.customData addObject:[dict copy]];
-}
-*/
 #pragma mark - SAFE CHECKS
 -(BOOL)entryAlreadyExists:(NSString*)entry {
     __block int exists = 0;
@@ -380,6 +285,10 @@
         }
     }];
     return exists ? YES : NO;
+}
+#pragma mark - TextField Delegates
+-(void)textFieldDidBeginEditing:(UITextField *)textField {
+    [self displayUnitOfMeasurementSelection];
 }
 
 #pragma mark - FetchedResultsController Delegate Methods
@@ -418,6 +327,11 @@
         NSString *objectName;
         ExerciseList *exercise = [self.frc objectAtIndexPath:indexPath];
         objectName = [NSString stringWithFormat:@"%@", exercise.name];
+        [exercise.exercise enumerateObjectsUsingBlock:^(Exercise * _Nonnull obj, BOOL * _Nonnull stop) {
+            [self.coreDataHelper.context deleteObject:obj];
+        }];
+        [self removeExerciseFromDatesUsingName:objectName];
+        
         [self.coreDataHelper.context deleteObject:exercise];
         [self.coreDataHelper backgroundSaveContext];
         NSLog(@"Deleted %@", objectName);
@@ -427,17 +341,30 @@
     }
 }
 
+-(void)removeExerciseFromDatesUsingName:(NSString*)exerciseName {
+    NSFetchRequest *fetchDates = [NSFetchRequest fetchRequestWithEntityName:@"Date"];
+    [fetchDates setSortDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"date" ascending:YES]]];
+    NSArray *fetchedDates = [self.coreDataHelper.context executeFetchRequest:fetchDates error:nil];
+    
+    [fetchedDates enumerateObjectsUsingBlock:^(Date * _Nonnull dateObject, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSMutableSet *newSet = [dateObject.exercise mutableCopy];
+        [dateObject.exercise enumerateObjectsUsingBlock:^(Exercise * _Nonnull obj, BOOL * _Nonnull stop) {
+            if([exerciseName isEqualToString:obj.name]) {
+                [newSet removeObject:obj];
+            }
+        }];
+        dateObject.exercise = [newSet copy];
+    }];
+    [self.coreDataHelper backgroundSaveContext];
+}
 
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *cellIdentifier = @"Cell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    
-    //NSDictionary *dict = [self.customData objectAtIndex:indexPath.row];
+
     ExerciseList *exercise = [self.frc objectAtIndexPath:indexPath];
     
-    cell.textLabel.text = [NSString stringWithFormat:@"%@", [exercise.name stringByReplacingOccurrencesOfString:@"_" withString:@" "]];
-    
-    //cell.textLabel.text = [NSString stringWithFormat:@"%@ (%@)", [dict valueForKey:@"WorkoutName"], [dict valueForKey:@"UnitOfMeasurement"]];
+    cell.textLabel.text = [NSString stringWithFormat:@"%@ (%@)", [exercise.name stringByReplacingOccurrencesOfString:@"_" withString:@" "], exercise.unit];
 
     return cell;
 }
@@ -449,7 +376,6 @@
 -(NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
     return self.defaultUnits.count;
 }
-
 #pragma mark - PICKERVIEW DELEGATE
 -(NSString*)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
     return (NSString*)[self.defaultUnits objectAtIndex:row];
@@ -457,14 +383,17 @@
 -(CGFloat)pickerView:(UIPickerView *)pickerView rowHeightForComponent:(NSInteger)component {
     return 30;
 }
--(CGFloat)pickerView:(UIPickerView *)pickerView widthForComponent:(NSInteger)component {
-    return self.unitPicker.frame.size.width;
-}
 
 -(void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
     [self becomeFirstResponder];
     [self.textField resignFirstResponder];
-    NSLog(@"You selected %@", [self.defaultUnits objectAtIndex:row]);
+    if(row == 0) {
+        NSLog(@"Cant select that!");
+        [unitTextFieldHolder setText:@""];
+    } else {
+        NSLog(@"You selected %@", [self.defaultUnits objectAtIndex:row]);
+        [unitTextFieldHolder setText:[self.defaultUnits objectAtIndex:row]];
+    }
 }
 
 -(BOOL)prefersStatusBarHidden {
@@ -485,20 +414,6 @@
     }
     return YES;
 }
--(void)displayAlertwithTitle:(NSString*)title withMessage:(NSString*)message
-{
-    //UIViewController *root = (UIViewController*)[UIApplication sharedApplication].keyWindow.rootViewController;
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    
-    
-    UIAlertAction *close = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-       //[root dismissViewControllerAnimated:YES completion:nil];
-    }];
-    
-    [alert addAction:close];
-    [self presentViewController:alert animated:YES completion:nil];
-}
-
 
 /*
 #pragma mark - Navigation

@@ -10,14 +10,14 @@
 		9314254C1CC09491001ACBB9 /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 9314254B1CC09491001ACBB9 /* settings.png */; };
 		93290D951C8BAF8000EBBAA1 /* MainTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93290D941C8BAF8000EBBAA1 /* MainTableViewController.m */; };
 		93290D9B1C8BB39C00EBBAA1 /* CoreDataHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 93290D9A1C8BB39C00EBBAA1 /* CoreDataHelper.m */; };
-		93290D9E1C90FB1D00EBBAA1 /* Workout.m in Sources */ = {isa = PBXBuildFile; fileRef = 93290D9D1C90FB1D00EBBAA1 /* Workout.m */; };
+		93354E571DB7C24F0068F194 /* ExerciseList+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 93354E4C1DB7C24F0068F194 /* ExerciseList+CoreDataClass.m */; };
+		93354E581DB7C24F0068F194 /* ExerciseList+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = 93354E4E1DB7C24F0068F194 /* ExerciseList+CoreDataProperties.m */; };
+		93354E591DB7C24F0068F194 /* Date+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 93354E501DB7C24F0068F194 /* Date+CoreDataClass.m */; };
+		93354E5A1DB7C24F0068F194 /* Date+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = 93354E521DB7C24F0068F194 /* Date+CoreDataProperties.m */; };
+		93354E5B1DB7C24F0068F194 /* Exercise+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 93354E541DB7C24F0068F194 /* Exercise+CoreDataClass.m */; };
+		93354E5C1DB7C24F0068F194 /* Exercise+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = 93354E561DB7C24F0068F194 /* Exercise+CoreDataProperties.m */; };
+		93354E671DB7E60F0068F194 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 93FF90C71D7F0FFE00A1BBFC /* Model.xcdatamodeld */; };
 		9348650E1D80823D00860821 /* LastModified.m in Sources */ = {isa = PBXBuildFile; fileRef = 9348650D1D80823D00860821 /* LastModified.m */; };
-		9348651B1D80ED8E00860821 /* ExerciseList+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = 934865101D80ED8E00860821 /* ExerciseList+CoreDataProperties.m */; };
-		9348651C1D80ED8E00860821 /* ExerciseList.m in Sources */ = {isa = PBXBuildFile; fileRef = 934865121D80ED8E00860821 /* ExerciseList.m */; };
-		9348651D1D80ED8E00860821 /* Exercise+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = 934865141D80ED8E00860821 /* Exercise+CoreDataProperties.m */; };
-		9348651E1D80ED8E00860821 /* Exercise.m in Sources */ = {isa = PBXBuildFile; fileRef = 934865161D80ED8E00860821 /* Exercise.m */; };
-		9348651F1D80ED8E00860821 /* Date+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = 934865181D80ED8E00860821 /* Date+CoreDataProperties.m */; };
-		934865201D80ED8E00860821 /* Date.m in Sources */ = {isa = PBXBuildFile; fileRef = 9348651A1D80ED8E00860821 /* Date.m */; };
 		93843F171CA4F2EE009F1AEE /* SettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93843F161CA4F2EE009F1AEE /* SettingsTableViewController.m */; };
 		93843F1B1CA52597009F1AEE /* greenbutton.png in Resources */ = {isa = PBXBuildFile; fileRef = 93843F191CA52597009F1AEE /* greenbutton.png */; };
 		93843F1C1CA52597009F1AEE /* redbutton.png in Resources */ = {isa = PBXBuildFile; fileRef = 93843F1A1CA52597009F1AEE /* redbutton.png */; };
@@ -37,7 +37,6 @@
 		93F11FAB1C84A127009E6428 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 93F11FAA1C84A127009E6428 /* Assets.xcassets */; };
 		93F11FAE1C84A127009E6428 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 93F11FAC1C84A127009E6428 /* LaunchScreen.storyboard */; };
 		93F11FB71C84A51D009E6428 /* SetupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93F11FB61C84A51D009E6428 /* SetupViewController.m */; };
-		93FF90C91D7F0FFE00A1BBFC /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 93FF90C71D7F0FFE00A1BBFC /* Model.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,22 +45,20 @@
 		93290D941C8BAF8000EBBAA1 /* MainTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainTableViewController.m; sourceTree = "<group>"; };
 		93290D991C8BB39C00EBBAA1 /* CoreDataHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreDataHelper.h; sourceTree = "<group>"; };
 		93290D9A1C8BB39C00EBBAA1 /* CoreDataHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreDataHelper.m; sourceTree = "<group>"; };
-		93290D9C1C90FB1D00EBBAA1 /* Workout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Workout.h; sourceTree = "<group>"; };
-		93290D9D1C90FB1D00EBBAA1 /* Workout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Workout.m; sourceTree = "<group>"; };
+		93354E4B1DB7C24F0068F194 /* ExerciseList+CoreDataClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ExerciseList+CoreDataClass.h"; sourceTree = "<group>"; };
+		93354E4C1DB7C24F0068F194 /* ExerciseList+CoreDataClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ExerciseList+CoreDataClass.m"; sourceTree = "<group>"; };
+		93354E4D1DB7C24F0068F194 /* ExerciseList+CoreDataProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ExerciseList+CoreDataProperties.h"; sourceTree = "<group>"; };
+		93354E4E1DB7C24F0068F194 /* ExerciseList+CoreDataProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ExerciseList+CoreDataProperties.m"; sourceTree = "<group>"; };
+		93354E4F1DB7C24F0068F194 /* Date+CoreDataClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Date+CoreDataClass.h"; sourceTree = "<group>"; };
+		93354E501DB7C24F0068F194 /* Date+CoreDataClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Date+CoreDataClass.m"; sourceTree = "<group>"; };
+		93354E511DB7C24F0068F194 /* Date+CoreDataProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Date+CoreDataProperties.h"; sourceTree = "<group>"; };
+		93354E521DB7C24F0068F194 /* Date+CoreDataProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Date+CoreDataProperties.m"; sourceTree = "<group>"; };
+		93354E531DB7C24F0068F194 /* Exercise+CoreDataClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Exercise+CoreDataClass.h"; sourceTree = "<group>"; };
+		93354E541DB7C24F0068F194 /* Exercise+CoreDataClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Exercise+CoreDataClass.m"; sourceTree = "<group>"; };
+		93354E551DB7C24F0068F194 /* Exercise+CoreDataProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Exercise+CoreDataProperties.h"; sourceTree = "<group>"; };
+		93354E561DB7C24F0068F194 /* Exercise+CoreDataProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Exercise+CoreDataProperties.m"; sourceTree = "<group>"; };
 		9348650C1D80823C00860821 /* LastModified.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LastModified.h; sourceTree = "<group>"; };
 		9348650D1D80823D00860821 /* LastModified.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LastModified.m; sourceTree = "<group>"; };
-		9348650F1D80ED8E00860821 /* ExerciseList+CoreDataProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ExerciseList+CoreDataProperties.h"; sourceTree = "<group>"; };
-		934865101D80ED8E00860821 /* ExerciseList+CoreDataProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ExerciseList+CoreDataProperties.m"; sourceTree = "<group>"; };
-		934865111D80ED8E00860821 /* ExerciseList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExerciseList.h; sourceTree = "<group>"; };
-		934865121D80ED8E00860821 /* ExerciseList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExerciseList.m; sourceTree = "<group>"; };
-		934865131D80ED8E00860821 /* Exercise+CoreDataProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Exercise+CoreDataProperties.h"; sourceTree = "<group>"; };
-		934865141D80ED8E00860821 /* Exercise+CoreDataProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Exercise+CoreDataProperties.m"; sourceTree = "<group>"; };
-		934865151D80ED8E00860821 /* Exercise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Exercise.h; sourceTree = "<group>"; };
-		934865161D80ED8E00860821 /* Exercise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Exercise.m; sourceTree = "<group>"; };
-		934865171D80ED8E00860821 /* Date+CoreDataProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Date+CoreDataProperties.h"; sourceTree = "<group>"; };
-		934865181D80ED8E00860821 /* Date+CoreDataProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Date+CoreDataProperties.m"; sourceTree = "<group>"; };
-		934865191D80ED8E00860821 /* Date.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Date.h; sourceTree = "<group>"; };
-		9348651A1D80ED8E00860821 /* Date.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Date.m; sourceTree = "<group>"; };
 		93843F151CA4F2EE009F1AEE /* SettingsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsTableViewController.h; sourceTree = "<group>"; };
 		93843F161CA4F2EE009F1AEE /* SettingsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsTableViewController.m; sourceTree = "<group>"; };
 		93843F191CA52597009F1AEE /* greenbutton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = greenbutton.png; sourceTree = "<group>"; };
@@ -168,18 +165,18 @@
 		93F11F921C84A127009E6428 = {
 			isa = PBXGroup;
 			children = (
-				9348650F1D80ED8E00860821 /* ExerciseList+CoreDataProperties.h */,
-				934865101D80ED8E00860821 /* ExerciseList+CoreDataProperties.m */,
-				934865111D80ED8E00860821 /* ExerciseList.h */,
-				934865121D80ED8E00860821 /* ExerciseList.m */,
-				934865131D80ED8E00860821 /* Exercise+CoreDataProperties.h */,
-				934865141D80ED8E00860821 /* Exercise+CoreDataProperties.m */,
-				934865151D80ED8E00860821 /* Exercise.h */,
-				934865161D80ED8E00860821 /* Exercise.m */,
-				934865171D80ED8E00860821 /* Date+CoreDataProperties.h */,
-				934865181D80ED8E00860821 /* Date+CoreDataProperties.m */,
-				934865191D80ED8E00860821 /* Date.h */,
-				9348651A1D80ED8E00860821 /* Date.m */,
+				93354E4B1DB7C24F0068F194 /* ExerciseList+CoreDataClass.h */,
+				93354E4C1DB7C24F0068F194 /* ExerciseList+CoreDataClass.m */,
+				93354E4D1DB7C24F0068F194 /* ExerciseList+CoreDataProperties.h */,
+				93354E4E1DB7C24F0068F194 /* ExerciseList+CoreDataProperties.m */,
+				93354E4F1DB7C24F0068F194 /* Date+CoreDataClass.h */,
+				93354E501DB7C24F0068F194 /* Date+CoreDataClass.m */,
+				93354E511DB7C24F0068F194 /* Date+CoreDataProperties.h */,
+				93354E521DB7C24F0068F194 /* Date+CoreDataProperties.m */,
+				93354E531DB7C24F0068F194 /* Exercise+CoreDataClass.h */,
+				93354E541DB7C24F0068F194 /* Exercise+CoreDataClass.m */,
+				93354E551DB7C24F0068F194 /* Exercise+CoreDataProperties.h */,
+				93354E561DB7C24F0068F194 /* Exercise+CoreDataProperties.m */,
 				93F11F9D1C84A127009E6428 /* iWorkout */,
 				93F11F9C1C84A127009E6428 /* Products */,
 			);
@@ -208,8 +205,6 @@
 				93F11FAC1C84A127009E6428 /* LaunchScreen.storyboard */,
 				93F11FAF1C84A127009E6428 /* Info.plist */,
 				93F11F9E1C84A127009E6428 /* Supporting Files */,
-				93290D9C1C90FB1D00EBBAA1 /* Workout.h */,
-				93290D9D1C90FB1D00EBBAA1 /* Workout.m */,
 			);
 			path = iWorkout;
 			sourceTree = "<group>";
@@ -307,26 +302,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93354E671DB7E60F0068F194 /* Model.xcdatamodeld in Sources */,
 				93290D9B1C8BB39C00EBBAA1 /* CoreDataHelper.m in Sources */,
+				93354E571DB7C24F0068F194 /* ExerciseList+CoreDataClass.m in Sources */,
 				93F11FB71C84A51D009E6428 /* SetupViewController.m in Sources */,
-				93290D9E1C90FB1D00EBBAA1 /* Workout.m in Sources */,
 				93E7ED201CFF1C60008CB16D /* DateChecker.m in Sources */,
+				93354E591DB7C24F0068F194 /* Date+CoreDataClass.m in Sources */,
 				93843F171CA4F2EE009F1AEE /* SettingsTableViewController.m in Sources */,
-				934865201D80ED8E00860821 /* Date.m in Sources */,
-				9348651F1D80ED8E00860821 /* Date+CoreDataProperties.m in Sources */,
-				9348651E1D80ED8E00860821 /* Exercise.m in Sources */,
 				93D9C8011D96E437006384B6 /* ExerciseAdder.m in Sources */,
-				9348651C1D80ED8E00860821 /* ExerciseList.m in Sources */,
+				93354E581DB7C24F0068F194 /* ExerciseList+CoreDataProperties.m in Sources */,
 				93F11FA61C84A127009E6428 /* ViewController.m in Sources */,
+				93354E5B1DB7C24F0068F194 /* Exercise+CoreDataClass.m in Sources */,
 				93E7ED211CFF1C60008CB16D /* DateFormat.m in Sources */,
 				9348650E1D80823D00860821 /* LastModified.m in Sources */,
+				93354E5C1DB7C24F0068F194 /* Exercise+CoreDataProperties.m in Sources */,
 				938DA3201C913B8B0060F8FD /* WorkoutViewController.m in Sources */,
 				93F11FA31C84A127009E6428 /* AppDelegate.m in Sources */,
-				9348651D1D80ED8E00860821 /* Exercise+CoreDataProperties.m in Sources */,
 				93290D951C8BAF8000EBBAA1 /* MainTableViewController.m in Sources */,
 				93F11FA01C84A127009E6428 /* main.m in Sources */,
-				93FF90C91D7F0FFE00A1BBFC /* Model.xcdatamodeld in Sources */,
-				9348651B1D80ED8E00860821 /* ExerciseList+CoreDataProperties.m in Sources */,
+				93354E5A1DB7C24F0068F194 /* Date+CoreDataProperties.m in Sources */,
 				93D9C7FE1D95B8F0006384B6 /* ExerciseLister.m in Sources */,
 				93E98D5F1D95940C00222FCB /* CleanupClass.m in Sources */,
 			);

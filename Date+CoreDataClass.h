@@ -1,9 +1,10 @@
 //
-//  Date.h
+//  Date+CoreDataClass.h
 //  iWorkout
 //
-//  Created by Dayan Yonnatan on 08/09/2016.
+//  Created by Dayan Yonnatan on 19/10/2016.
 //  Copyright © 2016 Dayan Yonnatan. All rights reserved.
+//  This file was automatically generated and should not be edited.
 //
 
 #import <Foundation/Foundation.h>
@@ -14,8 +15,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Date : NSManagedObject
-
-// Insert code here to declare functionality of your managed object subclass
 
 @end
 

@@ -12,7 +12,7 @@
 
 @interface SetupViewController : ViewController
 
-@property (nonatomic, strong) IBOutlet UIPickerView *unitPicker;
+@property (nonatomic, strong) IBOutlet UITextField *unitTextField;
 @property (nonatomic, strong) IBOutlet UITableView *tableView;
 @property (nonatomic, strong) IBOutlet UITextField *textField;
 

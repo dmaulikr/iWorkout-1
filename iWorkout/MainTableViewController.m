@@ -9,20 +9,20 @@
 #import "MainTableViewController.h"
 #import "AppDelegate.h"
 #import "CoreDataHelper.h"
-#import "Workout.h"
+//#import "Workout.h"
 #import "WorkoutViewController.h"
 #import "DateFormat.h"
 #import "DateChecker.h"
-#import "Date.h"
-#import "ExerciseList.h"
-#import "Exercise.h"
+#import "Date+CoreDataClass.h"
+#import "ExerciseList+CoreDataClass.h"
+#import "Exercise+CoreDataClass.h"
 #import "SettingsTableViewController.h"
 #import "CleanupClass.h"
 #import "SetupViewController.h"
 #import "ExerciseAdder.h"
 #import "ExerciseLister.h"
 
-#define DebugMode 1
+#define DebugMode 0
 
 @interface MainTableViewController () 
 @end
@@ -465,7 +465,14 @@
         [cdh backgroundSaveContext];
         
     } else if(objectsRetrieved.count != [ExerciseLister getArrayOfWorkouts:cdh.context].count) {
+        NSLog(@"objectsR: %i VS arrayOfWorkouts: %i", (int)objectsRetrieved.count, (int)[ExerciseLister getArrayOfWorkouts:cdh.context].count);
         NSLog(@"Missing exercises...");
+        [objectsRetrieved enumerateObjectsUsingBlock:^(Exercise * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSLog(@"Obj: %@", obj.name);
+        }];
+        [[ExerciseLister getArrayOfWorkouts:cdh.context] enumerateObjectsUsingBlock:^(ExerciseList * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            NSLog(@"excList: %@", obj.name);
+        }];
         ExerciseAdder *excAdder = [[ExerciseAdder alloc] initWithContext:cdh.context];
         [excAdder findMissingExercisesForObject:currentObject];
         
@@ -540,10 +547,7 @@
 }
 
 
-
-
 // Methods to add temporary data
-
 -(void)addTempData {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -558,13 +562,13 @@
         NSDateFormatter *dateFormatter = [NSDateFormatter new];
         [dateFormatter setDateFormat:@"dd-MM-yyyy HH:mm:ss"];
         
-        NSDate *dayOneDate = [dateFormatter dateFromString:@"10-10-2016 15:30:00"];
-        NSDate *dayTwoDate = [dateFormatter dateFromString:@"11-10-2016 16:30:00"];
-        NSDate *dayThreeDate = [dateFormatter dateFromString:@"12-10-2016 17:30:00"];
-        NSDate *dayFourDate = [dateFormatter dateFromString:@"13-10-2016 17:30:00"];
-        NSDate *dayFiveDate = [dateFormatter dateFromString:@"14-10-2016 17:30:00"];
-        NSDate *daySixDate = [dateFormatter dateFromString:@"15-10-2016 17:30:00"];
-        NSDate *daySevenDate = [dateFormatter dateFromString:@"16-10-2016 17:30:00"];
+        NSDate *dayOneDate = [dateFormatter dateFromString:@"12-10-2016 15:30:00"];
+        NSDate *dayTwoDate = [dateFormatter dateFromString:@"13-10-2016 16:30:00"];
+        NSDate *dayThreeDate = [dateFormatter dateFromString:@"14-10-2016 17:30:00"];
+        NSDate *dayFourDate = [dateFormatter dateFromString:@"15-10-2016 17:30:00"];
+        NSDate *dayFiveDate = [dateFormatter dateFromString:@"16-10-2016 17:30:00"];
+        NSDate *daySixDate = [dateFormatter dateFromString:@"17-10-2016 17:30:00"];
+        NSDate *daySevenDate = [dateFormatter dateFromString:@"18-10-2016 17:30:00"];
         
         
         dayOne.date = dayOneDate;

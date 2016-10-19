@@ -10,7 +10,7 @@
 #import "SetupViewController.h"
 #import "AppDelegate.h"
 #import "MainTableViewController.h"
-#import "Workout.h"
+
 
 #define DebugMode 1
 

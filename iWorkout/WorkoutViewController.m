@@ -9,9 +9,9 @@
 #import "WorkoutViewController.h"
 #import "DateFormat.h"
 #import "LastModified.h"
-#import "Date.h"
-#import "Exercise.h"
-#import "ExerciseList.h"
+#import "Date+CoreDataClass.h"
+#import "Exercise+CoreDataClass.h"
+#import "ExerciseList+CoreDataClass.h"
 #import "ExerciseLister.h"
 #import "ExerciseAdder.h"
 
@@ -229,9 +229,11 @@
     int rowNum = (int)indexPath.row;
     BOOL isDouble;
     
+    
     ExerciseList *excList = [[ExerciseLister getArrayOfWorkouts:cdh.context] objectAtIndex:rowNum];
     
     NSString *name = excList.name;
+    NSString *exerciseUnit = excList.unit;
     __block Exercise *selectedExercise;
     
     [dateObject.exercise enumerateObjectsUsingBlock:^(Exercise * _Nonnull obj, BOOL * _Nonnull stop) {
@@ -248,10 +250,12 @@
     } else {
     isDouble = [selectedExercise.isDouble boolValue];
         NSString *displayName = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
+        NSString *unitOfMeasurement = selectedExercise.name;
+#warning Figure out where the Unit of Measurement is stored.
     if(isDouble) {
-        cell.textLabel.text = [NSString stringWithFormat:@"%@ = %.1f", displayName, [selectedExercise.count doubleValue]];
+        cell.textLabel.text = [NSString stringWithFormat:@"%@ = %.1f %@", displayName, [selectedExercise.count doubleValue], exerciseUnit];
     } else {
-        cell.textLabel.text = [NSString stringWithFormat:@"%@ = %i", displayName, [selectedExercise.count intValue]];
+        cell.textLabel.text = [NSString stringWithFormat:@"%@ = %i %@", displayName, [selectedExercise.count intValue], exerciseUnit];
     }
     }
     
@@ -295,7 +299,6 @@
     [self requestEntryToAddToExercise:selectedExercise isDouble:isDouble];
 
     [self unSelectRowAtIndexPath:indexPath];
-
 }
 -(void)unSelectRowAtIndexPath:(NSIndexPath*)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];

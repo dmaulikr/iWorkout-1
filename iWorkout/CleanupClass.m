@@ -8,8 +8,8 @@
 
 #import "CleanupClass.h"
 //#import "AppDelegate.h"
-#import "Date.h"
-#import "Exercise.h"
+#import "Date+CoreDataClass.h"
+#import "Exercise+CoreDataClass.h"
 
 @implementation CleanupClass
 

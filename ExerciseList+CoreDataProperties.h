@@ -2,21 +2,23 @@
 //  ExerciseList+CoreDataProperties.h
 //  iWorkout
 //
-//  Created by Dayan Yonnatan on 08/09/2016.
+//  Created by Dayan Yonnatan on 19/10/2016.
 //  Copyright © 2016 Dayan Yonnatan. All rights reserved.
-//
-//  Choose "Create NSManagedObject Subclass…" from the Core Data editor menu
-//  to delete and recreate this implementation file for your updated model.
+//  This file was automatically generated and should not be edited.
 //
 
-#import "ExerciseList.h"
+#import "ExerciseList+CoreDataClass.h"
+
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ExerciseList (CoreDataProperties)
 
-@property (nullable, nonatomic, retain) NSNumber *isDouble;
-@property (nullable, nonatomic, retain) NSString *name;
++ (NSFetchRequest<ExerciseList *> *)fetchRequest;
+
+@property (nullable, nonatomic, copy) NSNumber *isDouble;
+@property (nullable, nonatomic, copy) NSString *name;
+@property (nullable, nonatomic, copy) NSString *unit;
 @property (nullable, nonatomic, retain) NSSet<Exercise *> *exercise;
 
 @end

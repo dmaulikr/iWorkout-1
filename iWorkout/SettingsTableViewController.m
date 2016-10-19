@@ -60,7 +60,6 @@
             }
         }
     }
-   
 }
 -(void)setAppropriateLoadedSettings {
     // Load the date format
@@ -72,7 +71,6 @@
             NSLog(@"Date index: %i", dateIndex);
             NSLog(@"Loaded date settings");
         }
-        
     } else {
         if(DebugMode) {
             NSLog(@"No date index exists.. Set to default.");
@@ -92,11 +90,9 @@
     } else {
         [self.autoLockSwitch setOn:NO];
     }
-    
 }
 -(BOOL)autoLockExists {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-           
     if([userDefaults valueForKey:@"DisableAutoLock"]) {
         return YES;
     } else {
@@ -106,7 +102,6 @@
 
 -(BOOL)dateIndexExists {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    
     if([userDefaults valueForKey:@"DateFormatIndex"]) {
         return YES;
     } else {
@@ -132,23 +127,14 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     [self setTitle:@"Settings"];
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    
-    //[self setAppropriateLoadedSettings];
+
     UIBarButtonItem *helpButton = [[UIBarButtonItem alloc] initWithTitle:@"?" style:UIBarButtonItemStyleDone target:self action:@selector(showHelp)];
     
     self.navigationItem.rightBarButtonItem = helpButton;
-    
 }
--(void)viewWillLayoutSubviews {
-    // This runs 3 times (?)
-    
+-(void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     if(!isLoadingActive) {
         isLoadingActive = YES;
         NSLog(@"Loading....");
@@ -158,6 +144,12 @@
         isLoadingActive = NO;
         NSLog(@"Loading complete!");
     }
+    
+}
+-(void)viewWillLayoutSubviews {
+    // This runs 3 times (?)
+    
+
 }
 
 -(void)showHelp {
@@ -208,7 +200,6 @@
             NSLog(@"Cancelled reset");
         }
     }];
-    
     [alertC addAction:yesAction];
     [alertC addAction:cancelAction];
     [self presentViewController:alertC animated:YES completion:nil];
@@ -305,7 +296,7 @@
 -(void)openSetupPage {
     NSLog(@"Opening setup page...");
     SetupViewController *setupVC = [self.storyboard instantiateViewControllerWithIdentifier:@"SetupViewController"];
-    
+
     setupVC.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
     [self.navigationController presentViewController:setupVC animated:YES completion:nil];
 }
@@ -325,7 +316,6 @@
                 break;
         }
     }
-    
     if(indexPath.section == 1) {
         switch (indexPath.row) {
             case 0:
@@ -349,17 +339,7 @@
         [tableView deselectRowAtIndexPath:indexPath animated:YES]; // To ensure the top settings are not selectable.
     }
 }
-/*
--(void)deleteAllWorkoutsIndexPath:(NSIndexPath*)indexPath {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"This function is not available yet." preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        // Removed func.
-    }];
-    [alert addAction:dismiss];
-    
-    [self presentViewController:alert animated:YES completion:nil];
-}*/
+
 -(void)displayDateSelection {
     UIPickerView *pickerView = [[UIPickerView alloc] init];
     [pickerView setDelegate:self];
@@ -406,7 +386,6 @@
     @autoreleasepool {
         NSError *error;
         AppDelegate *appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-        //NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
         NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Exercise"];
         [fetch setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"Date" ascending:NO]]];
         NSArray *fetchedObjects = [appDelegate.coreDataHelper.context executeFetchRequest:fetch error:&error];
@@ -432,69 +411,5 @@
     }
 }
 
-//#pragma mark - Table view data source
-/*
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-   return 0;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 0;
-}*/
-
-
-/*
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"reuseIdentifier" forIndexPath:indexPath];
-    
-    // Configure the cell...
-    
-    return cell;
-}
-*/
-
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    } else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

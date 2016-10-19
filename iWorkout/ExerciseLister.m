@@ -7,7 +7,7 @@
 //
 
 #import "ExerciseLister.h"
-#import "ExerciseList.h"
+#import "ExerciseList+CoreDataClass.h"
 
 
 @implementation ExerciseLister
@@ -25,11 +25,11 @@
     if(fetchedObjects.count <= 0) {
         NSLog(@"ERROR: No objects found!");
     } else {
-        
+        /*
          [fetchedObjects enumerateObjectsUsingBlock:^(ExerciseList  *_Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
              //NSLog(@"name: %@ & exercises under it: %@", obj.name, obj.exercise);
              //NSLog(@"Name: %@", obj.name);
-         }];
+         }];*/
     }
     //NSLog(@"Returned %i objects from Exercise List", (int)fetchedObjects.count);
     return fetchedObjects;

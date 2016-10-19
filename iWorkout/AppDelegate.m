@@ -8,7 +8,7 @@
 
 #import "AppDelegate.h"
 #import "DateChecker.h"
-#import "Date.h"
+#import "Date+CoreDataClass.h"
 
 #define DebugMode 1
 

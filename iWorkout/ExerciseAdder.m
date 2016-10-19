@@ -7,9 +7,9 @@
 //
 
 #import "ExerciseAdder.h"
-#import "ExerciseList.h"
+#import "ExerciseList+CoreDataClass.h"
 #import "ExerciseLister.h"
-#import "Exercise.h"
+#import "Exercise+CoreDataClass.h"
 
 @implementation ExerciseAdder
 
@@ -47,6 +47,8 @@
     NSError *error;
     if(![self.context save:&error]) {
         NSLog(@"ERROR while Saving: %@", error.localizedDescription);
+    } else {
+        NSLog(@"Added exercise to missing object.");
     }
 }
 -(void)findMissingExercisesForObject:(Date*)currentObject {
@@ -66,7 +68,7 @@
             [missingExercises removeObject:obj];
         }
     }];
-    NSLog(@"The missing exercises are: ");
+    //NSLog(@"The missing exercises are: ");
     [missingExercises enumerateObjectsUsingBlock:^(NSString  *_Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         __block BOOL foundObject = false;
         __block BOOL isDouble;
@@ -78,7 +80,7 @@
             }
         }];
         
-        NSLog(@"%@ isBool: %@",obj, isDouble ? @"YES" : @"NO");
+        //NSLog(@"%@ isBool: %@",obj, isDouble ? @"YES" : @"NO");
         [self addMissingExercisesForObject:currentObject withName:obj isDouble:isDouble];
     }];
 }

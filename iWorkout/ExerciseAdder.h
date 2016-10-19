@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
-#import "Date.h"
+#import "Date+CoreDataClass.h"
 
 @interface ExerciseAdder : NSObject
 
