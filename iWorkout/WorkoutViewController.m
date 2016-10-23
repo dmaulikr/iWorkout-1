@@ -15,14 +15,13 @@
 #import "ExerciseLister.h"
 #import "ExerciseAdder.h"
 
-#define DebugMode 1
+#define DebugMode 0
 
 @interface WorkoutViewController ()
 @end
 
 @implementation WorkoutViewController
 {
-    //NSString *textOfLabel;
     CoreDataHelper *cdh;
     
     NSManagedObjectID *objectID;
@@ -46,7 +45,7 @@
     [self createButtonOnNav];
     [self getLastModded];
     [self setDateLabelTextToDaysPassed];
-    [self createToolbar];
+    //[self createToolbar];
 }
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -59,6 +58,7 @@
     [super viewWillDisappear:animated];
     [self.navigationController setToolbarHidden:YES];
 }
+/*
 -(void)toolbarUndo {
     NSLog(@"Undo!");
 }
@@ -67,13 +67,13 @@
 }
 -(void)createToolbar {
 #warning Disabling Toolbar until functionality is available.
-    /*
+ 
     UIBarButtonItem *undoButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemUndo target:self action:@selector(toolbarUndo)];
     UIBarButtonItem *space = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     UIBarButtonItem *edit = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(toolbarEdit)];
     
-    [self setToolbarItems:@[undoButton, space, edit]];*/
-}
+    [self setToolbarItems:@[undoButton, space, edit]];
+}*/
 -(void)setDateLabelTextToDaysPassed {
     int DaysPassed = [DateFormat getDaysPassed:dateObject.date];
     if(DaysPassed == 0) {
@@ -94,8 +94,7 @@
     NSString *navTitle = [NSString stringWithFormat:@"%@ (%@)",[dayOfWeekFormat stringFromDate:workoutDateNew],[dateformatter stringFromDate:workoutDateNew]];
     self.navigationItem.title = navTitle;
     
-    //UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addReps)];
-    
+
     UIBarButtonItem *helpButton = [[UIBarButtonItem alloc] initWithTitle:@"?" style:UIBarButtonItemStyleDone target:self action:@selector(showHelp)];
     
     self.navigationItem.rightBarButtonItem = helpButton;
@@ -131,8 +130,6 @@
 #pragma mark - ADDING DATA
 
 -(void)requestEntryToAddToExercise:(Exercise*)exercise isDouble:(BOOL)isDouble {
-    //BOOL isDouble = [exercise.isDouble boolValue];
-    NSLog(@"isDouble = %@", isDouble ? @"YES" : @"NO");
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Add" message:@"Enter count to add:" preferredStyle:UIAlertControllerStyleAlert];
     [alertController addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
         [textField setTextAlignment:NSTextAlignmentCenter];
@@ -148,7 +145,6 @@
         
         [alertController.view endEditing:YES];
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-            //[self addDataForIndex:indexPass withText:textfieldString IsDouble:isDouble];
             [self addDataForExercise:exercise withText:textfieldString];
         });
     }];
@@ -186,7 +182,6 @@
 }
 
 -(void)addEntry:(NSNumber*)number toWorkout:(Exercise*)exercise {
-
     [exercise setCount:number];
     
     // New feature:
@@ -204,31 +199,15 @@
     [alert addAction:dismiss];
     [self presentViewController:alert animated:YES completion:nil];
 }
-/*
--(void)addReps {
-    if(!_selectedIndexPath) {
-        if(DebugMode) {
-            NSLog(@"Nothing is selected.");
-        }
-        return;
-    } else {
-       // [self requestEntryToAddAtIndex:_selectedIndexPath.row];
-    }
-    [self unSelectRowAtIndexPath:_selectedIndexPath];
-    
-    _selectedWorkout = nil;
-    _selectedIndexPath = nil;
-}*/
+
 -(NSString*)checkAndReplaceUnderscores:(NSString*)string {
     return [string stringByReplacingOccurrencesOfString:@"_" withString:@" "];
 }
 #pragma mark - TableView Methods
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
-    
     int rowNum = (int)indexPath.row;
     BOOL isDouble;
-    
     
     ExerciseList *excList = [[ExerciseLister getArrayOfWorkouts:cdh.context] objectAtIndex:rowNum];
     
@@ -250,8 +229,6 @@
     } else {
     isDouble = [selectedExercise.isDouble boolValue];
         NSString *displayName = [name stringByReplacingOccurrencesOfString:@"_" withString:@" "];
-        NSString *unitOfMeasurement = selectedExercise.name;
-#warning Figure out where the Unit of Measurement is stored.
     if(isDouble) {
         cell.textLabel.text = [NSString stringWithFormat:@"%@ = %.1f %@", displayName, [selectedExercise.count doubleValue], exerciseUnit];
     } else {
@@ -275,13 +252,9 @@
     if(DebugMode) {
         NSLog(@"You selected: %@", exerciseListObject.name);
     }
-    //[_selectedWorkout setString:[arrayOfWorkouts objectAtIndex:indexPath.row]];
 
-    
     _selectedIndexPath = indexPath;
-    
-    
-    //ExerciseList *exerciseListObject = [arrayOfWorkouts objectAtIndex:indexPath.row];
+ 
     NSString *selectedName = exerciseListObject.name;
     __block Exercise *selectedExercise;
     

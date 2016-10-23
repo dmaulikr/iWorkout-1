@@ -6,11 +6,12 @@
 //  Copyright © 2016 Dayan Yonnatan. All rights reserved.
 //
 
-#import "ViewController.h"
+
 #import <CoreData/CoreData.h>
+#import <UIKit/UIKit.h>
 #import "CoreDataHelper.h"
 
-@interface SetupViewController : ViewController
+@interface SetupViewController : UIViewController
 
 @property (nonatomic, strong) IBOutlet UITextField *unitTextField;
 @property (nonatomic, strong) IBOutlet UITableView *tableView;

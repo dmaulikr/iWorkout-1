@@ -12,7 +12,7 @@
 #import "Date+CoreDataClass.h"
 #import "Exercise+CoreDataClass.h"
 
-#define DebugMode 1
+#define DebugMode 0
 
 @interface SetupViewController () <UIPickerViewDataSource, UIPickerViewDelegate, UITableViewDataSource, UITableViewDelegate, NSFetchedResultsControllerDelegate, UITextFieldDelegate>
 
@@ -132,21 +132,18 @@
         [self displayErrorAlertWithTitle:@"Error: No entries added" andMessage:@"No exercises have been added.\nTap 'Help' on the top-left for more help."];
     } else {
         [self.coreDataHelper backgroundSaveContext];
-    /*NSFetchRequest *totalExercises = [NSFetchRequest fetchRequestWithEntityName:@"ExerciseList"];
-    [totalExercises setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"name" ascending:NO]]];
-    NSArray *allObjects = [self.coreDataHelper.context executeFetchRequest:totalExercises error:nil];
-     */
-    /*
-    [allObjects enumerateObjectsUsingBlock:^(ExerciseList *_Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        NSLog(@"Exercise name: %@  &  isDouble: %@", obj.name, [obj.isDouble boolValue] ? @"Yes" : @"No");
-    }];*/
+
     if(!firstSetupExists) {
         [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"FirstSetup"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         NSLog(@"First time set up complete.");
     } else {
+        if(newExercises.count > 0) {
         [[NSUserDefaults standardUserDefaults] setObject:newExercises forKey:@"NewExercises"];
         [[NSUserDefaults standardUserDefaults] synchronize];
+        } else {
+            NSLog(@"No new exercises added.");
+        }
     }
     [self dismissViewControllerAnimated:YES completion:nil];
     }

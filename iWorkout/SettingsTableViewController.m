@@ -137,7 +137,7 @@
     [super viewDidAppear:animated];
     if(!isLoadingActive) {
         isLoadingActive = YES;
-        NSLog(@"Loading....");
+        //NSLog(@"Loading....");
         [self performSelectorOnMainThread:@selector(setAppropriateLoadedSettings) withObject:nil waitUntilDone:YES];
         
         //[self setAppropriateLoadedSettings];
@@ -145,11 +145,6 @@
         NSLog(@"Loading complete!");
     }
     
-}
--(void)viewWillLayoutSubviews {
-    // This runs 3 times (?)
-    
-
 }
 
 -(void)showHelp {
@@ -206,11 +201,12 @@
 }
 
 -(void)eraseAllContent {
-    if([self removeSetupFile]) {
         if([self removeStoresDirectory]) {
             if(DebugMode) {
                 NSLog(@"Successfully erased all content!");
             }
+            [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:NO] forKey:@"FirstSetup"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
             UIAlertController *alertC = [UIAlertController alertControllerWithTitle:@"Reset Complete" message:@"Application will now exit, please re-open iWorkout to start setup." preferredStyle:UIAlertControllerStyleAlert];
             UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 exit(0);
@@ -218,39 +214,12 @@
             [alertC addAction:dismiss];
             [self presentViewController:alertC animated:YES completion:nil];
         }
-    }
-}
--(BOOL)removeSetupFile {
-    NSString *applicationDocumentsDirectoryPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *setupPath = [applicationDocumentsDirectoryPath stringByAppendingPathComponent:@"Setup.plist"];
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSError *error;
-    
-    if([fileManager fileExistsAtPath:setupPath]) {
-        if(![fileManager removeItemAtPath:setupPath error:&error]) {
-            if(DebugMode) {
-                NSLog(@"ERROR: %@", error.localizedDescription);
-            }
-            return NO;
-        } else {
-            if(DebugMode) {
-                NSLog(@"Successfully deleted setup file. ");
-            }
-            return YES;
-        }
-    } else {
-        if(DebugMode) {
-            NSLog(@"ERROR: File doesn't exist..");
-        }
-        return NO;
-    }
 }
 
 
 -(BOOL)removeStoresDirectory {
     NSString *applicationDocumentsDirectoryPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
     NSString *storesDirectory = [applicationDocumentsDirectoryPath stringByAppendingPathComponent:@"Stores"];
-    //NSString *fullStorePath = @"iWorkout.sqlite"; - Just remove the directory instead...
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSError *error;
     
@@ -358,6 +327,7 @@
         
     }];
     UIAlertAction *select = [UIAlertAction actionWithTitle:@"Select" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self.dateStyleLabel setText:textfieldForAlert.text];
         textfieldForAlert = nil;
     }];
     [alert addAction:select];
@@ -386,8 +356,8 @@
     @autoreleasepool {
         NSError *error;
         AppDelegate *appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-        NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Exercise"];
-        [fetch setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"Date" ascending:NO]]];
+        NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Date"];
+        [fetch setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"date" ascending:NO]]];
         NSArray *fetchedObjects = [appDelegate.coreDataHelper.context executeFetchRequest:fetch error:&error];
         
         if(fetchedObjects) {
@@ -398,7 +368,7 @@
                 NSLog(@"Successfully deleted objects.");
             }
             [appDelegate.coreDataHelper backgroundSaveContext];
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Success!" message:@"Successfully deleted all workouts" preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Success!" message:@"Successfully deleted all workout days" preferredStyle:UIAlertControllerStyleAlert];
             [alert addAction:[UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:nil]];
             [self presentViewController:alert animated:YES completion:nil];
             

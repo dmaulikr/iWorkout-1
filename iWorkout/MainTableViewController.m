@@ -143,16 +143,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self setupView];/*
-    if(![self isFirstSetupIsComplete]) {
-        [self startSetup];
-    } else {
-    
     [self setupView];
-    //[self configureFetch];
-    //[self performFetch];
-    
-        }*/
 }
 -(void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
@@ -207,8 +198,6 @@
     //NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Workout"];
     NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Date"];
     request.sortDescriptors = [NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"date" ascending:NO]];
-    
-    
     
     // Unsure about this...
     [request setFetchBatchSize:15];
@@ -414,6 +403,7 @@
     return exerciseListRetrieved;
 }
 #warning Complete the sorting by week (This week, last week, 2 weeks ago, etc..)
+/*
 -(void)getWeekNo:(NSDate*)date {
     NSCalendar *calendar = [NSCalendar currentCalendar];
     NSInteger dateComp = [calendar component:NSCalendarUnitWeekOfYear fromDate:date];
@@ -421,12 +411,8 @@
     if(DebugMode) {
         NSLog(@"Week %i",(int) dateComp);
     }
-}
+}*/
 -(NSPredicate*)getDatePredicateForDate:(NSDate*)date {
-    /*
-    NSDate *startDate = [[NSDate alloc] init];
-    NSDate *endDate = [[NSDate alloc] init];
-    */
     NSDate *startDate = [DateFormat getStartDate:[DateFormat dateToString:date]];
     NSDate *endDate = [DateFormat getEndDate:[DateFormat dateToString:date]];
 
@@ -439,11 +425,9 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     WorkoutViewController *workoutVC = [self.storyboard instantiateViewControllerWithIdentifier:@"WorkoutViewController"];
 
-    // Testing this..
     // WEEK SORTING TEMPORARY DISABLED.
     //[self getWeekNo:(NSDate*)[object valueForKey:@"Date"]];
-    
-    
+ 
     Date *currentObject = [self.frc objectAtIndexPath:indexPath];
     NSDate *selectedDate = currentObject.date;
     
@@ -485,9 +469,6 @@
         }*/
     }
     
-    
-    //NSString *dateLabel = [NSString stringWithFormat:@"%@", [DateFormat getDateStringFromDate:currentObject.date withIndex:4]];
-    //[workoutVC setDateLabelText:dateLabel];
     NSError *errorForID;
     if([cdh.context obtainPermanentIDsForObjects:[NSArray arrayWithObject:currentObject] error:&errorForID]) {
         [workoutVC sendObject:currentObject.objectID];
@@ -548,6 +529,7 @@
 
 
 // Methods to add temporary data
+/*
 -(void)addTempData {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -562,13 +544,13 @@
         NSDateFormatter *dateFormatter = [NSDateFormatter new];
         [dateFormatter setDateFormat:@"dd-MM-yyyy HH:mm:ss"];
         
-        NSDate *dayOneDate = [dateFormatter dateFromString:@"12-10-2016 15:30:00"];
-        NSDate *dayTwoDate = [dateFormatter dateFromString:@"13-10-2016 16:30:00"];
-        NSDate *dayThreeDate = [dateFormatter dateFromString:@"14-10-2016 17:30:00"];
-        NSDate *dayFourDate = [dateFormatter dateFromString:@"15-10-2016 17:30:00"];
-        NSDate *dayFiveDate = [dateFormatter dateFromString:@"16-10-2016 17:30:00"];
-        NSDate *daySixDate = [dateFormatter dateFromString:@"17-10-2016 17:30:00"];
-        NSDate *daySevenDate = [dateFormatter dateFromString:@"18-10-2016 17:30:00"];
+        NSDate *dayOneDate = [dateFormatter dateFromString:@"15-10-2016 15:30:00"];
+        NSDate *dayTwoDate = [dateFormatter dateFromString:@"16-10-2016 16:30:00"];
+        NSDate *dayThreeDate = [dateFormatter dateFromString:@"17-10-2016 17:30:00"];
+        NSDate *dayFourDate = [dateFormatter dateFromString:@"18-10-2016 17:30:00"];
+        NSDate *dayFiveDate = [dateFormatter dateFromString:@"19-10-2016 17:30:00"];
+        NSDate *daySixDate = [dateFormatter dateFromString:@"20-10-2016 17:30:00"];
+        NSDate *daySevenDate = [dateFormatter dateFromString:@"21-10-2016 17:30:00"];
         
         
         dayOne.date = dayOneDate;
@@ -583,7 +565,7 @@
     [cdh backgroundSaveContext];
     NSLog(@"Added temporary data!");
 }
-
+*/
 
 
 
