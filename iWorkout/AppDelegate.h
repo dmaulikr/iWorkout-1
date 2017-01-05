@@ -17,15 +17,14 @@
 @property (nonatomic, strong, readonly) CoreDataHelper *coreDataHelper;
 
 -(CoreDataHelper*)cdh;
-+(BOOL)isSetupComplete;
-+(NSManagedObjectModel*)getModel;
++(BOOL)isSetupComplete;	
 +(NSString*)getPath;
-+(NSArray*)getWorkouts;
-+(NSArray*)getUnits;
 
 -(BOOL)checkIfTodayExists;
 -(void)setAutoLock:(BOOL)lockSet;
 +(BOOL)isFirstTimeSetupComplete;
+
+-(NSDictionary*)fetchLastTenExercisesForExerciseName:(NSString*)exerciseName;
 
 @end
 

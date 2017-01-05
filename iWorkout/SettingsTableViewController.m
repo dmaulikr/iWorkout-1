@@ -10,8 +10,9 @@
 #import "AppDelegate.h"
 #import "DateFormat.h"
 #import "SetupViewController.h"
+#import "AutoLock.h"
 
-#define DebugMode 1
+#define DebugMode 0
 
 @interface SettingsTableViewController () <UIPickerViewDelegate, UIPickerViewDataSource, UITableViewDelegate>
 
@@ -33,33 +34,14 @@
     if(switchTag == 2) {
         // Auto Lock
         if(theSwitch.on) {
-            [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:YES] forKey:@"DisableAutoLock"];
-            if([[NSUserDefaults standardUserDefaults] synchronize]) {
-                if(DebugMode) {
-                    NSLog(@"Disable auto lock is now ON");
-                }
-                AppDelegate *appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-                [appDelegate setAutoLock:YES];
+            [AutoLock preventAutoLock:true];
+            NSLog(@"Preventing auto lock!");
             } else {
-                if(DebugMode) {
-                    NSLog(@"Error while saving settings");
-                }
-            }
-        } else {
-            [[NSUserDefaults standardUserDefaults] setValue:[NSNumber numberWithBool:NO] forKey:@"DisableAutoLock"];
-            if([[NSUserDefaults standardUserDefaults] synchronize]) {
-                if(DebugMode) {
-                    NSLog(@"Disable auto lock is now OFF");
-                }
-                AppDelegate *appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-                [appDelegate setAutoLock:NO];
-            } else {
-                if(DebugMode) {
-                    NSLog(@"Error while saving settings");
-                }
-            }
+            [AutoLock preventAutoLock:false];
+            NSLog(@"Disabled prevent auto lock!");
         }
     }
+    
 }
 -(void)setAppropriateLoadedSettings {
     // Load the date format
@@ -81,23 +63,13 @@
     // Load Auto-Lock settings
     if([self autoLockExists]){
         // Set the appropriate existing switch on view
-        BOOL disableAutoLock;
-        disableAutoLock = [[[NSUserDefaults standardUserDefaults] valueForKey:@"DisableAutoLock"] boolValue];
-        [self.autoLockSwitch setOn:disableAutoLock];
-        if(DebugMode) {
-            NSLog(@"Auto lock is: %@", disableAutoLock ? @"ON" : @"OFF");
-        }
+        [self.autoLockSwitch setOn:true];
     } else {
-        [self.autoLockSwitch setOn:NO];
+        [self.autoLockSwitch setOn:false];
     }
 }
 -(BOOL)autoLockExists {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    if([userDefaults valueForKey:@"DisableAutoLock"]) {
-        return YES;
-    } else {
-        return NO;
-    }
+    return [AutoLock readUserDefaults];
 }
 
 -(BOOL)dateIndexExists {

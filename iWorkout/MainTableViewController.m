@@ -21,6 +21,10 @@
 #import "SetupViewController.h"
 #import "ExerciseAdder.h"
 #import "ExerciseLister.h"
+#import "TrackerTableViewController.h"
+
+// TEMP
+#import "AutoLock.h"
 
 #define DebugMode 0
 
@@ -59,11 +63,16 @@
     }
     [customRefreshControl endRefreshing];
 }
--(void)showHelp {
+
+-(void)showTracker {
+    TrackerTableViewController *trackerTVC = [self.storyboard instantiateViewControllerWithIdentifier:@"TrackerTableViewController"];
+    [self.navigationController pushViewController:trackerTVC animated:true];
+    
+    /*
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Help" message:@"Tap a selected date to add your workouts\nTo refresh the page drag the table downwards\n\nTo Add or Edit your Exercises, \nOr to change the Date Format please tap Back and then tap the Settings icon." preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleDefault handler:nil];
     [alert addAction:dismiss];
-    [self presentViewController:alert animated:YES completion:nil];
+    [self presentViewController:alert animated:YES completion:nil];*/
 }
 -(UIBarButtonItem*)getSettingsIcon {
     UIBarButtonItem *settingsButton = [[UIBarButtonItem alloc] initWithTitle:@"\u2699" style:UIBarButtonItemStylePlain target:self action:@selector(showSettings)];
@@ -96,9 +105,11 @@
     self.tableView.contentInset = inset;
     [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
     
-    UIBarButtonItem *helpButton = [[UIBarButtonItem alloc] initWithTitle:@"?" style:UIBarButtonItemStyleDone target:self action:@selector(showHelp)];
+    //UIBarButtonItem *helpButton = [[UIBarButtonItem alloc] initWithTitle:@"?" style:UIBarButtonItemStyleDone target:self action:@selector(showHelp)];
+    UIBarButtonItem *trackerButton = [[UIBarButtonItem alloc] initWithTitle:@"Tracker" style:UIBarButtonItemStylePlain target:self action:@selector(showTracker)];
     
-    self.navigationItem.rightBarButtonItem = helpButton;
+    //self.navigationItem.rightBarButtonItem = helpButton;
+    self.navigationItem.rightBarButtonItem = trackerButton;
     self.navigationItem.leftBarButtonItem = [self getSettingsIcon];
     
     [self addRefreshControl];
@@ -180,16 +191,22 @@
         [self performSelector:@selector(delayConfirm) withObject:nil afterDelay:0.1]; // Added short delay to ensure DB has a lil time to load.
     }
     
+        // Check if any new exercises were added, if so create an entry for each date
         [self checkForNewExercises];
         [self refreshDate];
-        //[self addTempData];
-        /*
+        
+        
+        
+        // Adding temporary data for debug purposes.
+        // [self addTempData];
+        
+        // Ensure a date cleanup is processed once per launch. (Removing empty workout days)
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
             [self performCleanup];
-        });*/
+            [self refreshDate];
+        });
     }
-    
 }
 
 

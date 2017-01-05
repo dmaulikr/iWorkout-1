@@ -17,6 +17,12 @@
 		93354E5C1DB7C24F0068F194 /* Exercise+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = 93354E561DB7C24F0068F194 /* Exercise+CoreDataProperties.m */; };
 		93354E671DB7E60F0068F194 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 93FF90C71D7F0FFE00A1BBFC /* Model.xcdatamodeld */; };
 		9348650E1D80823D00860821 /* LastModified.m in Sources */ = {isa = PBXBuildFile; fileRef = 9348650D1D80823D00860821 /* LastModified.m */; };
+		936464C11E1D5CB7006A283C /* ChartsCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 936464C01E1D5CB7006A283C /* ChartsCreator.swift */; };
+		936464C81E1E96EA006A283C /* AutoLock.m in Sources */ = {isa = PBXBuildFile; fileRef = 936464C71E1E96EA006A283C /* AutoLock.m */; };
+		9373B9D21E109EB9001CF25D /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9373B9CD1E109E95001CF25D /* Charts.framework */; };
+		9373B9D31E109EB9001CF25D /* Charts.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9373B9CD1E109E95001CF25D /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		9373B9DA1E10A01E001CF25D /* ChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9373B9D91E10A01E001CF25D /* ChartViewController.swift */; };
+		9373B9DF1E10AAFD001CF25D /* TrackerTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9373B9DE1E10AAFD001CF25D /* TrackerTableViewController.m */; };
 		93843F171CA4F2EE009F1AEE /* SettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93843F161CA4F2EE009F1AEE /* SettingsTableViewController.m */; };
 		938DA3201C913B8B0060F8FD /* WorkoutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 938DA31F1C913B8B0060F8FD /* WorkoutViewController.m */; };
 		93D9C7FE1D95B8F0006384B6 /* ExerciseLister.m in Sources */ = {isa = PBXBuildFile; fileRef = 93D9C7FD1D95B8F0006384B6 /* ExerciseLister.m */; };
@@ -34,25 +40,78 @@
 		93F11FB71C84A51D009E6428 /* SetupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93F11FB61C84A51D009E6428 /* SetupViewController.m */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		9373B9CC1E109E95001CF25D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9373B9C61E109E94001CF25D /* Charts.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 06165F241D8110E600722320;
+			remoteInfo = Charts;
+		};
+		9373B9CE1E109E95001CF25D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9373B9C61E109E94001CF25D /* Charts.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 06B120D51D811E6200D14B02;
+			remoteInfo = ChartsRealm;
+		};
+		9373B9D01E109E95001CF25D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9373B9C61E109E94001CF25D /* Charts.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 06165F2E1D8110E600722320;
+			remoteInfo = ChartsTests;
+		};
+		9373B9D41E109EB9001CF25D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9373B9C61E109E94001CF25D /* Charts.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 06165F231D8110E600722320;
+			remoteInfo = Charts;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9373B9D61E109EB9001CF25D /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				9373B9D31E109EB9001CF25D /* Charts.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		93290D931C8BAF8000EBBAA1 /* MainTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainTableViewController.h; sourceTree = "<group>"; };
 		93290D941C8BAF8000EBBAA1 /* MainTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainTableViewController.m; sourceTree = "<group>"; };
 		93290D991C8BB39C00EBBAA1 /* CoreDataHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreDataHelper.h; sourceTree = "<group>"; };
 		93290D9A1C8BB39C00EBBAA1 /* CoreDataHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreDataHelper.m; sourceTree = "<group>"; };
-		93354E4B1DB7C24F0068F194 /* ExerciseList+CoreDataClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ExerciseList+CoreDataClass.h"; sourceTree = "<group>"; };
-		93354E4C1DB7C24F0068F194 /* ExerciseList+CoreDataClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ExerciseList+CoreDataClass.m"; sourceTree = "<group>"; };
-		93354E4D1DB7C24F0068F194 /* ExerciseList+CoreDataProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ExerciseList+CoreDataProperties.h"; sourceTree = "<group>"; };
-		93354E4E1DB7C24F0068F194 /* ExerciseList+CoreDataProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ExerciseList+CoreDataProperties.m"; sourceTree = "<group>"; };
-		93354E4F1DB7C24F0068F194 /* Date+CoreDataClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Date+CoreDataClass.h"; sourceTree = "<group>"; };
-		93354E501DB7C24F0068F194 /* Date+CoreDataClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Date+CoreDataClass.m"; sourceTree = "<group>"; };
-		93354E511DB7C24F0068F194 /* Date+CoreDataProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Date+CoreDataProperties.h"; sourceTree = "<group>"; };
-		93354E521DB7C24F0068F194 /* Date+CoreDataProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Date+CoreDataProperties.m"; sourceTree = "<group>"; };
-		93354E531DB7C24F0068F194 /* Exercise+CoreDataClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Exercise+CoreDataClass.h"; sourceTree = "<group>"; };
-		93354E541DB7C24F0068F194 /* Exercise+CoreDataClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Exercise+CoreDataClass.m"; sourceTree = "<group>"; };
-		93354E551DB7C24F0068F194 /* Exercise+CoreDataProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Exercise+CoreDataProperties.h"; sourceTree = "<group>"; };
-		93354E561DB7C24F0068F194 /* Exercise+CoreDataProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Exercise+CoreDataProperties.m"; sourceTree = "<group>"; };
+		93354E4B1DB7C24F0068F194 /* ExerciseList+CoreDataClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "ExerciseList+CoreDataClass.h"; path = "../ExerciseList+CoreDataClass.h"; sourceTree = "<group>"; };
+		93354E4C1DB7C24F0068F194 /* ExerciseList+CoreDataClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "ExerciseList+CoreDataClass.m"; path = "../ExerciseList+CoreDataClass.m"; sourceTree = "<group>"; };
+		93354E4D1DB7C24F0068F194 /* ExerciseList+CoreDataProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "ExerciseList+CoreDataProperties.h"; path = "../ExerciseList+CoreDataProperties.h"; sourceTree = "<group>"; };
+		93354E4E1DB7C24F0068F194 /* ExerciseList+CoreDataProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "ExerciseList+CoreDataProperties.m"; path = "../ExerciseList+CoreDataProperties.m"; sourceTree = "<group>"; };
+		93354E4F1DB7C24F0068F194 /* Date+CoreDataClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Date+CoreDataClass.h"; path = "../Date+CoreDataClass.h"; sourceTree = "<group>"; };
+		93354E501DB7C24F0068F194 /* Date+CoreDataClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "Date+CoreDataClass.m"; path = "../Date+CoreDataClass.m"; sourceTree = "<group>"; };
+		93354E511DB7C24F0068F194 /* Date+CoreDataProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Date+CoreDataProperties.h"; path = "../Date+CoreDataProperties.h"; sourceTree = "<group>"; };
+		93354E521DB7C24F0068F194 /* Date+CoreDataProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "Date+CoreDataProperties.m"; path = "../Date+CoreDataProperties.m"; sourceTree = "<group>"; };
+		93354E531DB7C24F0068F194 /* Exercise+CoreDataClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Exercise+CoreDataClass.h"; path = "../Exercise+CoreDataClass.h"; sourceTree = "<group>"; };
+		93354E541DB7C24F0068F194 /* Exercise+CoreDataClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "Exercise+CoreDataClass.m"; path = "../Exercise+CoreDataClass.m"; sourceTree = "<group>"; };
+		93354E551DB7C24F0068F194 /* Exercise+CoreDataProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Exercise+CoreDataProperties.h"; path = "../Exercise+CoreDataProperties.h"; sourceTree = "<group>"; };
+		93354E561DB7C24F0068F194 /* Exercise+CoreDataProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "Exercise+CoreDataProperties.m"; path = "../Exercise+CoreDataProperties.m"; sourceTree = "<group>"; };
 		9348650C1D80823C00860821 /* LastModified.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LastModified.h; sourceTree = "<group>"; };
 		9348650D1D80823D00860821 /* LastModified.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LastModified.m; sourceTree = "<group>"; };
+		936464C01E1D5CB7006A283C /* ChartsCreator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartsCreator.swift; sourceTree = "<group>"; };
+		936464C61E1E96EA006A283C /* AutoLock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoLock.h; sourceTree = "<group>"; };
+		936464C71E1E96EA006A283C /* AutoLock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AutoLock.m; sourceTree = "<group>"; };
+		9373B9C61E109E94001CF25D /* Charts.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Charts.xcodeproj; path = "../../../Downloads/Charts-master/Charts.xcodeproj"; sourceTree = "<group>"; };
+		9373B9D81E10A01D001CF25D /* iWorkout-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iWorkout-Bridging-Header.h"; sourceTree = "<group>"; };
+		9373B9D91E10A01E001CF25D /* ChartViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartViewController.swift; sourceTree = "<group>"; };
+		9373B9DD1E10AAFD001CF25D /* TrackerTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrackerTableViewController.h; sourceTree = "<group>"; };
+		9373B9DE1E10AAFD001CF25D /* TrackerTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrackerTableViewController.m; sourceTree = "<group>"; };
 		93843F151CA4F2EE009F1AEE /* SettingsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsTableViewController.h; sourceTree = "<group>"; };
 		93843F161CA4F2EE009F1AEE /* SettingsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsTableViewController.m; sourceTree = "<group>"; };
 		938DA31E1C913B8B0060F8FD /* WorkoutViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorkoutViewController.h; sourceTree = "<group>"; };
@@ -87,6 +146,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9373B9D21E109EB9001CF25D /* Charts.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,6 +160,44 @@
 				93290D9A1C8BB39C00EBBAA1 /* CoreDataHelper.m */,
 			);
 			name = "Core Data Helpers";
+			sourceTree = "<group>";
+		};
+		9373B9B91E109DFF001CF25D /* Core Data Classes */ = {
+			isa = PBXGroup;
+			children = (
+				93354E4B1DB7C24F0068F194 /* ExerciseList+CoreDataClass.h */,
+				93354E4C1DB7C24F0068F194 /* ExerciseList+CoreDataClass.m */,
+				93354E4D1DB7C24F0068F194 /* ExerciseList+CoreDataProperties.h */,
+				93354E4E1DB7C24F0068F194 /* ExerciseList+CoreDataProperties.m */,
+				93354E4F1DB7C24F0068F194 /* Date+CoreDataClass.h */,
+				93354E501DB7C24F0068F194 /* Date+CoreDataClass.m */,
+				93354E511DB7C24F0068F194 /* Date+CoreDataProperties.h */,
+				93354E521DB7C24F0068F194 /* Date+CoreDataProperties.m */,
+				93354E531DB7C24F0068F194 /* Exercise+CoreDataClass.h */,
+				93354E541DB7C24F0068F194 /* Exercise+CoreDataClass.m */,
+				93354E551DB7C24F0068F194 /* Exercise+CoreDataProperties.h */,
+				93354E561DB7C24F0068F194 /* Exercise+CoreDataProperties.m */,
+			);
+			name = "Core Data Classes";
+			sourceTree = "<group>";
+		};
+		9373B9C71E109E94001CF25D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9373B9CD1E109E95001CF25D /* Charts.framework */,
+				9373B9CF1E109E95001CF25D /* ChartsRealm.framework */,
+				9373B9D11E109E95001CF25D /* ChartsTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9373B9D71E109F77001CF25D /* BarChart */ = {
+			isa = PBXGroup;
+			children = (
+				9373B9D91E10A01E001CF25D /* ChartViewController.swift */,
+				9373B9D81E10A01D001CF25D /* iWorkout-Bridging-Header.h */,
+			);
+			name = BarChart;
 			sourceTree = "<group>";
 		};
 		93843F181CA5258D009F1AEE /* images */ = {
@@ -122,6 +220,8 @@
 				938DA31F1C913B8B0060F8FD /* WorkoutViewController.m */,
 				93843F151CA4F2EE009F1AEE /* SettingsTableViewController.h */,
 				93843F161CA4F2EE009F1AEE /* SettingsTableViewController.m */,
+				9373B9DD1E10AAFD001CF25D /* TrackerTableViewController.h */,
+				9373B9DE1E10AAFD001CF25D /* TrackerTableViewController.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -141,6 +241,9 @@
 				93D9C7FD1D95B8F0006384B6 /* ExerciseLister.m */,
 				93D9C7FF1D96E437006384B6 /* ExerciseAdder.h */,
 				93D9C8001D96E437006384B6 /* ExerciseAdder.m */,
+				936464C01E1D5CB7006A283C /* ChartsCreator.swift */,
+				936464C61E1E96EA006A283C /* AutoLock.h */,
+				936464C71E1E96EA006A283C /* AutoLock.m */,
 			);
 			name = "Custom Classes";
 			sourceTree = "<group>";
@@ -148,18 +251,6 @@
 		93F11F921C84A127009E6428 = {
 			isa = PBXGroup;
 			children = (
-				93354E4B1DB7C24F0068F194 /* ExerciseList+CoreDataClass.h */,
-				93354E4C1DB7C24F0068F194 /* ExerciseList+CoreDataClass.m */,
-				93354E4D1DB7C24F0068F194 /* ExerciseList+CoreDataProperties.h */,
-				93354E4E1DB7C24F0068F194 /* ExerciseList+CoreDataProperties.m */,
-				93354E4F1DB7C24F0068F194 /* Date+CoreDataClass.h */,
-				93354E501DB7C24F0068F194 /* Date+CoreDataClass.m */,
-				93354E511DB7C24F0068F194 /* Date+CoreDataProperties.h */,
-				93354E521DB7C24F0068F194 /* Date+CoreDataProperties.m */,
-				93354E531DB7C24F0068F194 /* Exercise+CoreDataClass.h */,
-				93354E541DB7C24F0068F194 /* Exercise+CoreDataClass.m */,
-				93354E551DB7C24F0068F194 /* Exercise+CoreDataProperties.h */,
-				93354E561DB7C24F0068F194 /* Exercise+CoreDataProperties.m */,
 				93F11F9D1C84A127009E6428 /* iWorkout */,
 				93F11F9C1C84A127009E6428 /* Products */,
 			);
@@ -176,6 +267,9 @@
 		93F11F9D1C84A127009E6428 /* iWorkout */ = {
 			isa = PBXGroup;
 			children = (
+				9373B9D71E109F77001CF25D /* BarChart */,
+				9373B9C61E109E94001CF25D /* Charts.xcodeproj */,
+				9373B9B91E109DFF001CF25D /* Core Data Classes */,
 				93FF90C61D7F0FEC00A1BBFC /* Core Data Models */,
 				93E7ED1B1CFF1C53008CB16D /* Custom Classes */,
 				93DECD8D1CEE4FF7002128F3 /* ViewControllers */,
@@ -218,10 +312,12 @@
 				93F11F971C84A127009E6428 /* Sources */,
 				93F11F981C84A127009E6428 /* Frameworks */,
 				93F11F991C84A127009E6428 /* Resources */,
+				9373B9D61E109EB9001CF25D /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				9373B9D51E109EB9001CF25D /* PBXTargetDependency */,
 			);
 			name = iWorkout;
 			productName = iWorkout;
@@ -240,6 +336,7 @@
 					93F11F9A1C84A127009E6428 = {
 						CreatedOnToolsVersion = 7.2.1;
 						DevelopmentTeam = S7WE6HW865;
+						LastSwiftMigration = 0810;
 					};
 				};
 			};
@@ -254,12 +351,42 @@
 			mainGroup = 93F11F921C84A127009E6428;
 			productRefGroup = 93F11F9C1C84A127009E6428 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 9373B9C71E109E94001CF25D /* Products */;
+					ProjectRef = 9373B9C61E109E94001CF25D /* Charts.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				93F11F9A1C84A127009E6428 /* iWorkout */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		9373B9CD1E109E95001CF25D /* Charts.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Charts.framework;
+			remoteRef = 9373B9CC1E109E95001CF25D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		9373B9CF1E109E95001CF25D /* ChartsRealm.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = ChartsRealm.framework;
+			remoteRef = 9373B9CE1E109E95001CF25D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		9373B9D11E109E95001CF25D /* ChartsTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = ChartsTests.xctest;
+			remoteRef = 9373B9D01E109E95001CF25D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		93F11F991C84A127009E6428 /* Resources */ = {
@@ -285,8 +412,10 @@
 				93290D9B1C8BB39C00EBBAA1 /* CoreDataHelper.m in Sources */,
 				93354E571DB7C24F0068F194 /* ExerciseList+CoreDataClass.m in Sources */,
 				93F11FB71C84A51D009E6428 /* SetupViewController.m in Sources */,
+				9373B9DF1E10AAFD001CF25D /* TrackerTableViewController.m in Sources */,
 				93E7ED201CFF1C60008CB16D /* DateChecker.m in Sources */,
 				93354E591DB7C24F0068F194 /* Date+CoreDataClass.m in Sources */,
+				936464C81E1E96EA006A283C /* AutoLock.m in Sources */,
 				93843F171CA4F2EE009F1AEE /* SettingsTableViewController.m in Sources */,
 				93D9C8011D96E437006384B6 /* ExerciseAdder.m in Sources */,
 				93354E581DB7C24F0068F194 /* ExerciseList+CoreDataProperties.m in Sources */,
@@ -298,13 +427,23 @@
 				93F11FA31C84A127009E6428 /* AppDelegate.m in Sources */,
 				93290D951C8BAF8000EBBAA1 /* MainTableViewController.m in Sources */,
 				93F11FA01C84A127009E6428 /* main.m in Sources */,
+				9373B9DA1E10A01E001CF25D /* ChartViewController.swift in Sources */,
 				93354E5A1DB7C24F0068F194 /* Date+CoreDataProperties.m in Sources */,
 				93D9C7FE1D95B8F0006384B6 /* ExerciseLister.m in Sources */,
 				93E98D5F1D95940C00222FCB /* CleanupClass.m in Sources */,
+				936464C11E1D5CB7006A283C /* ChartsCreator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		9373B9D51E109EB9001CF25D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Charts;
+			targetProxy = 9373B9D41E109EB9001CF25D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		93F11FA71C84A127009E6428 /* Main.storyboard */ = {
@@ -353,7 +492,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -368,6 +507,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -397,7 +537,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -407,6 +547,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -414,28 +555,38 @@
 		93F11FB31C84A127009E6428 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = S7WE6HW865;
 				INFOPLIST_FILE = iWorkout/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = AlwaysHustlin.iWorkout;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "iWorkout/iWorkout-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
 		93F11FB41C84A127009E6428 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = S7WE6HW865;
 				INFOPLIST_FILE = iWorkout/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = AlwaysHustlin.iWorkout;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "iWorkout/iWorkout-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

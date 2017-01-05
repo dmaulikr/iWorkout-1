@@ -9,6 +9,9 @@
 #import "AppDelegate.h"
 #import "DateChecker.h"
 #import "Date+CoreDataClass.h"
+#import "Exercise+CoreDataClass.h"
+#import "DateFormat.h"
+#import "AutoLock.h"
 
 #define DebugMode 1
 
@@ -19,7 +22,6 @@
 @implementation AppDelegate
 {
     NSString *applicationDocDir;
-    BOOL autoLockSetting;
 }
 
 
@@ -45,128 +47,7 @@
     }
     return _coreDataHelper;
 }
-+(NSArray*)getWorkouts {
-    NSMutableArray *workouts = [NSMutableArray new];
-    
-    NSString *appDocDir = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *setupPath = [appDocDir stringByAppendingPathComponent:@"Setup.plist"];
-    
-    if ([[NSFileManager defaultManager] fileExistsAtPath:setupPath]) {
-        /// run these statements
-        
-        NSArray *setupData = [NSArray arrayWithContentsOfFile:setupPath];
-        [setupData enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            [workouts addObject:[NSString stringWithFormat:@"%@", [obj valueForKey:@"WorkoutName"]]];
-        }];
-        
-    } else {
-        if(DebugMode) {
-            NSLog(@"ERROR: Setup file not found.");
-        }
-        exit(0);
-    }
-    return [workouts copy];
-}
-+(NSArray*)getUnits {
-    NSMutableArray *units = [NSMutableArray new];
-    
-    NSString *appDocDir = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *setupPath = [appDocDir stringByAppendingPathComponent:@"Setup.plist"];
-    
-    if ([[NSFileManager defaultManager] fileExistsAtPath:setupPath]) {
-        /// run these statements
-        
-        NSArray *setupData = [NSArray arrayWithContentsOfFile:setupPath];
-        [setupData enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            [units addObject:[NSString stringWithFormat:@"%@", [obj valueForKey:@"UnitOfMeasurement"]]];
-        }];
-        
-    } else {
-        if(DebugMode) {
-            NSLog(@"ERROR: Setup file not found.");
-        }
-        exit(0);
-    }
-    return [units copy];
-}
 
-
-+(NSManagedObjectModel*)getModel {
-    if(![self isSetupComplete]) {
-        if(DebugMode) {
-            NSLog(@"ERROR! No data found!");
-        }
-        return nil;
-    }
-    NSString *applicationDocDir = (NSString*)[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *setupPath = [applicationDocDir stringByAppendingPathComponent:@"Setup.plist"];
-    
-    NSManagedObjectModel *model = [[NSManagedObjectModel alloc] init];
-        
-    NSEntityDescription *entity = [[NSEntityDescription alloc] init];
-        
-    [entity setName:@"Workout"];
-    [entity setManagedObjectClassName:@"Workout"];
-        
-    NSMutableArray *properties = [NSMutableArray new];
-    
-    NSAttributeDescription *dateAtt = [[NSAttributeDescription alloc] init];
-    [dateAtt setName:@"Date"];
-    [dateAtt setAttributeType:NSDateAttributeType];
-    [dateAtt setOptional:NO];
-    [properties addObject:dateAtt];
-    
-    /* New feature - 'lastModified' attribute */
-    NSAttributeDescription *lastMod = [[NSAttributeDescription alloc] init];
-    [lastMod setName:@"LastModified"];
-    [lastMod setAttributeType:NSDateAttributeType];
-    [lastMod setOptional:YES];
-    [properties addObject:lastMod];
-    
-    NSArray *retrievedData = [[NSArray alloc] initWithContentsOfFile:setupPath];
-    if(retrievedData) {
-        [retrievedData enumerateObjectsUsingBlock:^(NSDictionary *obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSString *name = [obj valueForKey:@"WorkoutName"];
-            NSString *unit = [obj valueForKey:@"UnitOfMeasurement"];
-            
-            NSAttributeDescription *attribute = [[NSAttributeDescription alloc] init];
-            [attribute setName:name];
-            [attribute setAttributeType:[self getAttributeType:unit]];
-            [attribute setOptional:YES];
-            [attribute setDefaultValue:@0];
-            [properties addObject:attribute];
-            
-            
-            /* New
-            NSAttributeDescription *unitAtt = [[NSAttributeDescription alloc] init];
-            [unitAtt setName:@"Unit"];
-            [unitAtt setAttributeType:[self getAttributeType:unit]];
-            [unitAtt setOptional:YES];
-            [properties addObject:unitAtt];
-             */
-            
-        }];
-        
-    }
-    
-    [entity setProperties:properties];
-   
-    [model setEntities:[NSArray arrayWithObject:entity]];
-    return model;
-    
-}
-+(NSAttributeType)getAttributeType:(NSString*)infoD {
-    if([infoD isEqualToString:@"Reps"]) {
-        return NSInteger16AttributeType;
-    } else if([infoD isEqualToString:@"Mins"] || [infoD isEqualToString:@"Km"] || [infoD isEqualToString:@"Miles"]) {
-        return NSDoubleAttributeType;
-        //return NSFloatAttributeType;
-    }
-    if(DebugMode) {
-        NSLog(@"ERROR!! Unable to match attribute!");
-    }
-    return NAN;
-}
 +(BOOL)isSetupComplete {
     // Check if MODEL data exists, if yes: return yes
     // else return NO
@@ -187,33 +68,46 @@
     return NO;
 }
 
--(void)setAutoLock:(BOOL)lockSet {
-    autoLockSetting = lockSet;
-    if(lockSet) {
-        [self switchLock:YES];
-    } else {
-        [self switchLock:NO];
+-(NSDictionary*)fetchLastTenExercisesForExerciseName:(NSString*)exerciseName {
+    NSMutableDictionary *mutableDictionary = [[NSMutableDictionary alloc] init];
+    NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Date"];
+    fetchRequest.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"date" ascending:NO]];
+    [fetchRequest setFetchLimit:10];
+    
+    NSError *error;
+    
+    NSArray *fetchedObjects = [self.cdh.context executeFetchRequest:fetchRequest error:&error];
+    
+    if(!fetchedObjects) {
+        NSLog(@"Error: No fetched objects");
+        return (NSDictionary*)nil;
     }
-}
--(void)switchLock:(BOOL)lockSetting {
-    if(lockSetting) {
-        [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
-        if(DebugMode) {
-            NSLog(@"Idle timer DISABLED to prevent iPhone from locking.");
-        }
-    } else {
-        [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
-        if(DebugMode) {
-            NSLog(@"Idle timer returned to natural state.");
-        }
+    if(error) {
+        NSLog(@"Error: %@", error.localizedDescription);
+        return (NSDictionary*)nil;
     }
+    
+    for(Date *object in fetchedObjects) {
+        [object.exercise enumerateObjectsUsingBlock:^(Exercise * _Nonnull obj, BOOL * _Nonnull stop) {
+            if([exerciseName isEqualToString:obj.name]) {
+                NSString *stringOfDate = [DateFormat dateToString:object.date];
+                NSLog(@"%@: %@", stringOfDate, obj.count);
+                
+                [mutableDictionary setValue:obj.count forKey:stringOfDate];
+            }
+        }];
+    }
+    return [mutableDictionary copy];
 }
+
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    if(autoLockSetting) {
-        [self setAutoLock:YES];
+    if([AutoLock readUserDefaults]) {
+        [AutoLock preventAutoLock:true];
     }
+    
+    
     return YES;
 }
 
@@ -221,14 +115,17 @@
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
-    if(autoLockSetting) {
-        [self setAutoLock:NO];
+    if([AutoLock getStatus]) {
+        [AutoLock temporarySwitchOff];
     }
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+    if([AutoLock getStatus]) {
+        [AutoLock temporarySwitchOff];
+    }
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
@@ -238,6 +135,9 @@
     /*
      * Add function that checks latest database entry to ensure that latest date is created.
      */
+    if([AutoLock readUserDefaults]) {
+        [AutoLock switchOn];
+    }
    
     if([self checkIfTodayExists]) {
         if(DebugMode) {
@@ -279,9 +179,7 @@
     return NO;
 }
 -(void)addTodayEntry {
-    //NSManagedObject *newObject = [NSEntityDescription insertNewObjectForEntityForName:@"Workout" inManagedObjectContext:_coreDataHelper.context];
     Date *newObject = [NSEntityDescription insertNewObjectForEntityForName:@"Date" inManagedObjectContext:_coreDataHelper.context];
-    //[newObject setValue:[NSDate date] forKey:@"Date"];
     [newObject setDate:[NSDate date]];
     NSLog(@"Added %@ as a new date object.", [NSDate date]);
     [_coreDataHelper backgroundSaveContext];
@@ -292,11 +190,8 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-    if(autoLockSetting) {
-        [self switchLock:YES];
-        if(DebugMode) {
-            NSLog(@"Idle timer is DISABLED.");
-        }
+    if([AutoLock readUserDefaults]) {
+        [AutoLock preventAutoLock:true];
     }
 }
 

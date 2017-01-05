@@ -36,14 +36,13 @@
         
         [allObjects enumerateObjectsUsingBlock:^(Date  *_Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             if([todayDate isEqualToString:[dateFormat stringFromDate:obj.date]]) {
-                NSLog(@"Skipped %@ as it's today", todayDate);
+                //NSLog(@"Skipped %@ as it's today", todayDate);
             } else {
-                //NSLog(@"Date %@ =", [dateFormat stringFromDate:obj.date]);
                 if([self hasEmptyData:obj]) {
-                    NSLog(@"Date (%@) IS EMPTY", [dateFormat stringFromDate:obj.date]);
+                    //NSLog(@"Date (%@) IS EMPTY", [dateFormat stringFromDate:obj.date]);
                     [_context deleteObject:obj];
                 } else {
-                    NSLog(@"Is not empty");
+                    //NSLog(@"Is not empty");
                 }
                 
             }
@@ -55,11 +54,11 @@
 }
 -(BOOL)hasEmptyData:(Date*)dateObject {
     __block int objCount = 0, nilCount = 0;
-    NSLog(@"objCount = %i", objCount);
+    //NSLog(@"objCount = %i", objCount);
     
     [dateObject.exercise enumerateObjectsUsingBlock:^(Exercise * _Nonnull obj, BOOL * _Nonnull stop) {
         BOOL isDouble = [obj.isDouble boolValue];
-        NSLog(@"Exercise %@ = %f", obj.name, isDouble ? [obj.count doubleValue] : [obj.count intValue]);
+        //NSLog(@"Exercise %@ = %f", obj.name, isDouble ? [obj.count doubleValue] : [obj.count intValue]);
         objCount++;
         if(isDouble) {
             if([obj.count doubleValue] == 0.0) {
@@ -73,7 +72,7 @@
             }
         }
     }];
-    NSLog(@"Count (%i) vs nilCount (%i)", objCount, nilCount);
+    //NSLog(@"Count (%i) vs nilCount (%i)", objCount, nilCount);
     if(objCount == nilCount) {
         return YES;
     }
