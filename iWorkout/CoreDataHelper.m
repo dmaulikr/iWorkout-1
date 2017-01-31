@@ -13,7 +13,7 @@
 
 @implementation CoreDataHelper
 
-#define debugging 1
+#define debugging 0
 
 #pragma mark - FILES
 NSString *storeFilename = @"iWorkout.sqlite";

@@ -49,9 +49,21 @@
 -(void)viewBarChartWithTitle:(NSString*)title {
     
     ChartViewController *chartVC = [self.storyboard instantiateViewControllerWithIdentifier:@"ChartViewController"];
+    
+    
+    if(![chartVC isDataEmptyWithName:title]) {
     chartVC.navigationItem.title = title;
     [chartVC setTrackerTitle:title];
     [self.navigationController pushViewController:chartVC animated:true];
+    } else {
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"No data" message:@"Insufficient data for selected workout to load graph." preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDestructive handler:nil]];
+        [self presentViewController:alert animated:true completion:nil];
+        chartVC = nil;
+        
+    }
+    
+    
 }
 -(void)fetchExercises {
     AppDelegate *appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;

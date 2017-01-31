@@ -123,6 +123,13 @@ import Charts
     func savedImage() {
         print("Saved Image!")
     }
+    func isDataEmpty(name: String) -> Bool {
+        let chartsCreator:ChartsCreator = ChartsCreator(withExerciseName: name)
+        let _ = chartsCreator.fetchLastTenExercises() as [Double]
+
+        return chartsCreator.checkIfDataIsEmpty()
+        
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -142,6 +149,8 @@ import Charts
             if(chartsCreator.checkIfDataIsEmpty()) {
                 // Not enough data to draw chart
                 showInsufficientData()
+                print("Showing insufficient data!")
+                self.dismiss(animated: true, completion: nil)
             } else {
                 // Show welcome
                 showWelcome(withValues: unitsPerformed)

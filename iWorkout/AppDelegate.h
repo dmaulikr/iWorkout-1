@@ -21,7 +21,6 @@
 +(NSString*)getPath;
 
 -(BOOL)checkIfTodayExists;
--(void)setAutoLock:(BOOL)lockSet;
 +(BOOL)isFirstTimeSetupComplete;
 
 -(NSDictionary*)fetchLastTenExercisesForExerciseName:(NSString*)exerciseName;

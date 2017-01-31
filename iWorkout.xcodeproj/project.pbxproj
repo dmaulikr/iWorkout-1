@@ -19,12 +19,13 @@
 		9348650E1D80823D00860821 /* LastModified.m in Sources */ = {isa = PBXBuildFile; fileRef = 9348650D1D80823D00860821 /* LastModified.m */; };
 		936464C11E1D5CB7006A283C /* ChartsCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 936464C01E1D5CB7006A283C /* ChartsCreator.swift */; };
 		936464C81E1E96EA006A283C /* AutoLock.m in Sources */ = {isa = PBXBuildFile; fileRef = 936464C71E1E96EA006A283C /* AutoLock.m */; };
-		9373B9D21E109EB9001CF25D /* ReferenceProxy in Frameworks */ = {isa = PBXBuildFile; fileRef = 9373B9CD1E109E95001CF25D /* Charts.framework */; };
-		9373B9D31E109EB9001CF25D /* ReferenceProxy in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9373B9CD1E109E95001CF25D /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		9373B9D21E109EB9001CF25D /* Charts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9373B9CD1E109E95001CF25D /* Charts.framework */; };
+		9373B9D31E109EB9001CF25D /* Charts.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9373B9CD1E109E95001CF25D /* Charts.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		9373B9DA1E10A01E001CF25D /* ChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9373B9D91E10A01E001CF25D /* ChartViewController.swift */; };
 		9373B9DF1E10AAFD001CF25D /* TrackerTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9373B9DE1E10AAFD001CF25D /* TrackerTableViewController.m */; };
 		93843F171CA4F2EE009F1AEE /* SettingsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 93843F161CA4F2EE009F1AEE /* SettingsTableViewController.m */; };
 		938DA3201C913B8B0060F8FD /* WorkoutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 938DA31F1C913B8B0060F8FD /* WorkoutViewController.m */; };
+		93B98C681E412059009648E2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 93B98C671E412059009648E2 /* GoogleService-Info.plist */; };
 		93D9C7FE1D95B8F0006384B6 /* ExerciseLister.m in Sources */ = {isa = PBXBuildFile; fileRef = 93D9C7FD1D95B8F0006384B6 /* ExerciseLister.m */; };
 		93D9C8011D96E437006384B6 /* ExerciseAdder.m in Sources */ = {isa = PBXBuildFile; fileRef = 93D9C8001D96E437006384B6 /* ExerciseAdder.m */; };
 		93DECD8B1CEE41F1002128F3 /* new_greenbutton.png in Resources */ = {isa = PBXBuildFile; fileRef = 93DECD891CEE41F1002128F3 /* new_greenbutton.png */; };
@@ -79,7 +80,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				9373B9D31E109EB9001CF25D /* ReferenceProxy in Embed Frameworks */,
+				9373B9D31E109EB9001CF25D /* Charts.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -118,6 +119,7 @@
 		93843F161CA4F2EE009F1AEE /* SettingsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsTableViewController.m; sourceTree = "<group>"; };
 		938DA31E1C913B8B0060F8FD /* WorkoutViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorkoutViewController.h; sourceTree = "<group>"; };
 		938DA31F1C913B8B0060F8FD /* WorkoutViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WorkoutViewController.m; sourceTree = "<group>"; };
+		93B98C671E412059009648E2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		93D9C7FC1D95B8F0006384B6 /* ExerciseLister.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExerciseLister.h; sourceTree = "<group>"; };
 		93D9C7FD1D95B8F0006384B6 /* ExerciseLister.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExerciseLister.m; sourceTree = "<group>"; };
 		93D9C7FF1D96E437006384B6 /* ExerciseAdder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExerciseAdder.h; sourceTree = "<group>"; };
@@ -150,7 +152,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9373B9D21E109EB9001CF25D /* ReferenceProxy in Frameworks */,
+				9373B9D21E109EB9001CF25D /* Charts.framework in Frameworks */,
 				98FB4153C3F4D020A02A0E44 /* libPods-iWorkout.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -283,6 +285,7 @@
 		93F11F9D1C84A127009E6428 /* iWorkout */ = {
 			isa = PBXGroup;
 			children = (
+				93B98C671E412059009648E2 /* GoogleService-Info.plist */,
 				9373B9D71E109F77001CF25D /* BarChart */,
 				9373B9C61E109E94001CF25D /* Charts.xcodeproj */,
 				9373B9B91E109DFF001CF25D /* Core Data Classes */,
@@ -357,7 +360,7 @@
 		93F11F931C84A127009E6428 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0800;
+				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = "Dayan Yonnatan";
 				TargetAttributes = {
 					93F11F9A1C84A127009E6428 = {
@@ -425,6 +428,7 @@
 				93DECD8C1CEE41F1002128F3 /* new_redbutton.png in Resources */,
 				93F11FAB1C84A127009E6428 /* Assets.xcassets in Resources */,
 				93F11FA91C84A127009E6428 /* Main.storyboard in Resources */,
+				93B98C681E412059009648E2 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -622,7 +626,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -662,7 +666,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = AlwaysHustlin.iWorkout;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "iWorkout/iWorkout-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;

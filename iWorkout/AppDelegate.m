@@ -19,10 +19,13 @@
 
 @end
 
+@import GoogleMobileAds;
+
 @implementation AppDelegate
 {
     NSString *applicationDocDir;
 }
+
 
 
 +(NSString*)getPath {
@@ -91,7 +94,7 @@
         [object.exercise enumerateObjectsUsingBlock:^(Exercise * _Nonnull obj, BOOL * _Nonnull stop) {
             if([exerciseName isEqualToString:obj.name]) {
                 NSString *stringOfDate = [DateFormat dateToString:object.date];
-                NSLog(@"%@: %@", stringOfDate, obj.count);
+                //NSLog(@"%@: %@", stringOfDate, obj.count);
                 
                 [mutableDictionary setValue:obj.count forKey:stringOfDate];
             }
@@ -106,6 +109,8 @@
     if([AutoLock readUserDefaults]) {
         [AutoLock preventAutoLock:true];
     }
+    [GADMobileAds configureWithApplicationID:@"ca-app-pub-5032455353218069/2267987875"];
+
     
     
     return YES;

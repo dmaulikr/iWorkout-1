@@ -9,10 +9,17 @@
 #import <UIKit/UIKit.h>
 #import <CoreData/CoreData.h>
 
-@interface MainTableViewController : UITableViewController
+@import GoogleMobileAds;
+
+@interface MainTableViewController : UIViewController
 
 // FetchedResultsController
 @property (nonatomic, strong) NSFetchedResultsController *frc;
 //@property (nonatomic, strong) NSDateFormatter *dateformatter;
+
+// New
+@property (nonatomic, strong) IBOutlet UITableView *tableView;
+
+@property (strong, nonatomic) IBOutlet GADBannerView *bannerView;
 
 @end

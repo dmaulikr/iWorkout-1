@@ -38,8 +38,11 @@
 }
 
 
-// TESTING REFRESH CONTROL
-
+-(void)loadGoogleAds {
+    self.bannerView.adUnitID = @"ca-app-pub-5032455353218069/2267987875";
+    self.bannerView.rootViewController = self;
+    [self.bannerView loadRequest:[GADRequest request]];
+}
 -(void)addRefreshControl {
     customRefreshControl = [[UIRefreshControl alloc] init];
     
@@ -155,6 +158,7 @@
     [super viewDidLoad];
     
     [self setupView];
+    [self loadGoogleAds];
 }
 -(void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
