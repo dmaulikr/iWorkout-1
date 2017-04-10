@@ -112,20 +112,11 @@ import Charts
     func setTrackerTitle(title:String) {
         self.trackerTitle = title
     }
-    func createRightBarButtonItem() -> UIBarButtonItem {
-        let barbuttonItem = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(saveBarChartToCameraRoll))
-        return barbuttonItem
-    }
-    func saveBarChartToCameraRoll() {
-        //let image:UIImage = lineChartView.getChartImage(transparent: false)! as UIImage
-        UIImageWriteToSavedPhotosAlbum(lineChartView.getChartImage(transparent: false)!, nil, nil, nil)
-    }
-    func savedImage() {
-        print("Saved Image!")
-    }
+
     func isDataEmpty(name: String) -> Bool {
         let chartsCreator:ChartsCreator = ChartsCreator(withExerciseName: name)
-        let _ = chartsCreator.fetchLastTenExercises() as [Double]
+        let _ = chartsCreator.fetchLastTenExercises() 
+        
 
         return chartsCreator.checkIfDataIsEmpty()
         
@@ -134,12 +125,12 @@ import Charts
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.navigationItem.rightBarButtonItem = createRightBarButtonItem()
         
         if let title = self.trackerTitle {
             
             let chartsCreator:ChartsCreator = ChartsCreator(withExerciseName: title)
-            let unitsPerformed = chartsCreator.fetchLastTenExercises() as [Double]
+            //let unitsPerformed = chartsCreator.fetchLastTenExercises() as [Double]
+            let unitsPerformed = chartsCreator.fetchLastTenExercises() as! [Double]
             
             days = chartsCreator.retrieveDatesAsStrings()
             lineChartView.delegate = self
